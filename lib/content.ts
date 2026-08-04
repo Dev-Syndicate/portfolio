@@ -1,0 +1,409 @@
+/**
+ * Single source of truth for site copy.
+ *
+ * Everything here is grounded in one of the two source documents:
+ *   - `docs/website-content-part1.md` (brand, hero, trust, services, tech)
+ *   - `docs/website-prd-part1.md` (design principles, performance targets,
+ *     accessibility standards, information architecture)
+ *
+ * Deliberately absent: client names, testimonials, case-study results,
+ * project counts, delivery timelines, and prices. None of those exist in the
+ * source documents, and inventing them would put unverifiable claims in front
+ * of prospects. Sections that would normally carry social proof instead lean
+ * on standards the studio actually commits to and can be held to.
+ */
+
+export const site = {
+  name: "Dev Syndicate",
+  /* PRD-COPY — Brand Promise */
+  promise:
+    "We don't just build websites—we build digital experiences that help businesses establish credibility, attract customers, and scale confidently.",
+  email: "hello@devsyndicate.com",
+  url: "https://devsyndicate.com",
+} as const;
+
+export const nav = [
+  { href: "/", label: "Home" },
+  { href: "/about", label: "About" },
+  { href: "/services", label: "Services" },
+  { href: "/insights", label: "Insights" },
+  { href: "/contact", label: "Contact" },
+] as const;
+
+/* -------------------------------------------------------------------------- */
+/* Hero — PRD-COPY                                                            */
+/* -------------------------------------------------------------------------- */
+
+export const hero = {
+  eyebrow: "Web engineering studio",
+  /* Split for the word-stagger animation the PRD specifies. */
+  headline: "Building Digital Experiences That Help Businesses Grow.",
+  /* Words rendered in gradient within the headline stagger. */
+  headlineAccentFrom: 5,
+  supporting:
+    "Your website is often the first impression customers have of your business. We create high-performance websites that combine thoughtful design, modern technology, and seamless user experiences to help you build trust, generate leads, and support long-term growth.",
+  primaryCta: { label: "Start Your Project", href: "/contact" },
+  secondaryCta: { label: "Explore Our Process", href: "#process" },
+} as const;
+
+/* -------------------------------------------------------------------------- */
+/* Trust — PRD-COPY                                                           */
+/* -------------------------------------------------------------------------- */
+
+export const trust = {
+  heading: "Built Around Business Outcomes",
+  intro:
+    "Every decision we make is driven by the impact it creates for your business.",
+  points: [
+    {
+      icon: "gauge",
+      title: "Faster websites",
+      body: "Performance budgets and edge delivery keep pages quick, which improves user experience and keeps visitors engaged.",
+    },
+    {
+      icon: "layers",
+      title: "Scalable architecture",
+      body: "Systems designed to grow with your company, so a good quarter never becomes an engineering emergency.",
+    },
+    {
+      icon: "search",
+      title: "SEO-ready foundations",
+      body: "Semantic markup, structured data, and server rendering that improve discoverability from day one.",
+    },
+    {
+      icon: "shield",
+      title: "Secure and maintainable",
+      body: "Typed, tested, reviewed codebases that the next developer — ours or yours — can pick up without friction.",
+    },
+    {
+      icon: "smartphone",
+      title: "Responsive everywhere",
+      body: "Experiences that hold their shape across every device, from a 320px phone to an ultrawide display.",
+    },
+  ],
+} as const;
+
+/* -------------------------------------------------------------------------- */
+/* Services — PRD-COPY (Website Development) + DRAFT-COPY (remaining)         */
+/* -------------------------------------------------------------------------- */
+
+export const services = {
+  heading: "What We Build",
+  intro:
+    "Focused engagements that turn a business goal into shipped, measurable software.",
+
+  /* The home page shows `summary` only and links here for `body` plus the
+     benefits. Each summary is a condensation of the body below it, not a new
+     claim — so the two pages never print the same paragraph twice. */
+  overview: {
+    heading: "What We Build",
+    intro:
+      "Four kinds of engagement, each starting from a business goal rather than a technology.",
+    cta: { label: "See what each involves", href: "/services" },
+  },
+
+  items: [
+    {
+      /* PRD-COPY */
+      icon: "globe",
+      title: "Website Development",
+      summary:
+        "Sites that balance aesthetics with performance, built to carry real business value.",
+      body: "We design and develop websites that balance aesthetics with performance. Every project is crafted to represent your brand while delivering measurable business value.",
+      benefits: [
+        "Strong first impressions",
+        "Better customer engagement",
+        "Higher conversion potential",
+        "Long-term scalability",
+        "Faster loading times",
+      ],
+      featured: true,
+    },
+    {
+      /* DRAFT-COPY */
+      icon: "app-window",
+      title: "Web Applications",
+      summary:
+        "Dashboards, portals, and internal tools designed to be lived in every day.",
+      body: "Dashboards, portals, and internal tools built on the same foundations as our marketing work — typed, tested, and designed to be lived in every day.",
+      benefits: [
+        "Workflows tailored to your team",
+        "Role-aware access control",
+        "Reporting you can act on",
+      ],
+      featured: false,
+    },
+    {
+      /* DRAFT-COPY */
+      icon: "plug",
+      title: "APIs & Integrations",
+      summary:
+        "Connecting the systems you already pay for, so data moves without anyone copying it.",
+      body: "We connect the systems you already pay for — CRMs, payment providers, ERPs — so data moves without anyone copying it between tabs.",
+      benefits: [
+        "Fewer manual handoffs",
+        "One reliable source of truth",
+        "Documented, versioned contracts",
+      ],
+      featured: false,
+    },
+    {
+      /* DRAFT-COPY */
+      icon: "sparkles",
+      title: "AI & Automation",
+      summary: "Practical automation applied where it actually pays back.",
+      body: "Practical automation applied where it pays back: support triage, content pipelines, and the repetitive work quietly consuming your team's week.",
+      benefits: [
+        "Faster response times",
+        "Lower operational cost",
+        "Humans kept in the loop",
+      ],
+      featured: false,
+    },
+  ],
+} as const;
+
+/* -------------------------------------------------------------------------- */
+/* Technology — PRD-COPY                                                      */
+/* -------------------------------------------------------------------------- */
+
+export const technology = {
+  heading: "Technology, Explained as Business Impact",
+  intro:
+    "We choose tools for what they do for your business, not for what looks impressive on a slide.",
+
+  /* The full stack lists and impact write-ups live on /insights and nowhere
+     else. The home page names the five areas and links there — printing the
+     same stack on three pages made the site look padded. */
+  strip: {
+    heading: "Five areas, one standard",
+    intro:
+      "We pick per project rather than forcing one stack onto every problem.",
+    cta: { label: "How we choose", href: "/insights" },
+  },
+
+  groups: [
+    {
+      id: "frontend",
+      icon: "monitor",
+      title: "Modern Frontend",
+      stack: [
+        "Next.js",
+        "React",
+        "TypeScript",
+        "Tailwind CSS",
+        "Framer Motion",
+        "shadcn/ui",
+      ],
+      impact:
+        "Modern frontend technologies allow us to create websites that feel responsive, load quickly, and deliver a smooth experience across devices. This helps visitors stay engaged and improves overall perception of your brand.",
+    },
+    {
+      id: "backend",
+      icon: "server",
+      title: "Backend Engineering",
+      stack: ["Node.js", "Express", "Django", "FastAPI"],
+      impact:
+        "A reliable backend keeps your business running smoothly by handling data securely, supporting future expansion, and enabling advanced business functionality.",
+    },
+    {
+      id: "databases",
+      icon: "database",
+      title: "Databases",
+      stack: ["PostgreSQL", "MongoDB", "Firebase"],
+      impact:
+        "Choosing the right database ensures reliability, security, and the flexibility to support future business growth.",
+    },
+    {
+      id: "cloud",
+      icon: "cloud",
+      title: "Cloud & Deployment",
+      stack: ["Docker", "Vercel", "Cloudflare", "GitHub Actions"],
+      impact:
+        "Reliable deployment pipelines and cloud infrastructure minimize downtime while ensuring your website remains available and performs consistently.",
+    },
+    {
+      id: "ai",
+      icon: "bot",
+      title: "AI & Automation",
+      stack: ["OpenAI", "LangChain", "Workflow Automation"],
+      impact:
+        "Automating repetitive workflows helps your business operate more efficiently, respond faster to customers, and focus on higher-value work.",
+    },
+  ],
+} as const;
+
+/* -------------------------------------------------------------------------- */
+/* Process — derived from the PRD's design principles                         */
+/* -------------------------------------------------------------------------- */
+
+export const process = {
+  heading: "How We Work",
+  intro:
+    "Five stages, each answering a question you should not have to guess the answer to.",
+
+  /* Home shows the stage names and their questions; /services carries the
+     full description of each. */
+  strip: {
+    heading: "How We Work",
+    intro: "Five stages, each answering a question you shouldn't have to guess.",
+    cta: { label: "What happens at each stage", href: "/services" },
+  },
+
+  steps: [
+    {
+      title: "Discover",
+      /* PRD principle 5: technology presented through business outcomes */
+      question: "What does this site have to achieve?",
+      body: "We start with the business, not the sitemap. Who you are selling to, what a visitor is worth, and what the site has to do before it can be called a success.",
+    },
+    {
+      title: "Design",
+      /* Applies PRD principle 1 without restating it — the About page lists
+         the principles by name, and the two pages used to print the same
+         phrase. */
+      question: "What is each page actually saying?",
+      body: "We agree on the narrative each page tells and the question every section answers, then design against real content rather than filler, so nothing breaks when the placeholder text goes away.",
+    },
+    {
+      title: "Build",
+      question: "Is it holding up as it grows?",
+      body: "Typed, reviewed, component-driven development on a live preview URL, so progress is something you look at rather than something you are told about.",
+    },
+    {
+      title: "Verify",
+      /* PRD: Lighthouse 95+, Accessibility 100, SEO 100, Best Practices 100 */
+      question: "Does it meet the standard?",
+      body: "Performance, accessibility, SEO, and best-practice audits run before launch, against the targets on this page — not after the site is already live.",
+    },
+    {
+      title: "Support",
+      question: "What happens next?",
+      body: "The work does not end at launch. Dependencies stay current, the codebase stays maintainable, and the site keeps pace as the business changes.",
+    },
+  ],
+} as const;
+
+/* -------------------------------------------------------------------------- */
+/* Standards — the PRD's targets, stated as public commitments                */
+/* -------------------------------------------------------------------------- */
+
+export const standards = {
+  heading: "The Standard We Build To",
+  intro:
+    "These are not aspirations. They are the numbers every project is audited against before it ships, and you can verify all four yourself the moment we hand over.",
+  metrics: [
+    { label: "Performance", value: 95, suffix: "+", note: "Lighthouse score" },
+    { label: "Accessibility", value: 100, suffix: "", note: "WCAG AA, keyboard navigable" },
+    { label: "SEO", value: 100, suffix: "", note: "Semantic, server-rendered" },
+    { label: "Best practices", value: 100, suffix: "", note: "Secure by default" },
+  ],
+  footnote:
+    "Measured with Lighthouse. Run it against this very page if you would like to check our work first.",
+} as const;
+
+/* -------------------------------------------------------------------------- */
+/* Why Choose Us — derived from the trust points and PRD standards            */
+/* -------------------------------------------------------------------------- */
+
+export const whyUs = {
+  heading: "Why Teams Choose Us",
+  intro:
+    "Four commitments that shape every decision on a project.",
+  reasons: [
+    {
+      title: "Outcomes lead the conversation",
+      body: "Every decision is driven by the impact it creates for your business. We explain technology through what it does for you, not through what it is called.",
+    },
+    {
+      title: "Quality is measured, not asserted",
+      body: "Performance, accessibility, SEO, and best practices are held to published targets and audited before launch. Our claims come with numbers you can re-run.",
+    },
+    {
+      title: "Accessible to everyone, by default",
+      body: "Keyboard navigation, visible focus states, semantic HTML, proper heading order, and WCAG AA contrast are part of the build — never a later phase.",
+    },
+    {
+      title: "Built to be handed over",
+      body: "Secure, maintainable, typed codebases with a clear component structure, so the next developer to open the project is never starting from scratch.",
+    },
+  ],
+} as const;
+
+/* -------------------------------------------------------------------------- */
+/* FAQ — DRAFT-COPY (not in content doc Part 1)                               */
+/* -------------------------------------------------------------------------- */
+
+export const faq = {
+  heading: "Questions, Answered",
+  intro:
+    "If yours isn't here, ask us directly — we would rather answer it properly than have you guess.",
+  items: [
+    {
+      /* Points at /services rather than restating its copy — the two used to
+         print the same sentence. */
+      q: "What exactly do you build?",
+      a: "Four things: websites, web applications, API integrations, and workflow automation. The Services page breaks down what each one involves and the kind of business it suits.",
+    },
+    {
+      /* Deliberately does not restate the stack — that lives on /insights,
+         and repeating it here would put the same list on two pages. */
+      q: "Which technologies do you use?",
+      a: "We work across modern frontend, backend, database, cloud, and automation tooling, and we pick per project rather than forcing one stack onto every problem. Our Insights page explains what each area is for and why it would matter to your business.",
+    },
+    {
+      q: "How do you make sure the site is fast?",
+      a: "Performance is a target, not a hope. Every project is audited with Lighthouse before launch against a 95+ performance score, and modern frontend architecture keeps pages responsive and quick across devices.",
+    },
+    {
+      q: "Will the site be accessible?",
+      a: "Yes. Keyboard navigation, visible focus states, semantic HTML, proper heading hierarchy, and WCAG AA colour contrast are built in from the start, and audited to a score of 100 before we ship.",
+    },
+    {
+      q: "Does it work properly on mobile?",
+      a: "Every build is responsive across devices by default. Layouts are designed for the small screen as a first-class case, not adapted down from a desktop design at the end.",
+    },
+    {
+      q: "How do we get started?",
+      a: "Tell us what you are building and what it needs to achieve. We will come back with an honest view of scope and approach before anyone commits to anything.",
+    },
+  ],
+} as const;
+
+/* -------------------------------------------------------------------------- */
+/* Closing CTA — PRD-COPY                                                     */
+/* -------------------------------------------------------------------------- */
+
+export const closingCta = {
+  /* PRD-COPY — the canonical close, used on the home page only. */
+  heading: "Ready to Build Something Exceptional?",
+  body: "Whether you're launching a new business or elevating an existing brand, we're here to build digital experiences that create lasting impact.",
+  button: { label: "Let's Talk", href: "/contact" },
+
+  /* Per-page closes. The same two sentences repeated at the foot of every
+     page reads as a template; each variant picks up the thread of the page
+     it ends. */
+  variants: {
+    services: {
+      heading: "Not sure which of these you need?",
+      body: "Tell us the outcome you are after and we will tell you what it actually takes — including the parts you can skip.",
+    },
+    about: {
+      heading: "Think we would be a good fit?",
+      body: "The fastest way to find out is to tell us what you are building and see whether our answer sounds like someone who has done it before.",
+    },
+  },
+} as const;
+
+/* -------------------------------------------------------------------------- */
+/* Brand voice — used on the About page                                       */
+/* -------------------------------------------------------------------------- */
+
+export const brandVoice = [
+  "Professional",
+  "Modern",
+  "Confident",
+  "Honest",
+  "Solution-oriented",
+  "Human",
+] as const;

@@ -1,26 +1,781 @@
 @import "tailwindcss";
 
+/* ==========================================================================
+   1. PALETTE  —  EDIT COLOURS HERE AND NOWHERE ELSE
+   --------------------------------------------------------------------------
+   Every colour on the site resolves back to a variable in this block, so a
+   full re-skin means changing values here and nothing else. No component
+   hardcodes a colour.
+
+   There is one theme, defined once. Change a value, save, and the whole site
+   updates on the next paint — that is the trial-run loop.
+
+   Names follow the shadcn/ui token contract (background / foreground /
+   primary / secondary / muted / accent / border / ring), so any shadcn
+   component dropped in later inherits this palette with no remapping.
+
+   The block is in three layers, each built from the one above it:
+     1. THE FIVE SOURCE COLOURS — the only literal hex in the stylesheet.
+     2. BRAND RAMP — those five at their natural stops, gaps filled by mixes
+        of the neighbouring two.
+     3. SEMANTIC TOKENS — what a colour is *for*. Components reference only
+        these, so repointing one line re-tones the whole site.
+
+   Swap the five values in layer 1 and everything downstream follows.
+   ========================================================================== */
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* ------------------------------------------------------------------
+     THE FIVE SOURCE COLOURS
+     These are the only literal hex values in the entire stylesheet. Every
+     other colour on the site is one of these five or a mix of two of them,
+     so the palette can never drift off-reference.
+     ------------------------------------------------------------------ */
+  --ref-deep: #0a1931; /* darkest navy  — the page canvas       */
+  --ref-navy: #1a3d63; /* deep blue     — surfaces and lines    */
+  --ref-blue: #4a7fa7; /* mid blue      — accent and ambient light */
+  --ref-sky: #b3cfe5; /* light blue    — primary action        */
+  --ref-white: #f6fafd; /* near white    — text                  */
+
+  /* ------------------------------------------------------------------
+     BRAND RAMP
+     The five references placed at their natural stops, with the gaps
+     filled by mixes of the two neighbours. Custom properties resolve at
+     computed-value time, so the forward references below are fine.
+
+     Gives every Tailwind shade utility (bg-brand-300, text-brand-600 …)
+     without introducing a single colour that is not derived from the
+     reference set.
+     ------------------------------------------------------------------ */
+  --brand-50: var(--ref-white);
+  --brand-100: color-mix(in oklab, var(--ref-white) 55%, var(--ref-sky));
+  --brand-200: var(--ref-sky);
+  --brand-300: color-mix(in oklab, var(--ref-sky) 66%, var(--ref-blue));
+  --brand-400: color-mix(in oklab, var(--ref-sky) 33%, var(--ref-blue));
+  --brand-500: var(--ref-blue);
+  --brand-600: color-mix(in oklab, var(--ref-blue) 66%, var(--ref-navy));
+  --brand-700: color-mix(in oklab, var(--ref-blue) 33%, var(--ref-navy));
+  --brand-800: var(--ref-navy);
+  --brand-900: color-mix(in oklab, var(--ref-navy) 50%, var(--ref-deep));
+  --brand-950: var(--ref-deep);
+
+  /* ------------------------------------------------------------------
+     SEMANTIC TOKENS
+     What each colour is *for*. Components reference only these, so
+     repointing one line here re-tones the site.
+     ------------------------------------------------------------------ */
+
+  /* Page canvas and the text sitting on it */
+  --background: var(--ref-deep);
+  --foreground: var(--ref-white);
+
+  /* Surface levels, each a further step from canvas toward navy */
+  --surface-subtle: color-mix(in oklab, var(--ref-deep) 86%, var(--ref-navy));
+  --card: color-mix(in oklab, var(--ref-deep) 72%, var(--ref-navy));
+  --card-foreground: var(--ref-white);
+  --popover: color-mix(in oklab, var(--ref-deep) 72%, var(--ref-navy));
+  --popover-foreground: var(--ref-white);
+
+  /* Primary action — buttons, active states, icons, emphasis.
+     Light-on-dark: 11:1 against the canvas, so it is safe as a fill and as
+     text. Mid blue was the obvious pick here but only reaches ~4.1:1
+     either way, which fails AA for body-sized text. */
+  --primary: var(--ref-sky);
+  --primary-hover: var(--ref-white);
+  --primary-foreground: var(--ref-deep);
+
+  /* Quiet fills: chips, tag pills, hover backgrounds */
+  --secondary: color-mix(in oklab, var(--ref-deep) 58%, var(--ref-navy));
+  --secondary-foreground: var(--brand-100);
+
+  /* Supporting text. Roughly 9:1 on the canvas, well past AA. */
+  --muted: color-mix(in oklab, var(--ref-deep) 80%, var(--ref-navy));
+  --muted-foreground: color-mix(in oklab, var(--ref-sky) 72%, var(--ref-blue));
+
+  /* Secondary highlight. Mid blue carries the gradients, glows, dividers,
+     and progress bars — everything where it is decorative rather than
+     load-bearing text. */
+  --accent: var(--ref-blue);
+  --accent-foreground: var(--ref-white);
+
+  --destructive: #e5484d;
+  --destructive-foreground: var(--ref-white);
+
+  /* Lines. --border is the default hairline, --border-strong the hover
+     and emphasis state. */
+  --border: color-mix(in oklab, var(--ref-deep) 42%, var(--ref-navy));
+  --border-strong: var(--ref-navy);
+  --input: color-mix(in oklab, var(--ref-deep) 50%, var(--ref-navy));
+  --ring: var(--ref-sky);
+
+  /* ------------------------------------------------------------------
+     AMBIENT LIGHT
+     The soft washes behind the hero, section boundaries, and the closing
+     panel. Opacity is baked in via color-mix so components never need to
+     know the underlying colour.
+     ------------------------------------------------------------------ */
+  --glow-a: color-mix(in oklab, var(--ref-blue) 38%, transparent);
+  --glow-b: color-mix(in oklab, var(--ref-navy) 65%, transparent);
+  --glow-c: color-mix(in oklab, var(--ref-sky) 14%, transparent);
+
+  /* Headline emphasis gradient — see the `text-emphasis` utility.
+     Runs white → sky → mid blue, putting three of the five references into
+     the largest type on the page. */
+  --gradient-from: var(--ref-white);
+  --gradient-via: var(--ref-sky);
+  --gradient-to: var(--ref-blue);
+
+  /* ------------------------------------------------------------------
+     SHADOW + HIGHLIGHT
+     --shadow-color is an unwrapped HSL triplet so shadows can vary opacity
+     per layer. --highlight is the thin light catch along the top edge of a
+     raised surface: the single detail that most separates a surface that
+     looks lit from a flat div.
+     ------------------------------------------------------------------ */
+  --shadow-color: 213 72% 3%;
+  --highlight: rgba(255, 255, 255, 0.07);
+  --highlight-strong: rgba(255, 255, 255, 0.14);
+  --texture-dot: rgba(255, 255, 255, 0.06);
 }
+
+/* ==========================================================================
+   2. NON-COLOUR DESIGN TOKENS
+   ========================================================================== */
+
+:root {
+  --radius: 0.75rem;
+
+  /* Motion — PRD: buttons 250ms ease-out, cards spring */
+  --duration-fast: 150ms;
+  --duration-base: 250ms;
+  --duration-slow: 500ms;
+  --duration-reveal: 700ms;
+  --ease-out-soft: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  /* Layout */
+  --container-max: 80rem;
+  --section-py: clamp(4rem, 7.5vw, 6.5rem);
+
+  /* Layered elevation. A tight contact shadow plus a wide ambient one, over
+     an inner top highlight — one soft blur alone reads as a grey smudge. */
+  --elevation-1: 0 1px 2px hsl(var(--shadow-color) / 0.5),
+    inset 0 1px 0 var(--highlight);
+  --elevation-2: 0 1px 2px hsl(var(--shadow-color) / 0.6),
+    0 10px 24px -8px hsl(var(--shadow-color) / 0.7),
+    inset 0 1px 0 var(--highlight);
+  --elevation-3: 0 1px 2px hsl(var(--shadow-color) / 0.7),
+    0 16px 36px -10px hsl(var(--shadow-color) / 0.8),
+    0 40px 80px -32px hsl(var(--shadow-color) / 0.9),
+    inset 0 1px 0 var(--highlight-strong);
+}
+
+/* ==========================================================================
+   3. TAILWIND THEME BRIDGE
+   --------------------------------------------------------------------------
+   Maps the palette onto Tailwind's colour namespace, so `bg-primary`,
+   `text-muted-foreground`, `border-border` and friends all resolve to the
+   variables above.
+
+   `@theme inline` emits utilities that reference the custom properties by
+   name rather than inlining their value. That indirection is what lets a
+   single edit in section 1 restyle every utility on the site.
+   ========================================================================== */
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-surface-subtle: var(--surface-subtle);
+
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+
+  --color-primary: var(--primary);
+  --color-primary-hover: var(--primary-hover);
+  --color-primary-foreground: var(--primary-foreground);
+
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+
+  --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  --color-brand-50: var(--brand-50);
+  --color-brand-100: var(--brand-100);
+  --color-brand-200: var(--brand-200);
+  --color-brand-300: var(--brand-300);
+  --color-brand-400: var(--brand-400);
+  --color-brand-500: var(--brand-500);
+  --color-brand-600: var(--brand-600);
+  --color-brand-700: var(--brand-700);
+  --color-brand-800: var(--brand-800);
+  --color-brand-900: var(--brand-900);
+  --color-brand-950: var(--brand-950);
+
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 0.375rem);
+  --radius-2xl: calc(var(--radius) + 0.75rem);
+
+  --ease-out-soft: var(--ease-out-soft);
+  --ease-spring: var(--ease-spring);
+
+  --shadow-elevation-1: var(--elevation-1);
+  --shadow-elevation-2: var(--elevation-2);
+  --shadow-elevation-3: var(--elevation-3);
+
+  --animate-aurora: aurora 24s ease-in-out infinite;
+  --animate-float: float 7s ease-in-out infinite;
+  --animate-orbit: orbit 32s linear infinite;
+  --animate-orbit-reverse: orbit-reverse 32s linear infinite;
+  --animate-trace: trace 3.2s ease-in-out infinite;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+/* ==========================================================================
+   4. BASE STYLES
+   ========================================================================== */
+
+@layer base {
+  * {
+    border-color: var(--border);
+  }
+
+  html {
+    scroll-behavior: smooth;
+    /* Safety net against a decorative element pushing the page sideways.
+       `clip` rather than `hidden`: hidden would make <html> a scroll
+       container and break every `position: sticky` on the site, including
+       the Trust section's sticky heading column. `clip` does not. */
+    overflow-x: clip;
+    /* Opt back into Next 16's scroll-behavior override during route changes,
+       so smooth in-page anchors don't make navigation feel sluggish.
+       See node_modules/next/dist/docs/01-app/02-guides/upgrading/version-16.md */
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background-color: var(--background);
+    color: var(--foreground);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  ::selection {
+    background-color: color-mix(in oklab, var(--primary) 24%, transparent);
+    color: var(--foreground);
+  }
+
+  /* WCAG AA: always-visible, high-contrast focus ring */
+  :focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    text-wrap: balance;
+    letter-spacing: -0.025em;
+  }
+
+  p {
+    text-wrap: pretty;
   }
 }
 
-body {
-  background: var(--background);
+/* ==========================================================================
+   5. TONE SCOPES
+   --------------------------------------------------------------------------
+   A tone re-points the *same* semantic tokens inside a subtree. Because every
+   component reads `--card`, `--foreground`, `--primary` … and never a literal
+   colour, dropping a section into a tone re-skins everything inside it —
+   cards, buttons, icon tiles, borders, shadows — with no component changes.
+
+   This is what lets the near-white and light blue carry whole sections rather
+   than only appearing as small text on navy. A page that is one shade top to
+   bottom reads as flat no matter how good that shade is.
+   ========================================================================== */
+
+/* Near-white section: navy text on white, navy buttons, sky borders. */
+@utility tone-light {
+  --background: var(--ref-white);
+  --foreground: var(--ref-deep);
+
+  --surface-subtle: color-mix(in oklab, var(--ref-white) 82%, var(--ref-sky));
+  --card: var(--ref-white);
+  --card-foreground: var(--ref-deep);
+  --popover: var(--ref-white);
+  --popover-foreground: var(--ref-deep);
+
+  /* Inverted: on white, the deep navy becomes the high-contrast action
+     colour (10.7:1) and light blue would be unreadable. */
+  --primary: var(--ref-navy);
+  --primary-hover: var(--ref-deep);
+  --primary-foreground: var(--ref-white);
+
+  --secondary: color-mix(in oklab, var(--ref-white) 66%, var(--ref-sky));
+  --secondary-foreground: var(--ref-navy);
+
+  --muted: color-mix(in oklab, var(--ref-white) 85%, var(--ref-sky));
+  --muted-foreground: color-mix(in oklab, var(--ref-blue) 78%, var(--ref-deep));
+
+  --accent: var(--ref-blue);
+  --accent-foreground: var(--ref-white);
+
+  --border: color-mix(in oklab, var(--ref-white) 42%, var(--ref-sky));
+  --border-strong: var(--ref-sky);
+  --input: color-mix(in oklab, var(--ref-white) 42%, var(--ref-sky));
+  --ring: var(--ref-navy);
+
+  --glow-a: color-mix(in oklab, var(--ref-sky) 60%, transparent);
+  --glow-b: color-mix(in oklab, var(--ref-blue) 22%, transparent);
+  --glow-c: color-mix(in oklab, var(--ref-sky) 45%, transparent);
+
+  --gradient-from: var(--ref-deep);
+  --gradient-via: var(--ref-navy);
+  --gradient-to: var(--ref-blue);
+
+  /* Shadows on white have to be far lighter or they read as dirt. */
+  --shadow-color: 213 45% 25%;
+  --highlight: rgba(255, 255, 255, 0.9);
+  --highlight-strong: rgba(255, 255, 255, 1);
+  --texture-dot: color-mix(in oklab, var(--ref-blue) 22%, transparent);
+
+  --elevation-1: 0 1px 2px hsl(var(--shadow-color) / 0.06);
+  --elevation-2: 0 1px 2px hsl(var(--shadow-color) / 0.07),
+    0 8px 20px -6px hsl(var(--shadow-color) / 0.1);
+  --elevation-3: 0 1px 2px hsl(var(--shadow-color) / 0.08),
+    0 12px 28px -8px hsl(var(--shadow-color) / 0.14),
+    0 32px 64px -24px hsl(var(--shadow-color) / 0.18);
+
+  background-color: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+}
+
+/* Light blue section: the same inversion, one step deeper in the water. */
+@utility tone-sky {
+  --background: color-mix(in oklab, var(--ref-sky) 62%, var(--ref-white));
+  --foreground: var(--ref-deep);
+
+  --surface-subtle: color-mix(in oklab, var(--ref-sky) 78%, var(--ref-white));
+  --card: color-mix(in oklab, var(--ref-white) 78%, var(--ref-sky));
+  --card-foreground: var(--ref-deep);
+  --popover: var(--ref-white);
+  --popover-foreground: var(--ref-deep);
+
+  --primary: var(--ref-navy);
+  --primary-hover: var(--ref-deep);
+  --primary-foreground: var(--ref-white);
+
+  --secondary: color-mix(in oklab, var(--ref-white) 55%, var(--ref-sky));
+  --secondary-foreground: var(--ref-navy);
+
+  --muted: color-mix(in oklab, var(--ref-white) 70%, var(--ref-sky));
+  --muted-foreground: color-mix(in oklab, var(--ref-blue) 62%, var(--ref-deep));
+
+  --accent: var(--ref-blue);
+  --accent-foreground: var(--ref-white);
+
+  --border: color-mix(in oklab, var(--ref-sky) 62%, var(--ref-blue));
+  --border-strong: var(--ref-blue);
+  --input: color-mix(in oklab, var(--ref-white) 40%, var(--ref-sky));
+  --ring: var(--ref-navy);
+
+  --glow-a: color-mix(in oklab, var(--ref-white) 55%, transparent);
+  --glow-b: color-mix(in oklab, var(--ref-blue) 25%, transparent);
+
+  --shadow-color: 213 50% 28%;
+  --highlight: rgba(255, 255, 255, 0.85);
+  --highlight-strong: rgba(255, 255, 255, 1);
+
+  --elevation-1: 0 1px 2px hsl(var(--shadow-color) / 0.08);
+  --elevation-2: 0 1px 2px hsl(var(--shadow-color) / 0.09),
+    0 8px 20px -6px hsl(var(--shadow-color) / 0.12);
+  --elevation-3: 0 1px 2px hsl(var(--shadow-color) / 0.1),
+    0 12px 28px -8px hsl(var(--shadow-color) / 0.16),
+    0 32px 64px -24px hsl(var(--shadow-color) / 0.2);
+
+  background-color: var(--background);
+  color: var(--foreground);
+}
+
+/* ==========================================================================
+   6. UTILITIES
+   ========================================================================== */
+
+@utility container-page {
+  width: 100%;
+  max-width: var(--container-max);
+  margin-inline: auto;
+  padding-inline: 1.25rem;
+
+  @media (width >= 40rem) {
+    padding-inline: 2rem;
+  }
+
+  @media (width >= 64rem) {
+    padding-inline: 2.5rem;
+  }
+}
+
+@utility section-y {
+  padding-block: var(--section-py);
+}
+
+/* Headline emphasis. Starts at full foreground contrast and only resolves
+   into brand colour at the tail, so the text stays highly legible instead of
+   washing out the way an edge-to-edge gradient does. */
+@utility text-emphasis {
+  background-image: linear-gradient(
+    115deg,
+    var(--foreground) 0%,
+    var(--foreground) 22%,
+    var(--primary) 68%,
+    var(--accent) 100%
+  );
+  background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Gradient text that follows the active palette */
+@utility text-gradient {
+  background-image: linear-gradient(
+    100deg,
+    var(--gradient-from),
+    var(--gradient-via),
+    var(--gradient-to)
+  );
+  background-clip: text;
+  color: transparent;
+  /* Keep a readable fallback if background-clip is unsupported */
+  -webkit-text-fill-color: transparent;
+}
+
+@utility surface-card {
+  background-color: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--elevation-1);
+}
+
+/* Frosted panel used over the hero mesh and in the nav */
+@utility glass {
+  background-color: color-mix(in oklab, var(--card) 62%, transparent);
+  backdrop-filter: blur(20px) saturate(160%);
+  -webkit-backdrop-filter: blur(20px) saturate(160%);
+  border: 1px solid color-mix(in oklab, var(--border) 80%, transparent);
+  box-shadow: var(--elevation-2);
+}
+
+/* Ambient wash that carries a section boundary. Without this the deep navy
+   canvas reads as a blank void between sections; a soft off-centre pool of
+   brand light gives the eye something to travel across. */
+@utility section-glow {
+  position: relative;
+  isolation: isolate;
+
+  &::before {
+    content: "";
+    position: absolute;
+    inset-inline: -10%;
+    top: -30%;
+    height: 60%;
+    z-index: -1;
+    background: radial-gradient(
+      ellipse 55% 100% at 50% 0%,
+      var(--glow-b),
+      transparent 70%
+    );
+    pointer-events: none;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   DECORATIVE PATTERNS
+
+   All four take their colour from `currentColor`, so the calling element sets
+   both hue and strength with a single text utility:
+
+       <div className="pattern-waves text-accent/20" />
+
+   The SVG-based ones are masks rather than background images. A mask only
+   needs shape information, so the data URI can be flat black and the visible
+   colour still comes from the palette — a coloured data URI would have to
+   hardcode a hex and would fall out of sync the moment the palette changed.
+   -------------------------------------------------------------------------- */
+
+/* Rolling swell. The primary texture for deep sections.
+
+   Each pattern composites its shape mask with a radial falloff in a single
+   declaration. Splitting the falloff into a separate utility would not work:
+   two utilities both setting `mask-image` overwrite each other rather than
+   intersecting, so the last one applied simply wins. */
+@utility pattern-waves {
+  background-color: currentColor;
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='24' viewBox='0 0 120 24'%3E%3Cpath d='M0 12C15 2 45 2 60 12S105 22 120 12' fill='none' stroke='%23000' stroke-width='1.5'/%3E%3C/svg%3E"),
+    radial-gradient(ellipse 85% 75% at 50% 45%, #000 10%, transparent 74%);
+  mask-size: 120px 24px, 100% 100%;
+  mask-repeat: repeat, no-repeat;
+  mask-composite: intersect;
+  -webkit-mask-composite: source-in;
+}
+
+/* Interlocking scales — denser, for panels and narrow bands. */
+@utility pattern-scales {
+  background-color: currentColor;
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='20' viewBox='0 0 40 20'%3E%3Cpath d='M0 20a20 20 0 0 1 20-20 20 20 0 0 1 20 20' fill='none' stroke='%23000' stroke-width='1.2'/%3E%3C/svg%3E"),
+    radial-gradient(ellipse 85% 75% at 50% 45%, #000 10%, transparent 74%);
+  mask-size: 40px 20px, 100% 100%;
+  mask-repeat: repeat, no-repeat;
+  mask-composite: intersect;
+  -webkit-mask-composite: source-in;
+}
+
+/* Concentric ripple, as if something entered the water. The rings come from
+   a repeating radial gradient, so only the falloff needs a mask. */
+@utility pattern-ripple {
+  background-image: repeating-radial-gradient(
+    circle at var(--ripple-x, 50%) var(--ripple-y, 50%),
+    currentColor 0 1px,
+    transparent 1px 26px
+  );
+  mask-image: radial-gradient(
+    ellipse 70% 70% at var(--ripple-x, 50%) var(--ripple-y, 50%),
+    #000 5%,
+    transparent 70%
+  );
+}
+
+/* Depth contours, angled so they never line up with the layout grid. */
+@utility pattern-contour {
+  background-image: repeating-linear-gradient(
+    115deg,
+    currentColor 0 1px,
+    transparent 1px 16px
+  );
+  mask-image: radial-gradient(ellipse 80% 70% at 50% 40%, #000 5%, transparent 72%);
+}
+
+@utility bg-dots {
+  background-image: radial-gradient(var(--texture-dot) 1px, transparent 1px);
+  background-size: 22px 22px;
+  mask-image: radial-gradient(ellipse 70% 60% at 50% 50%, #000 20%, transparent 75%);
+  -webkit-mask-image: radial-gradient(
+    ellipse 70% 60% at 50% 50%,
+    #000 20%,
+    transparent 75%
+  );
+}
+
+/* Film grain. Breaks up the banding that large blurred gradients produce on
+   8-bit displays — the main reason a big soft gradient can look cheap. */
+@utility bg-noise {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.42'/%3E%3C/svg%3E");
+  mix-blend-mode: overlay;
+}
+
+/* Hairline rule that fades out at both ends */
+@utility rule-fade {
+  height: 1px;
+  background: linear-gradient(
+    to right,
+    transparent,
+    var(--border-strong),
+    transparent
+  );
+}
+
+/* Cursor-following spotlight. The component sets --mx/--my in px on hover;
+   with no JS it simply never lights up. */
+@utility spotlight {
+  position: relative;
+  /* Contain the negative z-index below so it cannot slip behind an
+     ancestor's background. */
+  isolation: isolate;
+
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    /* Painted after the element's own background but before its in-flow
+       content, so the wash sits on the surface without tinting the text.
+       This is why the card needs no extra wrapper element. */
+    z-index: -1;
+    border-radius: inherit;
+    background: radial-gradient(
+      420px circle at var(--mx, 50%) var(--my, 0%),
+      color-mix(in oklab, var(--primary) 14%, transparent),
+      transparent 68%
+    );
+    opacity: 0;
+    transition: opacity var(--duration-slow) var(--ease-out-soft);
+    pointer-events: none;
+  }
+
+  &:hover::before {
+    opacity: 1;
+  }
+}
+
+/* Diagonal light sweep across a button on hover */
+@utility sheen {
+  position: relative;
+  overflow: hidden;
+
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      110deg,
+      transparent 25%,
+      rgba(255, 255, 255, 0.22) 48%,
+      transparent 62%
+    );
+    transform: translateX(-120%);
+    transition: transform 0.75s var(--ease-out-soft);
+    pointer-events: none;
+  }
+
+  &:hover::after {
+    transform: translateX(120%);
+  }
+}
+
+/* Hairline gradient border that lights up on hover (PRD: card border glow) */
+@utility ring-glow {
+  position: relative;
+
+  &::after {
+    content: "";
+    position: absolute;
+    inset: -1px;
+    border-radius: inherit;
+    padding: 1px;
+    background: linear-gradient(
+      130deg,
+      color-mix(in oklab, var(--primary) 55%, transparent),
+      transparent 40%,
+      color-mix(in oklab, var(--accent) 45%, transparent)
+    );
+    -webkit-mask:
+      linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    opacity: 0;
+    transition: opacity var(--duration-base) var(--ease-out-soft);
+    pointer-events: none;
+  }
+
+  &:hover::after,
+  &:focus-within::after {
+    opacity: 1;
+  }
+}
+
+/* ==========================================================================
+   6. KEYFRAMES
+   ========================================================================== */
+
+/* Slow positional drift for the ambient washes. Only transform and opacity
+   animate, so it stays on the compositor. */
+@keyframes aurora {
+  0%,
+  100% {
+    transform: translate3d(-6%, 0, 0) scale(1);
+    opacity: 0.85;
+  }
+  50% {
+    transform: translate3d(6%, -4%, 0) scale(1.15);
+    opacity: 1;
+  }
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+/* Orbit rings. The counter-rotation keyframe keeps labels upright while
+   their ring turns — without it every node would tumble. */
+@keyframes orbit {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes orbit-reverse {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(-360deg);
+  }
+}
+
+/* Signal travelling along a graph edge. Animating dashoffset against a large
+   dash gap reads as a pulse rather than a marching-ants border. */
+@keyframes trace {
+  0% {
+    stroke-dashoffset: 120;
+    opacity: 0;
+  }
+  15%,
+  70% {
+    opacity: 1;
+  }
+  100% {
+    stroke-dashoffset: 0;
+    opacity: 0;
+  }
+}
+
+/* ==========================================================================
+   7. REDUCED MOTION
+   --------------------------------------------------------------------------
+   PRD accessibility target is 100. Everything decorative stops; nothing
+   load-bearing depends on an animation completing.
+   ========================================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
