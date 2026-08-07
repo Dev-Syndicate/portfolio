@@ -52,27 +52,6 @@ export function Hero() {
           transition={{ staggerChildren: reduceMotion ? 0 : 0.04 }}
           className="flex flex-col items-start gap-6 lg:col-span-7 lg:translate-y-[4%]"
         >
-          {/* Instrument label row — mono, with a pad + trace stub, and the
-              status token at the right. */}
-          <motion.div
-            variants={rise}
-            transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-            className="flex w-full max-w-lg flex-wrap items-center gap-x-4 gap-y-2"
-          >
-            <span className="flex items-center gap-2.5 font-mono text-[0.6875rem] tracking-[0.14em] text-muted-foreground uppercase">
-              <span aria-hidden className="size-1.5 bg-primary" />
-              <span aria-hidden className="h-px w-6 bg-border-strong" />
-              {hero.eyebrow}
-            </span>
-            <span className="flex items-center gap-1.5 font-mono text-[0.6875rem] tracking-[0.14em] text-muted-foreground uppercase">
-              <span aria-hidden className="relative flex size-1.5">
-                <span className="absolute inline-flex size-full animate-ping rounded-full bg-primary opacity-70" />
-                <span className="relative inline-flex size-1.5 rounded-full bg-primary" />
-              </span>
-              Status · Available
-            </span>
-          </motion.div>
-
           <h1
             id="hero-heading"
             aria-label={hero.headline}
