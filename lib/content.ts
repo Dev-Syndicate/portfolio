@@ -10,14 +10,17 @@
  * project counts, delivery timelines, and prices. None of those exist in the
  * source documents, and inventing them would put unverifiable claims in front
  * of prospects. Sections that would normally carry social proof instead lean
- * on standards the studio actually commits to and can be held to.
+ * on commitments the studio can be held to and the visitor can verify.
+ *
+ * Typography: copy uses curly apostrophes (’) and spaced em dashes ( — ), the
+ * same as the JSX literals elsewhere. Spelling is en-GB throughout.
  */
 
 export const site = {
   name: "Dev Syndicate",
   /* PRD-COPY — Brand Promise */
   promise:
-    "We don't just build websites—we build digital experiences that help businesses establish credibility, attract customers, and scale confidently.",
+    "We don’t just build websites — we build digital experiences that help businesses establish credibility, attract customers, and scale confidently.",
   email: "hello@devsyndicate.com",
   url: "https://devsyndicate.com",
 } as const;
@@ -58,7 +61,7 @@ export const trust = {
     {
       icon: "gauge",
       title: "Faster websites",
-      body: "Performance budgets and edge delivery keep pages quick, which improves user experience and keeps visitors engaged.",
+      body: "Performance budgets and edge delivery keep pages fast, so visitors stay engaged instead of leaving while the page loads.",
     },
     {
       icon: "layers",
@@ -98,7 +101,7 @@ export const services = {
   overview: {
     heading: "What We Build",
     intro:
-      "Four kinds of engagement, each starting from a business goal rather than a technology.",
+      "Five kinds of engagement, each starting from a business goal rather than a technology.",
     cta: { label: "See what each involves", href: "/services" },
   },
 
@@ -135,6 +138,21 @@ export const services = {
     },
     {
       /* DRAFT-COPY */
+      icon: "tablet-smartphone",
+      title: "Mobile Applications",
+      summary:
+        "One Flutter codebase that ships to both the App Store and Play Store.",
+      body: "Cross-platform apps built in Flutter, so iOS and Android come from a single codebase rather than two separate builds — and stay in step with each other as the product changes.",
+      benefits: [
+        "One codebase, both platforms",
+        "Native performance and feel",
+        "Offline use and push notifications",
+        "Store submission handled for you",
+      ],
+      featured: false,
+    },
+    {
+      /* DRAFT-COPY */
       icon: "plug",
       title: "APIs & Integrations",
       summary:
@@ -152,7 +170,7 @@ export const services = {
       icon: "sparkles",
       title: "AI & Automation",
       summary: "Practical automation applied where it actually pays back.",
-      body: "Practical automation applied where it pays back: support triage, content pipelines, and the repetitive work quietly consuming your team's week.",
+      body: "Practical automation applied where it pays back: support triage, content pipelines, and the repetitive work quietly consuming your team’s week.",
       benefits: [
         "Faster response times",
         "Lower operational cost",
@@ -173,10 +191,10 @@ export const technology = {
     "We choose tools for what they do for your business, not for what looks impressive on a slide.",
 
   /* The full stack lists and impact write-ups live on /insights and nowhere
-     else. The home page names the five areas and links there — printing the
+     else. The home page names the six areas and links there — printing the
      same stack on three pages made the site look padded. */
   strip: {
-    heading: "Five areas, one standard",
+    heading: "Six areas, one standard",
     intro:
       "We pick per project rather than forcing one stack onto every problem.",
     cta: { label: "How we choose", href: "/insights" },
@@ -197,6 +215,14 @@ export const technology = {
       ],
       impact:
         "Modern frontend technologies allow us to create websites that feel responsive, load quickly, and deliver a smooth experience across devices. This helps visitors stay engaged and improves overall perception of your brand.",
+    },
+    {
+      id: "mobile",
+      icon: "tablet-smartphone",
+      title: "Mobile Development",
+      stack: ["Flutter", "Dart", "iOS", "Android"],
+      impact:
+        "A single Flutter codebase covers both app stores, so you fund one build instead of two and every release reaches iOS and Android at the same time.",
     },
     {
       id: "backend",
@@ -220,7 +246,7 @@ export const technology = {
       title: "Cloud & Deployment",
       stack: ["Docker", "Vercel", "Cloudflare", "GitHub Actions"],
       impact:
-        "Reliable deployment pipelines and cloud infrastructure minimize downtime while ensuring your website remains available and performs consistently.",
+        "Reliable deployment pipelines and cloud infrastructure minimise downtime while ensuring your website remains available and performs consistently.",
     },
     {
       id: "ai",
@@ -246,7 +272,7 @@ export const process = {
      full description of each. */
   strip: {
     heading: "How We Work",
-    intro: "Five stages, each answering a question you shouldn't have to guess.",
+    intro: "Five stages, each answering a question you shouldn’t have to guess the answer to.",
     cta: { label: "What happens at each stage", href: "/services" },
   },
 
@@ -274,7 +300,7 @@ export const process = {
       title: "Verify",
       /* PRD: Lighthouse 95+, Accessibility 100, SEO 100, Best Practices 100 */
       question: "Does it meet the standard?",
-      body: "Performance, accessibility, SEO, and best-practice audits run before launch, against the targets on this page — not after the site is already live.",
+      body: "Performance, accessibility, SEO, and best-practice audits run before launch, against a Lighthouse target we agree with you up front — not after the site is already live.",
     },
     {
       title: "Support",
@@ -282,24 +308,6 @@ export const process = {
       body: "The work does not end at launch. Dependencies stay current, the codebase stays maintainable, and the site keeps pace as the business changes.",
     },
   ],
-} as const;
-
-/* -------------------------------------------------------------------------- */
-/* Standards — the PRD's targets, stated as public commitments                */
-/* -------------------------------------------------------------------------- */
-
-export const standards = {
-  heading: "The Standard We Build To",
-  intro:
-    "These are not aspirations. They are the numbers every project is audited against before it ships, and you can verify all four yourself the moment we hand over.",
-  metrics: [
-    { label: "Performance", value: 95, suffix: "+", note: "Lighthouse score" },
-    { label: "Accessibility", value: 100, suffix: "", note: "WCAG AA, keyboard navigable" },
-    { label: "SEO", value: 100, suffix: "", note: "Semantic, server-rendered" },
-    { label: "Best practices", value: 100, suffix: "", note: "Secure by default" },
-  ],
-  footnote:
-    "Measured with Lighthouse. Run it against this very page if you would like to check our work first.",
 } as const;
 
 /* -------------------------------------------------------------------------- */
@@ -317,7 +325,7 @@ export const whyUs = {
     },
     {
       title: "Quality is measured, not asserted",
-      body: "Performance, accessibility, SEO, and best practices are held to published targets and audited before launch. Our claims come with numbers you can re-run.",
+      body: "Performance, accessibility, SEO, and best practices are held to a fixed target and audited with Lighthouse before launch. Our claims come with numbers you can re-run yourself.",
     },
     {
       title: "Accessible to everyone, by default",
@@ -337,19 +345,26 @@ export const whyUs = {
 export const faq = {
   heading: "Questions, Answered",
   intro:
-    "If yours isn't here, ask us directly — we would rather answer it properly than have you guess.",
+    "If yours isn’t here, ask us directly — we would rather answer it properly than have you guess.",
   items: [
     {
       /* Points at /services rather than restating its copy — the two used to
          print the same sentence. */
       q: "What exactly do you build?",
-      a: "Four things: websites, web applications, API integrations, and workflow automation. The Services page breaks down what each one involves and the kind of business it suits.",
+      a: "Five things: websites, web applications, mobile apps, API integrations, and workflow automation. The Services page breaks down what each one involves and the kind of business it suits.",
     },
     {
       /* Deliberately does not restate the stack — that lives on /insights,
          and repeating it here would put the same list on two pages. */
       q: "Which technologies do you use?",
-      a: "We work across modern frontend, backend, database, cloud, and automation tooling, and we pick per project rather than forcing one stack onto every problem. Our Insights page explains what each area is for and why it would matter to your business.",
+      a: "We work across modern frontend, mobile, backend, database, cloud, and automation tooling, and we pick per project rather than forcing one stack onto every problem. Our Insights page explains what each area is for and why it would matter to your business.",
+    },
+    {
+      /* The native-vs-cross-platform question is the one every app enquiry
+         opens with, and the honest answer sometimes talks the client out of
+         an app entirely — which is the point. */
+      q: "Do you build native iOS and Android apps?",
+      a: "We build in Flutter, which compiles to genuinely native iOS and Android from one codebase — so you fund one build rather than two, and both stores stay in step. If what you actually need is your website working offline on a phone, we will say so rather than sell you an app you do not need.",
     },
     {
       q: "How do you make sure the site is fast?",
@@ -377,8 +392,8 @@ export const faq = {
 export const closingCta = {
   /* PRD-COPY — the canonical close, used on the home page only. */
   heading: "Ready to Build Something Exceptional?",
-  body: "Whether you're launching a new business or elevating an existing brand, we're here to build digital experiences that create lasting impact.",
-  button: { label: "Let's Talk", href: "/contact" },
+  body: "Whether you’re launching a new business or elevating an existing brand, we’re here to build digital experiences that create lasting impact.",
+  button: { label: "Let’s Talk", href: "/contact" },
 
   /* Per-page closes. The same two sentences repeated at the foot of every
      page reads as a template; each variant picks up the thread of the page
@@ -394,16 +409,3 @@ export const closingCta = {
     },
   },
 } as const;
-
-/* -------------------------------------------------------------------------- */
-/* Brand voice — used on the About page                                       */
-/* -------------------------------------------------------------------------- */
-
-export const brandVoice = [
-  "Professional",
-  "Modern",
-  "Confident",
-  "Honest",
-  "Solution-oriented",
-  "Human",
-] as const;

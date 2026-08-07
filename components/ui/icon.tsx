@@ -13,6 +13,7 @@ import {
   Shield,
   Smartphone,
   Sparkles,
+  TabletSmartphone,
   type LucideIcon,
 } from "lucide-react";
 
@@ -37,6 +38,9 @@ const icons = {
   shield: Shield,
   smartphone: Smartphone,
   sparkles: Sparkles,
+  /* Distinct from `smartphone`, which Trust already uses for responsiveness —
+     two different claims should not share a glyph. */
+  "tablet-smartphone": TabletSmartphone,
 } satisfies Record<string, LucideIcon>;
 
 export type IconName = keyof typeof icons;

@@ -16,17 +16,19 @@ import { Button } from "@/components/ui/button";
  * contents.
  *
  * What the content actually looks like: one service with a longer description
- * and five benefits, then three with short descriptions and three benefits
- * each. So the first gets a full-width band that runs its copy and benefits
- * side by side (wide, not tall — nothing has to stretch), and the other three
- * split a row evenly, where their near-identical volume means the grid's
+ * and five benefits, then four with short descriptions and three or four
+ * benefits each. So the first gets a full-width band that runs its copy and
+ * benefits side by side (wide, not tall — nothing has to stretch), and the
+ * other four fill a 2×2, where their near-identical volume means the grid's
  * equal heights cost nothing.
  *
  *   ┌───────────────────────┐
  *   │  1   copy  │ benefits │
- *   ├───────┬───────┬───────┤
- *   │   2   │   3   │   4   │
- *   └───────┴───────┴───────┘
+ *   ├───────────┬───────────┤
+ *   │     2     │     3     │
+ *   ├───────────┼───────────┤
+ *   │     4     │     5     │
+ *   └───────────┴───────────┘
  */
 export function Services() {
   const [featured, ...rest] = services.items;
@@ -84,7 +86,9 @@ export function Services() {
           </Card>
         </Reveal>
 
-        <ul className="grid gap-4 md:grid-cols-3">
+        {/* Two columns, not three: with the featured service pulled out there
+            are four left, so three columns would strand one on its own row. */}
+        <ul className="grid gap-4 md:grid-cols-2">
           {rest.map((service, i) => (
             <Reveal as="li" key={service.title} delay={0.08 + i * 0.07}>
               <Card className="group flex h-full flex-col gap-4 p-7">

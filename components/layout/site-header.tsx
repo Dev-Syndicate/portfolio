@@ -37,6 +37,15 @@ export function SiteHeader() {
   const [hidden, setHidden] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
 
+  // Close the mobile menu on navigation. Adjusting state during render rather
+  // than in an effect: React re-runs this component before committing, so the
+  // menu never paints open on the new route. An effect would flash it.
+  const [lastPathname, setLastPathname] = useState(pathname);
+  if (pathname !== lastPathname) {
+    setLastPathname(pathname);
+    setMenuOpen(false);
+  }
+
   // PRD nav motion: blur on scroll, hide while scrolling down, reveal on up.
   useMotionValueEvent(scrollY, "change", (current) => {
     const previous = scrollY.getPrevious() ?? 0;
@@ -47,11 +56,6 @@ export function SiteHeader() {
     if (menuOpen || Math.abs(delta) < HIDE_THRESHOLD) return;
     setHidden(delta > 0 && current > 120);
   });
-
-  // Close the mobile menu on navigation.
-  useEffect(() => {
-    setMenuOpen(false);
-  }, [pathname]);
 
   // Escape closes the menu; lock background scroll while it is open.
   useEffect(() => {

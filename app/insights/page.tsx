@@ -19,7 +19,7 @@ export const metadata: Metadata = {
  *
  * The stack lists and business-impact write-ups used to appear here, on the
  * home page, and on /services — the same framework names printed three times.
- * They now live here only; the other two pages name the five areas at most
+ * They now live here only; the other two pages name the six areas at most
  * and link across.
  *
  * There are no articles yet and the content document does not define a model

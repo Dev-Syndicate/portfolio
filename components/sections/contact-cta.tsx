@@ -1,6 +1,6 @@
 import { ArrowRight, Mail } from "lucide-react";
 
-import { closingCta, site, standards } from "@/lib/content";
+import { closingCta, site } from "@/lib/content";
 import { Button } from "@/components/ui/button";
 import { Magnetic } from "@/components/ui/magnetic";
 import { Reveal } from "@/components/ui/reveal";
@@ -9,16 +9,9 @@ import { Pattern } from "@/components/ui/pattern";
 export function ContactCta({
   heading = closingCta.heading,
   body = closingCta.body,
-  /**
-   * Restates the audited standard at the decision point. Off on any page that
-   * already carries the Standards section, so the four numbers never appear
-   * twice on one screen.
-   */
-  showStandards = true,
 }: {
   heading?: string;
   body?: string;
-  showStandards?: boolean;
 } = {}) {
   return (
     <section
@@ -74,24 +67,6 @@ export function ContactCta({
                   {site.email}
                 </a>
               </div>
-
-              {showStandards ? (
-                <ul className="mt-6 flex flex-wrap items-center justify-center gap-x-6 gap-y-2.5 border-t border-border pt-6 text-[0.8125rem] text-muted-foreground">
-                  {standards.metrics.map((metric) => (
-                    <li key={metric.label} className="flex items-center gap-2">
-                      <span
-                        aria-hidden
-                        className="size-1 rounded-full bg-primary/70"
-                      />
-                      <span className="font-medium text-foreground/90">
-                        {metric.value}
-                        {metric.suffix}
-                      </span>
-                      {metric.label}
-                    </li>
-                  ))}
-                </ul>
-              ) : null}
             </div>
           </div>
         </Reveal>

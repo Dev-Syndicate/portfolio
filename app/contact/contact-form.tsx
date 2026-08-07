@@ -1,7 +1,13 @@
 "use client";
 
 import { useActionState, useId } from "react";
-import { ArrowRight, CircleAlert, CircleCheck, Loader2 } from "lucide-react";
+import {
+  ArrowRight,
+  ChevronDown,
+  CircleAlert,
+  CircleCheck,
+  Loader2,
+} from "lucide-react";
 
 import { submitContact, type ContactState } from "./actions";
 import { services } from "@/lib/content";
@@ -65,18 +71,28 @@ export function ContactForm() {
           </label>
           {/* Options come from the services list rather than a budget ladder —
               we have no published pricing, so asking for a range would imply
-              one exists. */}
-          <select
-            id={`${id}-interest`}
-            name="interest"
-            defaultValue=""
-            className={cn(fieldBase, "appearance-none")}
-          >
-            <option value="">Not sure yet</option>
-            {services.items.map((service) => (
-              <option key={service.title}>{service.title}</option>
-            ))}
-          </select>
+              one exists.
+
+              `appearance-none` drops the native arrow, so the control would
+              otherwise be indistinguishable from the text inputs beside it.
+              The chevron below replaces it. */}
+          <div className="relative">
+            <select
+              id={`${id}-interest`}
+              name="interest"
+              defaultValue=""
+              className={cn(fieldBase, "appearance-none pr-11")}
+            >
+              <option value="">Not sure yet</option>
+              {services.items.map((service) => (
+                <option key={service.title}>{service.title}</option>
+              ))}
+            </select>
+            <ChevronDown
+              aria-hidden
+              className="pointer-events-none absolute top-1/2 right-4 size-4 -translate-y-1/2 text-muted-foreground"
+            />
+          </div>
         </div>
       </div>
 

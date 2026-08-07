@@ -7,7 +7,7 @@ import { Reveal } from "@/components/ui/reveal";
 import { Button } from "@/components/ui/button";
 
 /**
- * Home-page version of Technology: the five areas by name, and nothing else.
+ * Home-page version of Technology: the six areas by name, and nothing else.
  *
  * The stack lists and business-impact write-ups live on /insights. They used
  * to appear on the home page and the services page as well — the same

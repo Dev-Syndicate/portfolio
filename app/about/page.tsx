@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-import { brandVoice, closingCta, site } from "@/lib/content";
+import { closingCta, site } from "@/lib/content";
 import { PageHeader } from "@/components/ui/page-header";
 import { Section, SectionHeader } from "@/components/ui/section";
 import { Card } from "@/components/ui/card";
@@ -79,22 +79,6 @@ export default function AboutPage() {
             </Reveal>
           ))}
         </ul>
-
-        <Reveal delay={0.1} className="mt-12">
-          <div className="flex flex-wrap items-center gap-3 rounded-2xl border border-border bg-surface-subtle p-6">
-            <span className="text-sm font-medium text-muted-foreground">
-              How we sound:
-            </span>
-            {brandVoice.map((word) => (
-              <span
-                key={word}
-                className="rounded-full border border-border bg-card px-3 py-1.5 text-sm font-medium"
-              >
-                {word}
-              </span>
-            ))}
-          </div>
-        </Reveal>
       </Section>
 
       {/* Process is not repeated here — /services carries it in full. */}
