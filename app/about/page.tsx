@@ -9,13 +9,13 @@ import { ContactCta } from "@/components/sections/contact-cta";
 import { PrincipleOrbit } from "@/components/artwork/principle-orbit";
 
 const description =
-  "Dev Syndicate (DS) is a web engineering studio that treats your website as business infrastructure — building high-performance digital experiences that help businesses grow.";
+  "Dev Syndicate (DS) is a software development company that treats your website as business infrastructure — building high-performance digital experiences that help businesses grow.";
 
 export const metadata = pageMetadata({
   title: "About",
   description,
   path: "/about",
-  keywords: ["about Dev Syndicate", "web engineering team", "Developer Syndicate"],
+  keywords: ["about Dev Syndicate", "software development company", "Developer Syndicate"],
 });
 
 const principles = [

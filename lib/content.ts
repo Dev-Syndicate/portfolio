@@ -36,7 +36,7 @@ export const site = {
 
 export const seo = {
   /* A short, keyword-bearing tagline used after the brand name in titles. */
-  tagline: "Web Engineering Studio",
+  tagline: "Software Development Company",
 
   /* Every way people spell or shorten the brand. Google uses Organization
      `alternateName` to understand these all refer to one entity, which is what
@@ -58,9 +58,9 @@ export const seo = {
     "DevSyndicate",
     "Developer Syndicate",
     "D Syndicate",
-    "DS web studio",
-    "web engineering studio",
-    "web development studio",
+    "software development company",
+    "software company",
+    "web development company",
     "website development",
     "web application development",
     "Next.js development",
@@ -71,8 +71,10 @@ export const seo = {
   ],
 
   /* Profile URLs that tie the brand entity together via schema `sameAs`.
-     Add real URLs here as they exist — one place, flows everywhere. */
-  sameAs: [] as string[],
+     These tell Google the website and these profiles are one and the same
+     organisation — the fix for the "Dev Syndicate is a shared name" ambiguity.
+     Add more (LinkedIn, X) here as they exist — one place, flows everywhere. */
+  sameAs: ["https://github.com/Dev-Syndicate"] as string[],
 } as const;
 
 export const nav = [
@@ -88,7 +90,7 @@ export const nav = [
 /* -------------------------------------------------------------------------- */
 
 export const hero = {
-  eyebrow: "Web engineering studio",
+  eyebrow: "Software development company",
   /* Split for the word-stagger animation the PRD specifies. */
   headline: "Building Digital Experiences That Help Businesses Grow.",
   /* Words rendered in gradient within the headline stagger. */

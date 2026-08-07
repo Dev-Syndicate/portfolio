@@ -30,8 +30,8 @@ export function SiteFooter() {
               — this is what helps the site rank for each spelling. */}
           <p className="text-xs leading-relaxed text-muted-foreground/70">
             Dev Syndicate — also known as DS, DevSyndicate, or Developer
-            Syndicate — is a web engineering studio building websites, web and
-            mobile applications, and automation.
+            Syndicate — is a software development company building websites, web
+            and mobile applications, and automation.
           </p>
         </div>
 
