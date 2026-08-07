@@ -99,7 +99,11 @@ export function PostEditor({ post }: { post?: Post }) {
 
       <div className="flex flex-col gap-2">
         <label htmlFor="title" className={label}>
-          Title
+          Title{" "}
+          <span className="font-normal text-muted-foreground">
+            (the article headline — shown on the blog card and at the top of
+            the post)
+          </span>
         </label>
         <input
           id="title"
@@ -241,18 +245,66 @@ export function PostEditor({ post }: { post?: Post }) {
         />
       </div>
 
+      {/* Polaroid-wall card fields — how the post looks pinned on /blog. */}
+      <div className="rounded-xl border border-border bg-card/50 p-5">
+        <p className="mb-4 text-sm text-muted-foreground">
+          <span className="font-medium text-foreground">Blog card</span> — how
+          this post appears pinned on the /blog journal wall. Both are optional.
+        </p>
+        <div className="grid gap-6 sm:grid-cols-2">
+          <div className="flex flex-col gap-2">
+            <label htmlFor="category" className={label}>
+              Card tag{" "}
+              <span className="font-normal text-muted-foreground">
+                (small label above the title, e.g. the topic)
+              </span>
+            </label>
+            <input
+              id="category"
+              name="category"
+              defaultValue={post?.category}
+              className={field}
+              placeholder="Automation"
+            />
+          </div>
+          <div className="flex flex-col gap-2">
+            <label htmlFor="scrawl" className={label}>
+              Hand note{" "}
+              <span className="font-normal text-muted-foreground">
+                (handwritten scribble at the bottom of the card — leave blank
+                for none)
+              </span>
+            </label>
+            <input
+              id="scrawl"
+              name="scrawl"
+              defaultValue={post?.scrawl}
+              maxLength={24}
+              className={cn(
+                field,
+                "[font-family:var(--font-hand)] text-2xl text-foreground",
+              )}
+              placeholder="fig. 1"
+            />
+          </div>
+        </div>
+      </div>
+
       <div className="flex flex-col gap-2">
         <label htmlFor="status" className={label}>
-          Status
+          Status{" "}
+          <span className="font-normal text-muted-foreground">
+            (Draft = only you can see it; Published = live on the public blog)
+          </span>
         </label>
         <select
           id="status"
           name="status"
           defaultValue={post?.status ?? "draft"}
-          className={cn(field, "max-w-xs")}
+          className={cn(field, "max-w-xs bg-background text-foreground")}
         >
-          <option value="draft">Draft (not visible publicly)</option>
-          <option value="published">Published (live on /blog)</option>
+          <option value="draft">Draft — not visible publicly</option>
+          <option value="published">Published — live on /blog</option>
         </select>
       </div>
 

@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Caveat } from "next/font/google";
 
 import { seo, site } from "@/lib/content";
 import "./globals.css";
@@ -13,6 +13,14 @@ const geistSans = Geist({
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
+  display: "swap",
+});
+
+// Handwriting face for the polaroid-wall scrawl notes on the blog.
+const caveat = Caveat({
+  variable: "--font-caveat",
+  subsets: ["latin"],
+  weight: ["500", "700"],
   display: "swap",
 });
 
@@ -84,7 +92,7 @@ export default function RootLayout({
       // animates the scroll to top instead of jumping.
       // See node_modules/next/dist/docs/01-app/02-guides/upgrading/version-16.md
       data-scroll-behavior="smooth"
-      className={`${geistSans.variable} ${geistMono.variable} h-full`}
+      className={`${geistSans.variable} ${geistMono.variable} ${caveat.variable} h-full`}
     >
       {/* Root layout is just the document shell. The public site chrome lives
           in app/(site)/layout.tsx and the admin area in app/admin/layout.tsx,

@@ -18,6 +18,8 @@ function rowToPost(row: any): Post {
     body: row.body ?? "",
     coverUrl: row.cover_url ?? null,
     keywords: row.keywords ?? [],
+    scrawl: row.scrawl ?? "",
+    category: row.category ?? "",
     readingMinutes: row.reading_minutes ?? 3,
     status: row.status,
     publishedAt: row.published_at ?? null,

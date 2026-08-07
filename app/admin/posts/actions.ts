@@ -49,6 +49,9 @@ function readForm(formData: FormData) {
     .split(",")
     .map((k) => k.trim())
     .filter(Boolean);
+  // Polaroid-wall card fields — both optional.
+  const scrawl = String(formData.get("scrawl") ?? "").trim();
+  const category = String(formData.get("category") ?? "").trim();
   const status =
     String(formData.get("status") ?? "draft") === "published"
       ? "published"
@@ -65,6 +68,8 @@ function readForm(formData: FormData) {
     body,
     coverUrl,
     keywords,
+    scrawl,
+    category,
     status,
     readingMinutes,
   };
@@ -121,6 +126,8 @@ export async function createPost(
     body: f.body,
     cover_url: f.coverUrl,
     keywords: f.keywords,
+    scrawl: f.scrawl,
+    category: f.category,
     reading_minutes: f.readingMinutes,
     status: f.status,
     published_at: f.status === "published" ? new Date().toISOString() : null,
@@ -177,6 +184,8 @@ export async function updatePost(
       body: f.body,
       cover_url: f.coverUrl,
       keywords: f.keywords,
+      scrawl: f.scrawl,
+      category: f.category,
       reading_minutes: f.readingMinutes,
       status: f.status,
       published_at: publishedAt,
