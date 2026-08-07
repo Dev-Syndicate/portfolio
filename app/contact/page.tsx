@@ -4,8 +4,6 @@ import { Mail, MessageSquare, ShieldCheck } from "lucide-react";
 import { site } from "@/lib/content";
 import { PageHeader } from "@/components/ui/page-header";
 import { Reveal } from "@/components/ui/reveal";
-import { Pattern } from "@/components/ui/pattern";
-import { WaveDivider, ZONE } from "@/components/ui/wave-divider";
 import { Conversation } from "@/components/artwork/conversation";
 import { ContactForm } from "./contact-form";
 
@@ -44,12 +42,9 @@ export default function ContactPage() {
         visual={<Conversation />}
       />
 
-      {/* The form surfaces into near-white: the one place on the site where
-          we ask the visitor to do work, so it gets the clearest ground. */}
-      <WaveDivider from={ZONE.deep} to={ZONE.surface} flip />
-
-      <div className="tone-light relative isolate overflow-hidden pb-20">
-        <Pattern variant="scales" tone="text-accent/[0.16]" />
+      {/* The form area — the cards carry the structure; the ground stays the
+          same liquid as the rest of the site. */}
+      <div className="tone-light relative isolate pt-16 pb-20">
         <div className="relative container-page grid gap-12 pt-4 lg:grid-cols-[1fr_20rem] lg:gap-16">
           <Reveal className="surface-card p-7 sm:p-9">
             <ContactForm />

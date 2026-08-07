@@ -2,12 +2,10 @@ import type { Metadata } from "next";
 
 import { closingCta, site } from "@/lib/content";
 import { PageHeader } from "@/components/ui/page-header";
-import { Section, SectionHeader } from "@/components/ui/section";
-import { Card } from "@/components/ui/card";
-import { Reveal } from "@/components/ui/reveal";
+import { Section, SectionHeader, DividedGrid } from "@/components/ui/section";
+import { GridCell } from "@/components/ui/grid-cell";
 import { WhyUs } from "@/components/sections/why-us";
 import { ContactCta } from "@/components/sections/contact-cta";
-import { WaveDivider, ZONE } from "@/components/ui/wave-divider";
 import { PrincipleOrbit } from "@/components/artwork/principle-orbit";
 
 export const metadata: Metadata = {
@@ -50,8 +48,6 @@ export default function AboutPage() {
 
       <Section
         aria-labelledby="principles-heading"
-        pattern="waves"
-        patternTone="text-primary/[0.07]"
       >
         <SectionHeader
           id="principles-heading"
@@ -61,31 +57,27 @@ export default function AboutPage() {
           align="start"
         />
 
-        <ul className="mt-12 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+        <DividedGrid className="mt-9" cols="sm:grid-cols-2 lg:grid-cols-3">
           {principles.map((principle, i) => (
-            <Reveal as="li" key={principle.title} delay={i * 0.06}>
-              <Card className="flex h-full flex-col gap-3 p-7">
-                <span
-                  aria-hidden
-                  className="text-sm font-semibold tabular-nums text-primary"
-                >
-                  {String(i + 1).padStart(2, "0")}
-                </span>
-                <h3 className="text-lg font-semibold">{principle.title}</h3>
-                <p className="text-[0.9375rem] leading-relaxed text-muted-foreground">
-                  {principle.body}
-                </p>
-              </Card>
-            </Reveal>
+            <GridCell key={principle.title} className="gap-3">
+              <span
+                aria-hidden
+                className="font-mono text-[0.8125rem] font-semibold tabular-nums text-primary"
+              >
+                {String(i + 1).padStart(2, "0")}
+              </span>
+              <h3 className="text-lg font-semibold">{principle.title}</h3>
+              <p className="text-[0.9375rem] leading-relaxed text-muted-foreground">
+                {principle.body}
+              </p>
+            </GridCell>
           ))}
-        </ul>
+        </DividedGrid>
       </Section>
 
       {/* Process is not repeated here — /services carries it in full. */}
-      <WaveDivider from={ZONE.deep} to={ZONE.surface} flip />
       <WhyUs />
 
-      <WaveDivider from={ZONE.surface} to={ZONE.deep} />
       <ContactCta
         heading={closingCta.variants.about.heading}
         body={closingCta.variants.about.body}

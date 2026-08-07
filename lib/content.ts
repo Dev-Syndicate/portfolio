@@ -21,7 +21,7 @@ export const site = {
   /* PRD-COPY — Brand Promise */
   promise:
     "We don’t just build websites — we build digital experiences that help businesses establish credibility, attract customers, and scale confidently.",
-  email: "hello@devsyndicate.com",
+  email: "contact@devsyndicate.in",
   url: "https://devsyndicate.com",
 } as const;
 

@@ -1,6 +1,9 @@
 "use server";
 
 import { headers } from "next/headers";
+import { Resend } from "resend";
+
+import { site } from "@/lib/content";
 
 export type ContactState = {
   status: "idle" | "success" | "error";
@@ -12,13 +15,45 @@ export type ContactState = {
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
 /**
+ * Delivery config, read once from the server-side environment. None of these
+ * are `NEXT_PUBLIC_*`, so they never reach the browser bundle.
+ *
+ *   RESEND_API_KEY     — Resend secret key (server-only credential).
+ *   CONTACT_TO_EMAIL   — inbox that receives enquiries (defaults to site.email).
+ *   CONTACT_FROM_EMAIL — verified sender on our domain, e.g.
+ *                        "Dev Syndicate <contact@devsyndicate.in>".
+ *
+ * The recipient is fixed by config, never by form input — the form can't be
+ * used to relay mail to an arbitrary address.
+ */
+const RESEND_API_KEY = process.env.RESEND_API_KEY;
+const TO_EMAIL = process.env.CONTACT_TO_EMAIL ?? site.email;
+const FROM_EMAIL =
+  process.env.CONTACT_FROM_EMAIL ?? `Dev Syndicate <${site.email}>`;
+
+/** Neutralise a value before it goes into an email header (subject / reply-to).
+ *  Strips CR/LF so a crafted field can't inject extra headers, and caps length. */
+function headerSafe(value: string, max = 200): string {
+  return value.replace(/[\r\n]+/g, " ").trim().slice(0, max);
+}
+
+/** Minimal HTML escape so submitted text can't inject markup into the email body. */
+function escapeHtml(value: string): string {
+  return value
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
+
+/**
  * Handles a contact enquiry.
  *
- * Delivery is intentionally pluggable: set `CONTACT_WEBHOOK_URL` to any
- * endpoint that accepts a JSON POST (Resend, Formspree, a Slack incoming
- * webhook, your own handler). Until that is configured the action refuses the
- * submission and tells the visitor to email directly, rather than showing a
- * success message for a request that went nowhere.
+ * Enquiries are delivered via Resend to our own inbox. The visitor's address is
+ * set as Reply-To so the team can reply straight from the inbox, while `From`
+ * stays on our verified domain (required for deliverability, and it stops the
+ * form being used to spoof arbitrary senders). If the API key is absent the
+ * action refuses the submission rather than showing a false success.
  */
 export async function submitContact(
   _prev: ContactState,
@@ -52,38 +87,53 @@ export async function submitContact(
     return { status: "success", message: "Thanks — we've got your message." };
   }
 
-  const endpoint = process.env.CONTACT_WEBHOOK_URL;
-  if (!endpoint) {
+  if (!RESEND_API_KEY) {
+    // Misconfiguration, not the visitor's fault — log for us, fall back for them.
+    console.error("[contact] RESEND_API_KEY is not set; cannot deliver enquiry.");
     return {
       status: "error",
       message:
-        "Our form isn't connected yet — please email hello@devsyndicate.com directly and we'll pick it up from there.",
+        `Our form isn't connected yet — please email ${site.email} directly and we'll pick it up from there.`,
     };
   }
 
   try {
     const referer = (await headers()).get("referer") ?? undefined;
+    const resend = new Resend(RESEND_API_KEY);
 
-    const response = await fetch(endpoint, {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({
-        name,
-        email,
-        company: company || null,
-        interest: interest || null,
-        message,
-        submittedFrom: referer,
-      }),
+    const subject = headerSafe(
+      `New enquiry — ${name}${interest ? ` (${interest})` : ""}`,
+    );
+
+    const html = `
+      <h2>New contact enquiry</h2>
+      <table cellpadding="6" style="border-collapse:collapse;font-family:system-ui,sans-serif;font-size:14px">
+        <tr><td><strong>Name</strong></td><td>${escapeHtml(name)}</td></tr>
+        <tr><td><strong>Email</strong></td><td>${escapeHtml(email)}</td></tr>
+        <tr><td><strong>Company</strong></td><td>${escapeHtml(company) || "—"}</td></tr>
+        <tr><td><strong>Interest</strong></td><td>${escapeHtml(interest) || "—"}</td></tr>
+        <tr><td valign="top"><strong>Message</strong></td><td>${escapeHtml(message).replace(/\n/g, "<br>")}</td></tr>
+        <tr><td><strong>Submitted from</strong></td><td>${escapeHtml(referer ?? "—")}</td></tr>
+      </table>
+    `.trim();
+
+    const { error } = await resend.emails.send({
+      from: FROM_EMAIL,
+      to: TO_EMAIL,
+      // Visitor's address is only ever a Reply-To — never the From, never the
+      // recipient — and is header-sanitised above via the regex validation.
+      replyTo: email,
+      subject,
+      html,
     });
 
-    if (!response.ok) throw new Error(`Webhook responded ${response.status}`);
+    if (error) throw new Error(`${error.name}: ${error.message}`);
   } catch (error) {
     console.error("[contact] delivery failed:", error);
     return {
       status: "error",
       message:
-        "Something went wrong sending your message. Please email hello@devsyndicate.com instead.",
+        `Something went wrong sending your message. Please email ${site.email} instead.`,
     };
   }
 

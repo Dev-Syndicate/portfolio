@@ -5,7 +5,6 @@ import { TechnologyStrip } from "@/components/sections/technology-strip";
 import { ProcessStrip } from "@/components/sections/process-strip";
 import { Faq } from "@/components/sections/faq";
 import { ContactCta } from "@/components/sections/contact-cta";
-import { WaveDivider, ZONE } from "@/components/ui/wave-divider";
 
 /* ---------------------------------------------------------------------------
    Home is the overview. It touches every topic in the PRD's information
@@ -20,31 +19,19 @@ import { WaveDivider, ZONE } from "@/components/ui/wave-divider";
    card grid vs. a detail list, a horizontal band vs. tabs, a stepper vs. a
    timeline — so the two never read as the same block pasted twice.
 
-   Depth rhythm: the page starts deep, surfaces, sinks, and closes deep. Each
-   wave divider carries one transition.
+   Depth now comes from the fixed animated background and each section's
+   elevation rung, not from carved-in dividers — so the page reads as one
+   continuous lit space that the sections float over.
    --------------------------------------------------------------------------- */
-const { deep: DEEP, shallow: SHALLOW } = ZONE;
-
 export default function Home() {
   return (
     <>
       <Hero />
       <Trust />
-
-      <WaveDivider from={DEEP} to={SHALLOW} />
       <ServicesOverview />
-
-      <WaveDivider from={SHALLOW} to={DEEP} flip />
       <TechnologyStrip />
-
       <ProcessStrip />
-
-      <WaveDivider from={DEEP} to={SHALLOW} flip />
       <Faq />
-
-      {/* Close deep, so the final panel has the strongest contrast on the
-          page behind it. */}
-      <WaveDivider from={SHALLOW} to={DEEP} />
       <ContactCta />
     </>
   );

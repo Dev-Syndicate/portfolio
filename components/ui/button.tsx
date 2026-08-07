@@ -34,7 +34,7 @@ const variants: Record<ButtonVariant, string> = {
     "hover:bg-secondary/70 hover:shadow-[var(--elevation-2)]",
   ),
   outline: cn(
-    "glass text-foreground",
+    "conic-sweep glass text-foreground",
     "hover:border-primary/50 hover:text-primary",
   ),
   ghost: "text-foreground hover:bg-secondary",

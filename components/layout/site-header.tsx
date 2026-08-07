@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
@@ -90,30 +91,25 @@ export function SiteHeader() {
     >
       <nav
         aria-label="Main"
-        className="container-page flex h-18 items-center justify-between gap-6"
+        className="container-page flex h-18 items-center justify-between gap-6 2xl:h-24"
       >
         <Link
           href="/"
-          className="group flex items-center gap-2.5 text-base font-semibold tracking-tight"
+          className="group flex items-center gap-2.5 text-base font-semibold tracking-tight 2xl:gap-3 2xl:text-xl"
         >
-          <span
+          <Image
+            src="/dev-syndicate-logo.png"
+            alt=""
             aria-hidden
-            className="grid size-8 place-items-center rounded-lg bg-primary text-primary-foreground transition-transform duration-[var(--duration-base)] ease-spring group-hover:rotate-6"
-          >
-            <svg viewBox="0 0 24 24" className="size-4.5" fill="none">
-              <path
-                d="M4 7 9 12l-5 5M12 17h8"
-                stroke="currentColor"
-                strokeWidth="2.2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-          </span>
+            width={44}
+            height={44}
+            priority
+            className="size-8 transition-transform duration-[var(--duration-base)] ease-spring group-hover:rotate-6 2xl:size-11"
+          />
           {site.name}
         </Link>
 
-        <ul className="hidden items-center gap-1 md:flex">
+        <ul className="hidden items-center gap-1 md:flex 2xl:gap-2">
           {nav.map((item) => {
             const active =
               item.href === "/"
@@ -126,7 +122,7 @@ export function SiteHeader() {
                   href={item.href}
                   aria-current={active ? "page" : undefined}
                   className={cn(
-                    "relative rounded-full px-3.5 py-2 text-sm font-medium",
+                    "relative rounded-full px-3.5 py-2 text-sm font-medium 2xl:px-5  2xl:py-2.5 2xl:text-base",
                     "transition-colors duration-[var(--duration-fast)]",
                     active
                       ? "text-foreground"
@@ -150,7 +146,7 @@ export function SiteHeader() {
 
         <div className="hidden md:block">
           <Magnetic strength={0.25}>
-            <Button href="/contact" size="sm">
+            <Button href="/contact" size="sm" className="2xl:h-11 2xl:px-6 2xl:text-[0.9375rem]">
               Start Your Project
             </Button>
           </Magnetic>

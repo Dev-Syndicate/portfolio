@@ -83,6 +83,9 @@ export function Card({
         className,
       )}
     >
+      {/* Pin-1 node at the routed (chamfered) top-right corner — the card's
+          board-literacy tell, matching the hero panel. */}
+      <span aria-hidden className="card-node" />
       {children}
     </motion.div>
   );

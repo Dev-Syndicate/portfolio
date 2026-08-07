@@ -2,67 +2,41 @@ import type { ReactNode } from "react";
 
 import { cn } from "@/lib/utils";
 import { Reveal } from "@/components/ui/reveal";
-import { Pattern } from "@/components/ui/pattern";
+import { InstrumentLabel } from "@/components/ui/instrument";
 
 /**
- * Standard section shell: vertical rhythm, page container, and an optional
- * one-step-off background for alternating bands.
- */
-/**
- * `tone` picks which palette scope the section renders in:
- *   default — the deep navy canvas
- *   subtle  — one step up from it, for adjacent dark bands
- *   sky     — light blue scope (see `tone-sky` in globals.css)
- *   light   — near-white scope (see `tone-light`)
+ * Section shell — vertical rhythm and the page container, transparent.
  *
- * The light tones re-point the semantic tokens, so every component inside
- * inverts automatically without knowing it happened.
+ * There is no section-level background: every section sits on the one
+ * continuous liquid ground, so the motion breathes across the whole page.
+ * Separation comes from the bordered content panels (`DividedGrid`) and
+ * spacing, not from tinting the background. `tone` only re-points the semantic
+ * tokens so a raised section's cards/borders lift a step — the ground stays
+ * the same everywhere.
  */
 export function Section({
   id,
   children,
   className,
   tone = "default",
-  pattern,
-  patternTone,
   "aria-labelledby": ariaLabelledBy,
 }: {
   id?: string;
   children: ReactNode;
   className?: string;
   tone?: "default" | "subtle" | "sky" | "light";
-  /** Decorative texture layer. See `components/ui/pattern.tsx`. */
-  pattern?: "waves" | "scales" | "ripple" | "contour";
-  patternTone?: string;
   "aria-labelledby"?: string;
 }) {
-  const isLight = tone === "sky" || tone === "light";
+  const scope =
+    tone === "sky" ? "tone-sky" : tone === "light" ? "tone-light" : undefined;
+
   return (
     <section
       id={id}
       aria-labelledby={ariaLabelledBy}
-      className={cn(
-        "section-y relative isolate overflow-hidden",
-        tone === "subtle" && "bg-surface-subtle",
-        tone === "sky" && "tone-sky",
-        tone === "light" && "tone-light",
-        // Only the plain navy band gets the ambient wash — a run of identical
-        // dark sections is what reads as empty canvas. The light tones carry
-        // themselves.
-        tone === "default" && "section-glow",
-        className,
-      )}
-      // Anchor links land below the fixed header rather than under it
+      className={cn("section-y relative isolate", scope, className)}
       style={id ? { scrollMarginTop: "5.5rem" } : undefined}
     >
-      {pattern ? (
-        <Pattern
-          variant={pattern}
-          tone={
-            patternTone ?? (isLight ? "text-accent/12" : "text-primary/[0.07]")
-          }
-        />
-      ) : null}
       <div className="relative container-page">{children}</div>
     </section>
   );
@@ -70,14 +44,15 @@ export function Section({
 
 /**
  * Eyebrow + heading + intro, sharing one reveal so the block animates as a
- * unit instead of three separate slides.
+ * unit. `align="start"` is the default now — a left-locked header reads as
+ * structured; centred headers are what made sections feel like loose slides.
  */
 export function SectionHeader({
   id,
   eyebrow,
   heading,
   intro,
-  align = "center",
+  align = "start",
   className,
 }: {
   id?: string;
@@ -91,39 +66,57 @@ export function SectionHeader({
     <Reveal
       className={cn(
         "flex max-w-3xl flex-col gap-4",
-        align === "center" ? "mx-auto text-center items-center" : "items-start",
+        align === "center" ? "mx-auto items-center text-center" : "items-start",
         className,
       )}
     >
-      {eyebrow ? (
-        <span className="inline-flex items-center gap-2 rounded-full border border-border bg-card/70 px-3.5 py-1.5 text-[0.6875rem] font-semibold tracking-[0.14em] uppercase text-muted-foreground shadow-[var(--elevation-1)] backdrop-blur-sm">
-          <span aria-hidden className="size-1.5 rounded-full bg-primary" />
-          {eyebrow}
-        </span>
-      ) : null}
+      {eyebrow ? <InstrumentLabel>{eyebrow}</InstrumentLabel> : null}
 
       <h2
         id={id}
-        className="text-[clamp(1.875rem,3.6vw,2.875rem)] leading-[1.08] font-semibold tracking-[-0.03em]"
+        className="text-[clamp(1.875rem,3.4vw,3.5rem)] leading-[1.08] font-semibold tracking-[-0.03em]"
       >
         {heading}
       </h2>
 
       {intro ? (
-        <p className="text-[1.0625rem] leading-[1.7] text-muted-foreground sm:text-lg">
+        <p className="max-w-2xl text-[1.0625rem] leading-[1.7] text-muted-foreground sm:text-lg 2xl:max-w-3xl 2xl:text-xl">
           {intro}
         </p>
       ) : null}
-
-      <span
-        aria-hidden
-        className={cn(
-          "rule-fade mt-2 w-24",
-          align === "center" &&
-            "bg-gradient-to-r from-transparent via-primary/50 to-transparent",
-          align === "start" && "bg-gradient-to-r from-primary/60 to-transparent",
-        )}
-      />
     </Reveal>
+  );
+}
+
+/**
+ * A shared-border grid: cells sit flush against one another separated by a
+ * single hairline, framed by an outer border — the "spec sheet" structure.
+ * This is what stops cards floating: everything locks to one grid, no gaps, no
+ * raw void between them.
+ *
+ * Implemented with a 1px background showing through 1px gaps (the classic
+ * `gap` + `bg-border` trick), so every internal and outer rule is exactly one
+ * pixel and always aligned.
+ */
+export function DividedGrid({
+  children,
+  className,
+  cols = "sm:grid-cols-2 lg:grid-cols-3",
+}: {
+  children: ReactNode;
+  className?: string;
+  /** Responsive column classes. */
+  cols?: string;
+}) {
+  return (
+    <div
+      className={cn(
+        "grid gap-px overflow-hidden rounded-xl border border-border bg-border",
+        cols,
+        className,
+      )}
+    >
+      {children}
+    </div>
   );
 }

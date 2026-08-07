@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 
 import { nav, site } from "@/lib/content";
@@ -12,20 +13,14 @@ export function SiteFooter() {
             href="/"
             className="flex w-fit items-center gap-2.5 text-base font-semibold tracking-tight"
           >
-            <span
+            <Image
+              src="/dev-syndicate-logo.png"
+              alt=""
               aria-hidden
-              className="grid size-8 place-items-center rounded-lg bg-primary text-primary-foreground"
-            >
-              <svg viewBox="0 0 24 24" className="size-4.5" fill="none">
-                <path
-                  d="M4 7 9 12l-5 5M12 17h8"
-                  stroke="currentColor"
-                  strokeWidth="2.2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-            </span>
+              width={32}
+              height={32}
+              className="size-8"
+            />
             {site.name}
           </Link>
           <p className="text-sm leading-relaxed text-muted-foreground">

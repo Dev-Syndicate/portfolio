@@ -5,7 +5,6 @@ import { PageHeader } from "@/components/ui/page-header";
 import { Services } from "@/components/sections/services";
 import { Process } from "@/components/sections/process";
 import { ContactCta } from "@/components/sections/contact-cta";
-import { WaveDivider, ZONE } from "@/components/ui/wave-divider";
 import { LayerStack } from "@/components/artwork/layer-stack";
 
 export const metadata: Metadata = {
@@ -32,10 +31,7 @@ export default function ServicesPage() {
         visual={<LayerStack />}
       />
 
-      <WaveDivider from={ZONE.deep} to={ZONE.shallow} />
       <Services />
-
-      <WaveDivider from={ZONE.shallow} to={ZONE.deep} flip />
       <Process />
 
       <ContactCta

@@ -59,13 +59,19 @@ export function IconTile({
     <span
       aria-hidden
       className={cn(
-        "inline-flex size-11 shrink-0 items-center justify-center rounded-xl",
-        "bg-primary/10 text-primary",
+        // Squared tile with a hairline, not a soft pill — the instrument
+        // language is hard-edged. A single lit corner echoes the card node.
+        "relative inline-flex size-11 shrink-0 items-center justify-center rounded-md",
+        "border border-border bg-primary/10 text-primary",
         "transition-colors duration-[var(--duration-base)] ease-out-soft",
-        "group-hover:bg-primary group-hover:text-primary-foreground",
+        "group-hover:border-primary group-hover:bg-primary group-hover:text-primary-foreground",
         className,
       )}
     >
+      <span
+        aria-hidden
+        className="absolute top-1 right-1 size-0.5 bg-primary/70 group-hover:bg-primary-foreground/70"
+      />
       <Glyph className="size-5" strokeWidth={1.75} />
     </span>
   );

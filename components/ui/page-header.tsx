@@ -4,32 +4,26 @@ import { useRef, type ReactNode } from "react";
 import { motion, useReducedMotion, useScroll, useTransform } from "motion/react";
 
 import { cn } from "@/lib/utils";
-import { Pattern } from "@/components/ui/pattern";
+import { InstrumentLabel } from "@/components/ui/instrument";
 
 /**
  * Interior-page hero.
  *
- * Carries the same three ingredients as the home hero so the pages read as
- * one site: oversized editorial type, an asymmetric composition, and
- * scroll-linked parallax between the ambient light and the copy.
- *
- * `kicker` is an oversized ghosted word set behind the title. It is the one
- * piece of pure decoration here — it gives the section a second layer of
- * depth and stops a short page title from floating alone in a large space.
+ * Shares the home hero's language: the mono instrument label, oversized
+ * editorial type, an asymmetric composition, and scroll-linked parallax on the
+ * copy and artwork. It paints no background of its own — the site-wide liquid
+ * ground shows straight through, so every hero sits in the same lit space.
  */
 export function PageHeader({
   eyebrow,
   title,
   intro,
-  kicker,
   visual,
   children,
 }: {
   eyebrow: string;
   title: string;
   intro: string;
-  /** Ghosted background word. Defaults to the eyebrow. */
-  kicker?: string;
   /** Page-specific artwork. See `components/artwork/`. */
   visual?: ReactNode;
   children?: ReactNode;
@@ -42,48 +36,16 @@ export function PageHeader({
     offset: ["start start", "end start"],
   });
 
-  const glowY = useTransform(scrollYProgress, [0, 1], ["0%", "30%"]);
   const copyY = useTransform(scrollYProgress, [0, 1], ["0%", "22%"]);
-  const kickerX = useTransform(scrollYProgress, [0, 1], ["0%", "-14%"]);
-  // Artwork counter-moves against the copy, the same three-plane arrangement
-  // the home hero uses.
+  // Artwork counter-moves against the copy, the same arrangement the home hero
+  // uses.
   const visualY = useTransform(scrollYProgress, [0, 1], ["0%", "-12%"]);
   const fade = useTransform(scrollYProgress, [0, 0.85], [1, 0]);
 
   const words = title.split(" ");
 
   return (
-    // No bottom border: a wave divider follows on every page that uses this,
-    // and a hairline sitting directly above the crest reads as a seam.
     <section ref={ref} className="relative isolate overflow-hidden">
-      <motion.div
-        aria-hidden
-        style={reduceMotion ? undefined : { y: glowY }}
-        className="pointer-events-none absolute inset-0 -z-10"
-      >
-        <div
-          className="absolute -top-2/3 left-1/4 size-[46rem] rounded-full blur-[130px] motion-safe:animate-aurora"
-          style={{ background: "var(--glow-a)" }}
-        />
-        <div
-          className="absolute -top-1/2 right-0 size-[34rem] rounded-full blur-[130px] motion-safe:animate-aurora"
-          style={{ background: "var(--glow-b)", animationDelay: "-20s" }}
-        />
-        <div className="bg-noise absolute inset-0 opacity-40" />
-      </motion.div>
-
-      <Pattern variant="waves" tone="text-primary/[0.07]" />
-
-      {/* Ghosted kicker, clipped by the right edge. Aria-hidden — it repeats
-          the eyebrow and would only add noise to a screen reader. */}
-      <motion.span
-        aria-hidden
-        style={reduceMotion ? undefined : { x: kickerX, opacity: fade }}
-        className="pointer-events-none absolute -top-2 -right-8 -z-10 hidden text-[13vw] leading-none font-semibold tracking-[-0.05em] text-foreground/[0.035] select-none sm:block"
-      >
-        {kicker ?? eyebrow}
-      </motion.span>
-
       <div
         className={cn(
           "container-page grid items-center gap-12 pt-32 pb-16 sm:pt-36 sm:pb-20",
@@ -103,17 +65,14 @@ export function PageHeader({
           )}
         >
           <Rise reduceMotion={reduceMotion}>
-            <span className="glass inline-flex items-center gap-2 rounded-full px-3.5 py-1.5 text-[0.6875rem] font-semibold tracking-[0.16em] uppercase text-muted-foreground">
-              <span aria-hidden className="size-1.5 rounded-full bg-primary" />
-              {eyebrow}
-            </span>
+            <InstrumentLabel>{eyebrow}</InstrumentLabel>
           </Rise>
 
           <h1
             aria-label={title}
             // Height-aware, same as the home hero: a short laptop viewport
             // should not push the intro copy below the fold.
-            className="text-[clamp(2rem,min(4.6vw,6.4vh),3.5rem)] leading-[1.05] font-semibold tracking-[-0.035em]"
+            className="text-[clamp(2rem,min(4.8vw,7vh),4.75rem)] leading-[1.05] font-semibold tracking-[-0.035em]"
           >
             {words.map((word, i) => (
               <Rise key={`${word}-${i}`} reduceMotion={reduceMotion} inline>
@@ -132,7 +91,7 @@ export function PageHeader({
           </h1>
 
           <Rise reduceMotion={reduceMotion}>
-            <p className="max-w-2xl text-[1.0625rem] leading-[1.75] text-muted-foreground sm:text-lg">
+            <p className="max-w-2xl text-[1.0625rem] leading-[1.75] text-muted-foreground sm:text-lg 2xl:max-w-3xl 2xl:text-xl">
               {intro}
             </p>
           </Rise>

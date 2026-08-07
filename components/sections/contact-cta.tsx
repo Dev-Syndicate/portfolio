@@ -4,7 +4,6 @@ import { closingCta, site } from "@/lib/content";
 import { Button } from "@/components/ui/button";
 import { Magnetic } from "@/components/ui/magnetic";
 import { Reveal } from "@/components/ui/reveal";
-import { Pattern } from "@/components/ui/pattern";
 
 export function ContactCta({
   heading = closingCta.heading,
@@ -22,10 +21,10 @@ export function ContactCta({
     >
       <div className="container-page">
         <Reveal>
-          {/* The panel inverts to near-white against the deep navy close —
-              the single highest-contrast moment on the page, placed exactly
-              where we are asking for the click. */}
-          <div className="tone-light relative isolate overflow-hidden rounded-3xl border border-border px-6 py-16 text-center shadow-[var(--elevation-3)] sm:px-12 sm:py-20">
+          {/* The most-elevated panel on the page — a lifted dark band with a
+              lit border and pooled glow, placed exactly where we are asking
+              for the click. The highest-contrast moment on the page. */}
+          <div className="tone-light ring-glow relative isolate overflow-hidden rounded-3xl border border-border-strong/60 bg-card px-6 py-16 text-center shadow-[var(--elevation-3)] sm:px-12 sm:py-20">
             <div
               aria-hidden
               className="pointer-events-none absolute inset-0 -z-10"
@@ -39,8 +38,6 @@ export function ContactCta({
                 style={{ background: "var(--glow-b)", animationDelay: "-18s" }}
               />
             </div>
-            <Pattern variant="waves" tone="text-accent/[0.18]" />
-
             <div className="mx-auto flex max-w-2xl flex-col items-center gap-6">
               <h2
                 id="cta-heading"

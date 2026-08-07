@@ -4,6 +4,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { site } from "@/lib/content";
 import { SiteHeader } from "@/components/layout/site-header";
 import { SiteFooter } from "@/components/layout/site-footer";
+import { LiquidBackground } from "@/components/layout/liquid-background";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -46,7 +47,7 @@ export const viewport: Viewport = {
   // literal — the meta tag is emitted before any stylesheet loads, so it
   // cannot read `--ref-deep`. Keep this in sync with that variable in
   // app/globals.css; it is the one colour that has to be duplicated.
-  themeColor: "#0a1931",
+  themeColor: "#0a0a0c",
 };
 
 export default function RootLayout({
@@ -65,6 +66,7 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} h-full`}
     >
       <body className="flex min-h-full flex-col">
+        <LiquidBackground />
         <a
           href="#main"
           className="sr-only rounded-full bg-primary px-4 py-2 text-sm font-medium text-primary-foreground focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[200]"

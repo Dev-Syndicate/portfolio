@@ -5,7 +5,6 @@ import { PageHeader } from "@/components/ui/page-header";
 import { Button } from "@/components/ui/button";
 import { Reveal } from "@/components/ui/reveal";
 import { Technology } from "@/components/sections/technology-section";
-import { WaveDivider, ZONE } from "@/components/ui/wave-divider";
 import { DecisionGraph } from "@/components/artwork/decision-graph";
 
 export const metadata: Metadata = {
@@ -38,12 +37,7 @@ export default function InsightsPage() {
         visual={<DecisionGraph />}
       />
 
-      {/* Surfaces into near-white: a long reading section is the worst thing
-          to put on the darkest background. */}
-      <WaveDivider from={ZONE.deep} to={ZONE.surface} flip />
       <Technology />
-
-      <WaveDivider from={ZONE.surface} to={ZONE.deep} />
 
       <section className="section-glow section-y relative isolate overflow-hidden">
         <Reveal>

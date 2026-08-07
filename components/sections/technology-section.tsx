@@ -7,8 +7,6 @@ export function Technology() {
     <Section
       id="technology"
       tone="light"
-      pattern="waves"
-      patternTone="text-accent/20"
       aria-labelledby="technology-heading"
     >
       <SectionHeader

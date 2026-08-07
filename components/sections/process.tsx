@@ -6,8 +6,6 @@ export function Process() {
   return (
     <Section
       id="process"
-      pattern="contour"
-      patternTone="text-primary/[0.08]"
       aria-labelledby="process-heading"
     >
       <SectionHeader
