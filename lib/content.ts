@@ -18,9 +18,10 @@
 
 export const site = {
   name: "Dev Syndicate",
-  /* PRD-COPY — Brand Promise */
+  /* Brand promise / default meta description — general, no filler. Feeds the
+     search snippet, OG/Twitter, schema, and footer. */
   promise:
-    "We don’t just build websites — we build digital experiences that help businesses establish credibility, attract customers, and scale confidently.",
+    "Dev Syndicate is a software development company that solves complex problems with software, AI, and automation — from websites and web or mobile apps to API integrations and intelligent workflows.",
   email: "contact@devsyndicate.in",
   /* Canonical domain. Everything SEO (canonicals, sitemap, robots, OG)
      resolves from this one value. It must match where the live host actually
