@@ -102,16 +102,29 @@ export function DividedGrid({
   children,
   className,
   cols = "sm:grid-cols-2 lg:grid-cols-3",
+  mobileCards = false,
 }: {
   children: ReactNode;
   className?: string;
   /** Responsive column classes. */
   cols?: string;
+  /**
+   * On mobile, render as a gap-separated stack of standalone cards instead of
+   * the flush shared-border panel. The panel collapses to one column below
+   * `sm` anyway, and a stack of identical flush boxes reads as monotonous on a
+   * phone; separate on-brand cards give each item its own surface. Pair with
+   * `<GridCell mobileCard>` so the cells pick up the card styling to match.
+   * The flush spec-sheet returns unchanged at `sm`+.
+   */
+  mobileCards?: boolean;
 }) {
   return (
     <div
       className={cn(
-        "grid gap-px overflow-hidden rounded-xl border border-border bg-border",
+        mobileCards
+          ? // Mobile: standalone cards. sm+: the flush shared-border panel.
+            "flex flex-col gap-3 sm:grid sm:gap-px sm:overflow-hidden sm:rounded-xl sm:border sm:border-border sm:bg-border"
+          : "grid gap-px overflow-hidden rounded-xl border border-border bg-border",
         cols,
         className,
       )}

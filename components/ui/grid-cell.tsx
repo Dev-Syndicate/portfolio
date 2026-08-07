@@ -24,6 +24,7 @@ export function GridCell({
   className,
   interactive = true,
   href,
+  mobileCard = false,
   "aria-label": ariaLabel,
 }: {
   children: ReactNode;
@@ -31,6 +32,12 @@ export function GridCell({
   interactive?: boolean;
   /** Render the whole cell as a link. */
   href?: string;
+  /**
+   * On mobile, render as a standalone on-brand card (chamfer + node + border +
+   * elevation) instead of a flush filled cell. Use inside a
+   * `<DividedGrid mobileCards>`. Reverts to the flush cell at `sm`+.
+   */
+  mobileCard?: boolean;
   "aria-label"?: string;
 }) {
   const ref = useRef<HTMLElement>(null);
@@ -47,6 +54,13 @@ export function GridCell({
 
   const classes = cn(
     "group/cell relative flex flex-col bg-card p-7 2xl:p-9",
+    // Mobile card mode: standalone rounded, bordered, elevated surface with its
+    // own padding; at sm+ every one of those traits is reset so it becomes a
+    // flush filled cell inside the shared-border grid again.
+    mobileCard && [
+      "rounded-xl border border-border p-6 shadow-[var(--elevation-1)]",
+      "sm:rounded-none sm:border-0 sm:p-7 sm:shadow-none 2xl:p-9",
+    ],
     interactive && [
       "spotlight isolate",
       "transition-colors duration-[var(--duration-base)] ease-out-soft",

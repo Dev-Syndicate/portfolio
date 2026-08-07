@@ -61,9 +61,11 @@ export const metadata: Metadata = {
       "max-video-preview": -1,
     },
   },
-  // Placeholder — paste the token from Google Search Console here to verify
-  // ownership of devsyndicate.in, then submit the sitemap.
-  // verification: { google: "PASTE_GSC_TOKEN_HERE" },
+  // Google Search Console ownership verification for www.devsyndicate.in.
+  // A public ownership claim, not a secret — safe to commit.
+  verification: {
+    google: "nGPRdcdcn94uKBjsLzkBK2Nebm0oO5gOwPqVE_qANzk",
+  },
 };
 
 export const viewport: Viewport = {

@@ -12,9 +12,9 @@ export function WhyUs() {
         intro={whyUs.intro}
       />
 
-      <DividedGrid className="mt-9" cols="md:grid-cols-2">
+      <DividedGrid className="mt-9" cols="md:grid-cols-2" mobileCards>
         {whyUs.reasons.map((reason, i) => (
-          <GridCell key={reason.title} className="gap-4 sm:p-8">
+          <GridCell key={reason.title} className="gap-4 sm:p-8" mobileCard>
             <div className="flex items-center gap-3">
               <span
                 aria-hidden

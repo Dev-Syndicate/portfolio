@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 
 import { articles } from "@/lib/articles";
@@ -46,18 +45,11 @@ export const metadata = pageMetadata({
 });
 
 /**
- * The single home for the technology stack.
- *
- * The stack lists and business-impact write-ups used to appear here, on the
- * home page, and on /services — the same framework names printed three times.
- * They now live here only; the other two pages name the six areas at most
- * and link across.
- *
- * There are no articles yet and the content document does not define a model
- * for them. Rather than list titles that do not exist, the page does
- * something useful with what we do have: the reasoning behind each technology
- * choice, which is the same thinking a first article would contain. When the
- * content model is defined, add `app/insights/[slug]/page.tsx` alongside this.
+ * The Insights hub: real articles (lib/articles.ts, rendered at
+ * app/insights/[slug]) plus the single home for the technology-stack
+ * reasoning. The stack write-ups used to also appear on the home and services
+ * pages — the same framework names printed three times — and now live here
+ * only; the other pages name the six areas at most and link across.
  */
 export default function InsightsPage() {
   return (

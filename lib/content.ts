@@ -23,8 +23,11 @@ export const site = {
     "We don’t just build websites — we build digital experiences that help businesses establish credibility, attract customers, and scale confidently.",
   email: "contact@devsyndicate.in",
   /* Canonical domain. Everything SEO (canonicals, sitemap, robots, OG)
-     resolves from this one value, so it must be the domain we actually own. */
-  url: "https://devsyndicate.in",
+     resolves from this one value. It must match where the live host actually
+     serves the site: the server 308-redirects devsyndicate.in → the www host,
+     so www is the canonical. Both URLs stay reachable for visitors; the
+     non-www one simply redirects here, consolidating all ranking signals. */
+  url: "https://www.devsyndicate.in",
 } as const;
 
 /* -------------------------------------------------------------------------- */

@@ -71,9 +71,13 @@ export default function AboutPage() {
           align="start"
         />
 
-        <DividedGrid className="mt-9" cols="sm:grid-cols-2 lg:grid-cols-3">
+        <DividedGrid
+          className="mt-9"
+          cols="sm:grid-cols-2 lg:grid-cols-3"
+          mobileCards
+        >
           {principles.map((principle, i) => (
-            <GridCell key={principle.title} className="gap-3">
+            <GridCell key={principle.title} className="gap-3" mobileCard>
               <span
                 aria-hidden
                 className="font-mono text-[0.8125rem] font-semibold tabular-nums text-primary"

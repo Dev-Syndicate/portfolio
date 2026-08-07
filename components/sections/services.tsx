@@ -49,8 +49,11 @@ export function Services() {
       {/* Featured service spans the full top row of one shared-border panel;
           the other four fill a 2×2 beneath, so all five read as one framed set
           rather than a big card plus loose ones. */}
-      <DividedGrid className="mt-9" cols="md:grid-cols-2">
-        <GridCell className="gap-8 md:col-span-2 sm:p-9 lg:flex-row lg:items-center lg:gap-12">
+      <DividedGrid className="mt-9" cols="md:grid-cols-2" mobileCards>
+        <GridCell
+          mobileCard
+          className="gap-8 md:col-span-2 sm:p-9 lg:flex-row lg:items-center lg:gap-12"
+        >
           <div className="flex flex-col gap-4 lg:flex-1">
             <div className="flex items-center gap-4">
               <IconTile name={featured.icon as IconName} className="size-12" />
@@ -86,7 +89,7 @@ export function Services() {
         </GridCell>
 
         {rest.map((service) => (
-          <GridCell key={service.title} className="gap-4">
+          <GridCell key={service.title} className="gap-4" mobileCard>
             <IconTile name={service.icon as IconName} />
             <h3 className="text-xl font-semibold">{service.title}</h3>
             <p className="text-[0.9375rem] leading-[1.7] text-muted-foreground">
