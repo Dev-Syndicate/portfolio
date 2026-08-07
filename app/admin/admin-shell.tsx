@@ -38,23 +38,14 @@ export function AdminShell({
             </span>
           </Link>
 
-          <div className="flex items-center gap-2">
-            <Link
-              href="/blog"
-              target="_blank"
-              className="hidden rounded-full px-3.5 py-2 text-sm text-muted-foreground transition-colors hover:text-foreground sm:inline-flex"
+          <form action={logout}>
+            <button
+              type="submit"
+              className="rounded-full border border-border px-4 py-2 text-sm font-medium text-muted-foreground transition-colors hover:border-border-strong hover:text-foreground"
             >
-              View blog ↗
-            </Link>
-            <form action={logout}>
-              <button
-                type="submit"
-                className="rounded-full border border-border px-4 py-2 text-sm font-medium text-muted-foreground transition-colors hover:border-border-strong hover:text-foreground"
-              >
-                Sign out
-              </button>
-            </form>
-          </div>
+              Sign out
+            </button>
+          </form>
         </div>
       </header>
 

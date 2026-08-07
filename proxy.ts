@@ -2,15 +2,16 @@ import { NextResponse, type NextRequest } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 
 /**
- * Proxy (Next 16's renamed middleware). Two jobs:
- *   1. Refresh the Supabase auth session on every matched request so the
- *      admin's login stays valid across navigations.
- *   2. Guard /admin — anyone without a valid session is bounced to the login
- *      page before the protected route ever renders. This is server-side, so
- *      it can't be bypassed by tampering with the client.
+ * Proxy (Next 16's renamed middleware). Jobs:
+ *   1. Refresh the Supabase auth session on every request so the admin's login
+ *      stays valid across navigations.
+ *   2. Guard /admin — no valid session → bounced to login (server-side, can't
+ *      be bypassed from the client).
+ *   3. Lock the admin in: while signed in, visiting any PUBLIC page redirects
+ *      back to /admin. The admin experience is contained until sign-out.
  *
- * The public site (/, /blog, etc.) is unaffected — the matcher scopes this to
- * /admin only (plus it excludes static assets).
+ * Trade-off of (3): a signed-in admin cannot view the public site or the live
+ * blog — sign out (or use a private window) to preview it.
  */
 export async function proxy(request: NextRequest) {
   let response = NextResponse.next({ request });
@@ -36,8 +37,8 @@ export async function proxy(request: NextRequest) {
     },
   );
 
-  // IMPORTANT: getUser() revalidates the token with Supabase (getSession only
-  // reads the cookie and can be spoofed). Use getUser for the auth gate.
+  // getUser() revalidates the token with Supabase (getSession only reads the
+  // cookie and can be spoofed). Use getUser for the auth gate.
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -46,15 +47,14 @@ export async function proxy(request: NextRequest) {
   const isLogin = pathname === "/admin/login";
   const isAdmin = pathname.startsWith("/admin");
 
-  // Admin responses must never be cached by the browser or a CDN — otherwise
-  // the back/forward cache can show a stale admin page after sign-out. This
-  // forces a fresh server round-trip (and this auth check) every time.
+  // Admin responses must never be cached, or the back/forward cache can show a
+  // stale admin page after sign-out. Public pages keep their normal caching.
   const noStore = (res: NextResponse) => {
     res.headers.set("Cache-Control", "no-store, no-cache, must-revalidate");
     return res;
   };
 
-  // Not signed in and trying to reach a protected admin page → send to login.
+  // --- Not signed in, reaching a protected admin page → login ---
   if (isAdmin && !isLogin && !user) {
     const url = request.nextUrl.clone();
     url.pathname = "/admin/login";
@@ -62,9 +62,7 @@ export async function proxy(request: NextRequest) {
     return noStore(NextResponse.redirect(url));
   }
 
-  // Already signed in and hitting the login page → go straight to dashboard.
-  // (The client also replace()s on login, so this only fires on a direct visit
-  // to /admin/login while already authenticated.)
+  // --- Signed in, on the login page → straight to the dashboard ---
   if (isLogin && user) {
     const url = request.nextUrl.clone();
     url.pathname = "/admin";
@@ -72,11 +70,25 @@ export async function proxy(request: NextRequest) {
     return noStore(NextResponse.redirect(url));
   }
 
-  return noStore(response);
+  // --- Signed in, on a PUBLIC page → lock back into admin ---
+  // (Everything that isn't /admin is public here — the matcher already
+  //  excludes static assets, images, OG, sitemap, robots, etc.)
+  if (user && !isAdmin) {
+    const url = request.nextUrl.clone();
+    url.pathname = "/admin";
+    url.search = "";
+    return noStore(NextResponse.redirect(url));
+  }
+
+  // Admin pages get no-store; public pages keep their normal caching.
+  return isAdmin ? noStore(response) : response;
 }
 
 export const config = {
-  // Run only on /admin routes. Everything else (public site, static assets,
-  // image optimisation) is untouched, so the guard never blocks CSS/JS/images.
-  matcher: ["/admin/:path*"],
+  // Run on everything EXCEPT Next internals and static assets, so the admin
+  // lock can apply to public routes without ever blocking CSS/JS/images/fonts
+  // or the SEO files. Anything with a file extension is skipped.
+  matcher: [
+    "/((?!_next/static|_next/image|favicon.ico|icon.png|apple-icon.png|opengraph-image|robots.txt|sitemap.xml|manifest.webmanifest|.*\\.(?:png|jpg|jpeg|gif|webp|avif|svg|ico|txt|xml|webmanifest)$).*)",
+  ],
 };
