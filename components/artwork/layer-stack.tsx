@@ -25,8 +25,7 @@ type Layer = {
 };
 
 /* Top to bottom, matching how the stack is usually drawn.
-   Each `detail` says what the layer is *for*, not which tools sit in it —
-   the framework names belong on /insights and nowhere else. */
+   Each `detail` says what the layer is *for*, not which tools sit in it. */
 const layers: Layer[] = [
   { icon: Monitor, label: "Interface", detail: "What your customers see and touch" },
   { icon: Server, label: "Application", detail: "Business rules and integrations" },

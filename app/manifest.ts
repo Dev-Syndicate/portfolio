@@ -18,19 +18,28 @@ export default function manifest(): MetadataRoute.Manifest {
     icons: [
       {
         src: "/icon.png",
-        sizes: "64x64",
+        sizes: "96x96",
         type: "image/png",
       },
       {
-        src: "/apple-icon.png",
-        sizes: "180x180",
+        src: "/icon-192.png",
+        sizes: "192x192",
         type: "image/png",
+        purpose: "any",
       },
       {
-        src: "/dev-syndicate-logo.png",
+        src: "/icon-512.png",
         sizes: "512x512",
         type: "image/png",
         purpose: "any",
+      },
+      {
+        /* Maskable copy so Android can safely crop to its icon shape without
+           clipping the mark — the logo already carries generous padding. */
+        src: "/icon-512.png",
+        sizes: "512x512",
+        type: "image/png",
+        purpose: "maskable",
       },
     ],
   };

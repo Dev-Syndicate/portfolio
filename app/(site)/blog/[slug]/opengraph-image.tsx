@@ -2,14 +2,15 @@ import { ImageResponse } from "next/og";
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 
-import { articles, getArticle } from "@/lib/articles";
+import { getPublishedPost, getPublishedSlugs } from "@/lib/posts";
 import { site } from "@/lib/content";
 
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
-export function generateStaticParams() {
-  return articles.map((a) => ({ slug: a.slug }));
+export async function generateStaticParams() {
+  const slugs = await getPublishedSlugs();
+  return slugs.map((slug) => ({ slug }));
 }
 
 /** Per-article social share card — the article title on the brand void. */
@@ -19,8 +20,8 @@ export default async function ArticleOgImage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const article = getArticle(slug);
-  const title = article?.title ?? site.name;
+  const post = await getPublishedPost(slug);
+  const title = post?.title ?? site.name;
 
   const logo = await readFile(
     join(process.cwd(), "public", "dev-syndicate-logo.png"),
@@ -54,7 +55,7 @@ export default async function ArticleOgImage({
           }}
         >
           <span style={{ width: 10, height: 10, background: "#afb4bc" }} />
-          Insights
+          Blog
         </div>
 
         <div

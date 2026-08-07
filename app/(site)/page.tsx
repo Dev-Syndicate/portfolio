@@ -12,7 +12,7 @@ import { ContactCta } from "@/components/sections/contact-cta";
    FAQ. Services, Technology, and Process appear here in condensed form and
    link to the page that carries them in full:
 
-     Services   → /services      Technology → /insights
+     Services   → /services      Technology → /services
      Process    → /services      Why Us     → /about
 
    Each condensed block is also a different shape from its full version — a

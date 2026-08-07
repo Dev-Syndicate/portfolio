@@ -85,7 +85,7 @@ export const nav = [
   { href: "/", label: "Home" },
   { href: "/about", label: "About" },
   { href: "/services", label: "Services" },
-  { href: "/insights", label: "Insights" },
+  { href: "/blog", label: "Blog" },
   { href: "/contact", label: "Contact" },
 ] as const;
 
@@ -246,14 +246,14 @@ export const technology = {
   intro:
     "We choose tools for what they do for your business, not for what looks impressive on a slide.",
 
-  /* The full stack lists and impact write-ups live on /insights and nowhere
-     else. The home page names the six areas and links there — printing the
-     same stack on three pages made the site look padded. */
+  /* Home names the six areas; the approach behind the choices is on /services.
+     (The old technology-explainer page was folded away when Insights became
+     the Blog.) */
   strip: {
     heading: "Six areas, one standard",
     intro:
       "We pick per project rather than forcing one stack onto every problem.",
-    cta: { label: "How we choose", href: "/insights" },
+    cta: { label: "How we choose", href: "/services" },
   },
 
   groups: [

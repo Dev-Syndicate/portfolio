@@ -64,8 +64,7 @@ export function SiteFooter() {
             {technology.groups.map((group) => (
               <li key={group.id}>
                 <Link
-                  // Technology lives on /insights now, not /services.
-                  href="/insights#technology"
+                  href="/services"
                   className="text-sm text-muted-foreground transition-colors hover:text-foreground"
                 >
                   {group.title}

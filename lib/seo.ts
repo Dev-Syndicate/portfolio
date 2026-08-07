@@ -137,7 +137,7 @@ export function articleSchema(opts: {
   published: string;
   updated: string;
 }) {
-  const url = abs(`/insights/${opts.slug}`);
+  const url = abs(`/blog/${opts.slug}`);
   return {
     "@context": "https://schema.org",
     "@type": "Article",
@@ -146,7 +146,7 @@ export function articleSchema(opts: {
     description: opts.description,
     url,
     mainEntityOfPage: url,
-    image: abs(`/insights/${opts.slug}/opengraph-image`),
+    image: abs(`/blog/${opts.slug}/opengraph-image`),
     datePublished: opts.published,
     dateModified: opts.updated,
     author: { "@id": ORG_ID },

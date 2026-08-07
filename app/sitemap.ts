@@ -1,29 +1,30 @@
 import type { MetadataRoute } from "next";
 
 import { nav, site } from "@/lib/content";
-import { articles } from "@/lib/articles";
+import { getPublishedPosts } from "@/lib/posts";
 
 /**
- * XML sitemap. Static pages carry the deploy date (accurate for a site whose
- * content updates on deploy); articles carry their own real `updated` date so
- * crawlers see genuine per-post freshness rather than one shared timestamp.
+ * XML sitemap. Static pages carry the deploy date; blog posts are pulled live
+ * from Supabase and carry their own real published/updated dates so crawlers
+ * see genuine per-post freshness.
  */
-export default function sitemap(): MetadataRoute.Sitemap {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const deployDate = new Date();
 
   const pages: MetadataRoute.Sitemap = nav.map((item) => ({
     url: new URL(item.href, site.url).toString(),
     lastModified: deployDate,
-    changeFrequency: item.href === "/insights" ? "weekly" : "monthly",
+    changeFrequency: item.href === "/blog" ? "weekly" : "monthly",
     priority: item.href === "/" ? 1 : 0.8,
   }));
 
-  const posts: MetadataRoute.Sitemap = articles.map((article) => ({
-    url: new URL(`/insights/${article.slug}`, site.url).toString(),
-    lastModified: new Date(article.updated),
+  const posts = await getPublishedPosts();
+  const postEntries: MetadataRoute.Sitemap = posts.map((post) => ({
+    url: new URL(`/blog/${post.slug}`, site.url).toString(),
+    lastModified: new Date(post.updatedAt),
     changeFrequency: "yearly",
     priority: 0.6,
   }));
 
-  return [...pages, ...posts];
+  return [...pages, ...postEntries];
 }
