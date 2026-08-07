@@ -99,8 +99,7 @@ export function SiteHeader() {
         >
           <Image
             src="/dev-syndicate-logo.png"
-            alt=""
-            aria-hidden
+            alt="Dev Syndicate logo"
             width={44}
             height={44}
             priority

@@ -127,6 +127,10 @@ export function HeroVisual() {
               strokeWidth={3.5}
               strokeLinejoin="miter"
               strokeLinecap="square"
+              /* Rendered hidden as a real attribute so the pre-hydration paint
+                 shows nothing — otherwise the full paths flash for a frame
+                 before Motion applies `initial` and snaps them back to empty. */
+              opacity={reduceMotion ? undefined : 0}
               initial={reduceMotion ? false : { pathLength: 0, opacity: 0 }}
               animate={reduceMotion ? undefined : { pathLength: 1, opacity: 1 }}
               transition={
@@ -162,6 +166,10 @@ export function HeroVisual() {
                 style={{
                   animation: "mark-pulse 5s linear infinite",
                   animationDelay: `${ENERGIZE_AT + 2 + i * 0.4}s`,
+                  /* `backwards` holds the first keyframe (opacity 0) through the
+                     delay, so the packet stays invisible until its path has
+                     drawn — no stray dash flashing on first paint. */
+                  animationFillMode: "backwards",
                   opacity: 0.9,
                 }}
               />

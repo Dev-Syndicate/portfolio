@@ -1,7 +1,9 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 
-import { site } from "@/lib/content";
+import { seo, site } from "@/lib/content";
+import { organizationSchema, websiteSchema } from "@/lib/seo";
+import { JsonLd } from "@/components/seo/json-ld";
 import { SiteHeader } from "@/components/layout/site-header";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { LiquidBackground } from "@/components/layout/liquid-background";
@@ -22,24 +24,46 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   metadataBase: new URL(site.url),
   title: {
-    default: `${site.name} — Building Digital Experiences That Help Businesses Grow`,
+    default: `${site.name} — ${seo.tagline} | Building Digital Experiences That Help Businesses Grow`,
     template: `%s — ${site.name}`,
   },
   description: site.promise,
   applicationName: site.name,
+  keywords: [...seo.keywords],
+  authors: [{ name: site.name, url: site.url }],
+  creator: site.name,
+  publisher: site.name,
+  // Home is the canonical root; interior pages set their own.
+  alternates: { canonical: "/" },
   openGraph: {
     type: "website",
     siteName: site.name,
+    locale: "en",
     url: site.url,
-    title: `${site.name} — Building Digital Experiences That Help Businesses Grow`,
+    title: `${site.name} — ${seo.tagline}`,
     description: site.promise,
+    // OG image URL + alt come from app/opengraph-image.tsx (file convention),
+    // which exports `alt` — no manual image entry needed here.
   },
   twitter: {
     card: "summary_large_image",
-    title: site.name,
+    title: `${site.name} — ${seo.tagline}`,
     description: site.promise,
   },
-  robots: { index: true, follow: true },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+      "max-video-preview": -1,
+    },
+  },
+  // Placeholder — paste the token from Google Search Console here to verify
+  // ownership of devsyndicate.in, then submit the sitemap.
+  // verification: { google: "PASTE_GSC_TOKEN_HERE" },
 };
 
 export const viewport: Viewport = {
@@ -66,6 +90,7 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} h-full`}
     >
       <body className="flex min-h-full flex-col">
+        <JsonLd data={[organizationSchema(), websiteSchema()]} />
         <LiquidBackground />
         <a
           href="#main"

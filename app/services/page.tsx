@@ -1,17 +1,32 @@
-import type { Metadata } from "next";
-
-import { closingCta } from "@/lib/content";
+import { closingCta, services } from "@/lib/content";
+import {
+  pageMetadata,
+  webPageSchema,
+  breadcrumbSchema,
+  servicesSchema,
+} from "@/lib/seo";
+import { JsonLd } from "@/components/seo/json-ld";
 import { PageHeader } from "@/components/ui/page-header";
 import { Services } from "@/components/sections/services";
 import { Process } from "@/components/sections/process";
 import { ContactCta } from "@/components/sections/contact-cta";
 import { LayerStack } from "@/components/artwork/layer-stack";
 
-export const metadata: Metadata = {
+const description =
+  "Website development, web applications, mobile apps, API integrations, and automation — engineered around the business outcome, not the tech stack.";
+
+export const metadata = pageMetadata({
   title: "Services",
-  description:
-    "Website development, web applications, integrations, and automation — engineered around the business outcome, not the tech stack.",
-};
+  description,
+  path: "/services",
+  keywords: [
+    "website development",
+    "web application development",
+    "mobile app development",
+    "API integration services",
+    "workflow automation",
+  ],
+});
 
 /**
  * Owns the full detail for Services and Process. The home page shows
@@ -24,6 +39,20 @@ export const metadata: Metadata = {
 export default function ServicesPage() {
   return (
     <>
+      <JsonLd
+        data={[
+          webPageSchema({
+            path: "/services",
+            name: "Services — Dev Syndicate",
+            description,
+          }),
+          breadcrumbSchema([
+            { name: "Home", path: "/" },
+            { name: "Services", path: "/services" },
+          ]),
+          servicesSchema(services.items),
+        ]}
+      />
       <PageHeader
         eyebrow="Services"
         title="Engineering scoped to the outcome you need."

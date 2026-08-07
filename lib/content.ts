@@ -22,7 +22,54 @@ export const site = {
   promise:
     "We don’t just build websites — we build digital experiences that help businesses establish credibility, attract customers, and scale confidently.",
   email: "contact@devsyndicate.in",
-  url: "https://devsyndicate.com",
+  /* Canonical domain. Everything SEO (canonicals, sitemap, robots, OG)
+     resolves from this one value, so it must be the domain we actually own. */
+  url: "https://devsyndicate.in",
+} as const;
+
+/* -------------------------------------------------------------------------- */
+/* SEO / brand entity — the single source of truth for search.                */
+/* -------------------------------------------------------------------------- */
+
+export const seo = {
+  /* A short, keyword-bearing tagline used after the brand name in titles. */
+  tagline: "Web Engineering Studio",
+
+  /* Every way people spell or shorten the brand. Google uses Organization
+     `alternateName` to understand these all refer to one entity, which is what
+     lets the site rank for each variant. Keep these ALSO present in real page
+     copy (footer/About) — schema-only claims are discounted. */
+  alternateNames: [
+    "DS",
+    "Dev Syndicate",
+    "DevSyndicate",
+    "Developer Syndicate",
+    "Developers Syndicate",
+    "D Syndicate",
+    "Dev Syndicate Studio",
+  ],
+
+  /* Broad keyword set surfaced site-wide; pages add their own on top. */
+  keywords: [
+    "Dev Syndicate",
+    "DevSyndicate",
+    "Developer Syndicate",
+    "D Syndicate",
+    "DS web studio",
+    "web engineering studio",
+    "web development studio",
+    "website development",
+    "web application development",
+    "Next.js development",
+    "React development studio",
+    "Flutter app development",
+    "API integration",
+    "custom software development",
+  ],
+
+  /* Profile URLs that tie the brand entity together via schema `sameAs`.
+     Add real URLs here as they exist — one place, flows everywhere. */
+  sameAs: [] as string[],
 } as const;
 
 export const nav = [
@@ -205,6 +252,9 @@ export const technology = {
       id: "frontend",
       icon: "monitor",
       title: "Modern Frontend",
+      /* Short, on-message distillation of `impact` — used where a full
+         paragraph won't fit (mobile cards). Not a new claim; a condensation. */
+      outcome: "Fast, responsive interfaces that keep visitors engaged.",
       stack: [
         "Next.js",
         "React",
@@ -220,6 +270,7 @@ export const technology = {
       id: "mobile",
       icon: "tablet-smartphone",
       title: "Mobile Development",
+      outcome: "One codebase ships to both app stores.",
       stack: ["Flutter", "Dart", "iOS", "Android"],
       impact:
         "A single Flutter codebase covers both app stores, so you fund one build instead of two and every release reaches iOS and Android at the same time.",
@@ -228,6 +279,7 @@ export const technology = {
       id: "backend",
       icon: "server",
       title: "Backend Engineering",
+      outcome: "Secure, scalable systems built to grow with you.",
       stack: ["Node.js", "Express", "Django", "FastAPI"],
       impact:
         "A reliable backend keeps your business running smoothly by handling data securely, supporting future expansion, and enabling advanced business functionality.",
@@ -236,6 +288,7 @@ export const technology = {
       id: "databases",
       icon: "database",
       title: "Databases",
+      outcome: "Reliable data foundations that scale.",
       stack: ["PostgreSQL", "MongoDB", "Firebase"],
       impact:
         "Choosing the right database ensures reliability, security, and the flexibility to support future business growth.",
@@ -244,6 +297,7 @@ export const technology = {
       id: "cloud",
       icon: "cloud",
       title: "Cloud & Deployment",
+      outcome: "Dependable delivery with minimal downtime.",
       stack: ["Docker", "Vercel", "Cloudflare", "GitHub Actions"],
       impact:
         "Reliable deployment pipelines and cloud infrastructure minimise downtime while ensuring your website remains available and performs consistently.",
@@ -252,6 +306,7 @@ export const technology = {
       id: "ai",
       icon: "bot",
       title: "AI & Automation",
+      outcome: "Automated workflows that free up your team.",
       stack: ["OpenAI", "LangChain", "Workflow Automation"],
       impact:
         "Automating repetitive workflows helps your business operate more efficiently, respond faster to customers, and focus on higher-value work.",

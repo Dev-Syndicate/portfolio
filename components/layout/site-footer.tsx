@@ -15,8 +15,7 @@ export function SiteFooter() {
           >
             <Image
               src="/dev-syndicate-logo.png"
-              alt=""
-              aria-hidden
+              alt="Dev Syndicate logo"
               width={32}
               height={32}
               className="size-8"
@@ -25,6 +24,14 @@ export function SiteFooter() {
           </Link>
           <p className="text-sm leading-relaxed text-muted-foreground">
             {site.promise}
+          </p>
+          {/* Natural on-page reinforcement of the brand's alternate names, so
+              the Organization schema's alternateName isn't a schema-only claim
+              — this is what helps the site rank for each spelling. */}
+          <p className="text-xs leading-relaxed text-muted-foreground/70">
+            Dev Syndicate — also known as DS, DevSyndicate, or Developer
+            Syndicate — is a web engineering studio building websites, web and
+            mobile applications, and automation.
           </p>
         </div>
 

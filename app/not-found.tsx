@@ -1,6 +1,14 @@
+import type { Metadata } from "next";
 import { ArrowLeft } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+
+export const metadata: Metadata = {
+  title: "Page not found",
+  description: "The page you’re looking for doesn’t exist or has moved.",
+  // A 404 should never be indexed or waste crawl budget.
+  robots: { index: false, follow: true },
+};
 
 export default function NotFound() {
   return (

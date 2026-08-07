@@ -26,7 +26,44 @@ export function ProcessStrip() {
         intro={process.strip.intro}
       />
 
-      <DividedGrid className="mt-9" cols="sm:grid-cols-2 lg:grid-cols-5">
+      {/* Mobile: a numbered vertical timeline. A connecting spine threads the
+          five stages into one sequence — a distinct rhythm from the card grids
+          above and below, so the scroll has texture instead of repeating one
+          shape. Reads as "a process," which is the point of the section. */}
+      <ol className="mt-8 flex flex-col sm:hidden">
+        {process.steps.map((step, i) => {
+          const last = i === process.steps.length - 1;
+          return (
+            <li key={step.title} className="relative flex gap-4 pb-8 last:pb-0">
+              {/* Spine segment behind the marker, drawn for all but the last. */}
+              {!last && (
+                <span
+                  aria-hidden
+                  className="absolute top-9 left-[0.9375rem] h-[calc(100%-1.5rem)] w-px bg-border"
+                />
+              )}
+              <span
+                aria-hidden
+                className="relative z-10 flex size-8 shrink-0 items-center justify-center rounded-full border border-border bg-card font-mono text-[0.75rem] font-semibold tabular-nums text-primary"
+              >
+                {String(i + 1).padStart(2, "0")}
+              </span>
+              <div className="flex flex-col gap-1 pt-1">
+                <h3 className="text-base font-semibold">{step.title}</h3>
+                <p className="text-[0.875rem] leading-[1.6] text-muted-foreground">
+                  {step.question}
+                </p>
+              </div>
+            </li>
+          );
+        })}
+      </ol>
+
+      {/* sm+: unchanged — the shared-border horizontal stepper. */}
+      <DividedGrid
+        className="mt-9 hidden sm:grid"
+        cols="sm:grid-cols-2 lg:grid-cols-5"
+      >
         {process.steps.map((step, i) => (
           <GridCell key={step.title} className="gap-3">
             <span

@@ -156,7 +156,14 @@
   /* Layout. The container widens on big screens so a 1080p+ monitor isn't
      mostly empty margin, and section rhythm scales with it. */
   --container-max: 90rem;
-  --section-py: clamp(3.5rem, 6vw, 7rem);
+  /* Vertical section rhythm. On mobile the old `clamp(3.5rem, 6vw, 7rem)`
+     pinned to its 3.5rem floor for every section, so the whole page marched at
+     one flat cadence. The floor is now larger (4.5rem) and the fluid term
+     steeper, so sections breathe more on a phone; `section-y-lg`/`-sm` below
+     let individual sections break the cadence for hierarchy. */
+  --section-py: clamp(4.5rem, 11vw, 7rem);
+  --section-py-lg: clamp(6rem, 15vw, 9rem);
+  --section-py-sm: clamp(3rem, 7vw, 5rem);
 
   /* Layered elevation. A tight contact shadow plus a wide ambient one, over
      an inner top highlight — one soft blur alone reads as a grey smudge. */
@@ -411,6 +418,17 @@
 
 @utility section-y {
   padding-block: var(--section-py);
+}
+
+/* Rhythm modifiers — a section opts into a heavier or lighter cadence so the
+   page doesn't march at one constant spacing on mobile. Pair on the same
+   element as `section-y` (or use alone). */
+@utility section-y-lg {
+  padding-block: var(--section-py-lg);
+}
+
+@utility section-y-sm {
+  padding-block: var(--section-py-sm);
 }
 
 /* Headline emphasis. Starts at full foreground contrast and only resolves
@@ -799,8 +817,16 @@
    normalised to 600, dash period 40 + 560 = 600, so one full period per loop
    is seamless. This is what keeps the mark lit from within, no glow. */
 @keyframes mark-pulse {
+  from {
+    stroke-dashoffset: 0;
+    opacity: 0;
+  }
+  5% {
+    opacity: 0.9;
+  }
   to {
     stroke-dashoffset: -600;
+    opacity: 0.9;
   }
 }
 

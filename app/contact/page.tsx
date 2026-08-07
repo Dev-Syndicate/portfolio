@@ -1,17 +1,22 @@
-import type { Metadata } from "next";
 import { Mail, MessageSquare, ShieldCheck } from "lucide-react";
 
 import { site } from "@/lib/content";
+import { pageMetadata, webPageSchema, breadcrumbSchema } from "@/lib/seo";
+import { JsonLd } from "@/components/seo/json-ld";
 import { PageHeader } from "@/components/ui/page-header";
 import { Reveal } from "@/components/ui/reveal";
 import { Conversation } from "@/components/artwork/conversation";
 import { ContactForm } from "./contact-form";
 
-export const metadata: Metadata = {
+const description =
+  "Tell us what you're building and what it needs to achieve. We'll come back with an honest view of scope and approach. Contact Dev Syndicate to start your project.";
+
+export const metadata = pageMetadata({
   title: "Contact",
-  description:
-    "Tell us what you're building and what it needs to achieve. We'll come back with an honest view of scope and approach.",
-};
+  description,
+  path: "/contact",
+  keywords: ["contact Dev Syndicate", "hire web developers", "start a project"],
+});
 
 const details = [
   {
@@ -35,6 +40,15 @@ const details = [
 export default function ContactPage() {
   return (
     <>
+      <JsonLd
+        data={[
+          webPageSchema({ path: "/contact", name: "Contact — Dev Syndicate", description }),
+          breadcrumbSchema([
+            { name: "Home", path: "/" },
+            { name: "Contact", path: "/contact" },
+          ]),
+        ]}
+      />
       <PageHeader
         eyebrow="Contact"
         title="Tell us what you're building."

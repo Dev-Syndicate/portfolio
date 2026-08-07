@@ -1,6 +1,6 @@
-import type { Metadata } from "next";
-
 import { closingCta, site } from "@/lib/content";
+import { pageMetadata, webPageSchema, breadcrumbSchema } from "@/lib/seo";
+import { JsonLd } from "@/components/seo/json-ld";
 import { PageHeader } from "@/components/ui/page-header";
 import { Section, SectionHeader, DividedGrid } from "@/components/ui/section";
 import { GridCell } from "@/components/ui/grid-cell";
@@ -8,10 +8,15 @@ import { WhyUs } from "@/components/sections/why-us";
 import { ContactCta } from "@/components/sections/contact-cta";
 import { PrincipleOrbit } from "@/components/artwork/principle-orbit";
 
-export const metadata: Metadata = {
+const description =
+  "Dev Syndicate (DS) is a web engineering studio that treats your website as business infrastructure — building high-performance digital experiences that help businesses grow.";
+
+export const metadata = pageMetadata({
   title: "About",
-  description: site.promise,
-};
+  description,
+  path: "/about",
+  keywords: ["about Dev Syndicate", "web engineering team", "Developer Syndicate"],
+});
 
 const principles = [
   {
@@ -39,6 +44,15 @@ const principles = [
 export default function AboutPage() {
   return (
     <>
+      <JsonLd
+        data={[
+          webPageSchema({ path: "/about", name: "About — Dev Syndicate", description }),
+          breadcrumbSchema([
+            { name: "Home", path: "/" },
+            { name: "About", path: "/about" },
+          ]),
+        ]}
+      />
       <PageHeader
         eyebrow="About"
         title="A small team that treats your website as business infrastructure."

@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 
 import { services } from "@/lib/content";
@@ -23,7 +24,42 @@ export function ServicesOverview() {
         intro={services.overview.intro}
       />
 
-      <DividedGrid className="mt-9" cols="sm:grid-cols-2 lg:grid-cols-6">
+      {/* Mobile: a full-width card stack — every service visible without a
+          sideways gesture (horizontal scroll hides content most people never
+          reach). Content-rich cards, so one-up rather than the 2-col Technology
+          grid, keeping the two sections visually distinct. */}
+      <div className="mt-8 flex flex-col gap-3 sm:hidden">
+        {services.items.map((service) => (
+          <Link
+            key={service.title}
+            href={services.overview.cta.href}
+            aria-label={`${service.title} — see what it involves`}
+            className="surface-card group/card flex flex-col gap-3 p-5"
+          >
+            <span aria-hidden className="card-node" />
+            <div className="flex items-center gap-3">
+              <IconTile name={service.icon as IconName} />
+              <h3 className="text-lg font-semibold">{service.title}</h3>
+            </div>
+            <p className="text-[0.9375rem] leading-[1.65] text-muted-foreground">
+              {service.summary}
+            </p>
+            <span className="flex items-center gap-1.5 text-sm font-medium text-primary">
+              {service.title} details
+              <ArrowRight
+                aria-hidden
+                className="size-3.5 transition-transform duration-[var(--duration-base)] ease-out-soft group-hover/card:translate-x-0.5"
+              />
+            </span>
+          </Link>
+        ))}
+      </div>
+
+      {/* sm+: unchanged — the shared-border spec sheet. */}
+      <DividedGrid
+        className="mt-9 hidden sm:grid"
+        cols="sm:grid-cols-2 lg:grid-cols-6"
+      >
         {services.items.map((service, i) => (
           <GridCell
             key={service.title}
@@ -41,7 +77,7 @@ export function ServicesOverview() {
               {service.summary}
             </p>
             <span className="mt-auto flex items-center gap-1.5 pt-3 text-sm font-medium text-primary">
-              Details
+              {service.title} details
               <ArrowRight
                 aria-hidden
                 className="size-3.5 transition-transform duration-[var(--duration-base)] ease-out-soft group-hover/cell:translate-x-0.5"
