@@ -166,6 +166,142 @@ export function ArtGlobe({ className }: ArtProps) {
   );
 }
 
+/** Orbit / satellite — reach, distribution, always-on. */
+export function ArtOrbit({ className }: ArtProps) {
+  const cx = 100;
+  const cy = 70;
+  return (
+    <svg viewBox="0 0 200 140" fill="none" aria-hidden className={cn(base, className)}>
+      <g stroke="currentColor" strokeWidth="1" opacity="0.55">
+        <circle cx={cx} cy={cy} r="16" opacity="0.9" />
+        <ellipse cx={cx} cy={cy} rx="52" ry="20" />
+        <ellipse cx={cx} cy={cy} rx="52" ry="20" transform={`rotate(58 ${cx} ${cy})`} />
+        <ellipse cx={cx} cy={cy} rx="52" ry="20" transform={`rotate(-58 ${cx} ${cy})`} />
+      </g>
+      {/* satellites pinned on the rings */}
+      {[
+        [cx + 52, cy],
+        [cx - 26, cy - 32],
+        [cx + 22, cy + 34],
+      ].map(([x, y], i) => (
+        <circle key={i} cx={x} cy={y} r="3" fill="currentColor" opacity="0.85" />
+      ))}
+    </svg>
+  );
+}
+
+/** Routed circuit traces converging on a pad — integration, wiring. */
+export function ArtCircuit({ className }: ArtProps) {
+  return (
+    <svg viewBox="0 0 200 140" fill="none" aria-hidden className={cn(base, className)}>
+      <g stroke="currentColor" strokeWidth="1" opacity="0.5" strokeLinecap="square">
+        <path d="M20 40 H70 V64 H100" />
+        <path d="M20 100 H52 V76 H100" />
+        <path d="M180 34 H130 V70 H100" />
+        <path d="M180 104 H140 V88 H112 V70" />
+        <path d="M100 24 V52" />
+      </g>
+      {[
+        [20, 40],
+        [20, 100],
+        [180, 34],
+        [180, 104],
+        [100, 24],
+      ].map(([x, y], i) => (
+        <rect key={i} x={x - 2.5} y={y - 2.5} width="5" height="5" fill="currentColor" opacity="0.5" />
+      ))}
+      <rect x="92" y="62" width="16" height="16" rx="1" fill="currentColor" opacity="0.85" />
+    </svg>
+  );
+}
+
+/** Stepped bar climb — growth, conversion lift. */
+export function ArtGrowth({ className }: ArtProps) {
+  const bars = [22, 34, 30, 48, 58, 74, 92];
+  const bw = 16;
+  const gap = 8;
+  const x0 = 100 - (bars.length * (bw + gap) - gap) / 2;
+  return (
+    <svg viewBox="0 0 200 140" fill="none" aria-hidden className={cn(base, className)}>
+      <g stroke="currentColor" strokeWidth="1" opacity="0.6">
+        {bars.map((h, i) => (
+          <rect
+            key={i}
+            x={x0 + i * (bw + gap)}
+            y={116 - h}
+            width={bw}
+            height={h}
+            opacity={i === bars.length - 1 ? "0.95" : 0.35 + i * 0.06}
+          />
+        ))}
+      </g>
+      {/* trend line riding the tops */}
+      <polyline
+        points={bars.map((h, i) => `${x0 + i * (bw + gap) + bw / 2},${116 - h}`).join(" ")}
+        stroke="currentColor"
+        strokeWidth="1.4"
+        opacity="0.85"
+        fill="none"
+      />
+    </svg>
+  );
+}
+
+/** Radar / target rings with a sweep tick — monitoring, discovery, audit. */
+export function ArtRadar({ className }: ArtProps) {
+  const cx = 100;
+  const cy = 70;
+  return (
+    <svg viewBox="0 0 200 140" fill="none" aria-hidden className={cn(base, className)}>
+      <g stroke="currentColor" strokeWidth="1" opacity="0.5">
+        {[14, 28, 42, 54].map((r, i) => (
+          <circle key={i} cx={cx} cy={cy} r={r} />
+        ))}
+        <line x1={cx} y1={cy} x2={cx + 54} y2={cy} />
+        <line x1={cx} y1={cy} x2={cx} y2={cy - 54} />
+        <line x1={cx} y1={cy} x2={cx + 38} y2={cy - 38} opacity="0.9" />
+      </g>
+      <circle cx={cx + 38} cy={cy - 38} r="3" fill="currentColor" opacity="0.9" />
+    </svg>
+  );
+}
+
+/** Shielded lock lattice — security, reliability. */
+export function ArtShield({ className }: ArtProps) {
+  return (
+    <svg viewBox="0 0 200 140" fill="none" aria-hidden className={cn(base, className)}>
+      <g stroke="currentColor" strokeWidth="1" opacity="0.6">
+        <path d="M100 22 L142 38 V74 C142 98 122 112 100 120 C78 112 58 98 58 74 V38 Z" />
+        <path d="M100 34 L130 46 V74 C130 91 116 101 100 108 C84 101 70 91 70 74 V46 Z" opacity="0.6" />
+      </g>
+      {/* dotted interior lattice */}
+      {Array.from({ length: 5 }).flatMap((_, r) =>
+        Array.from({ length: 5 }).map((__, c) => {
+          const x = 82 + c * 9;
+          const y = 54 + r * 9;
+          return <circle key={`${r}-${c}`} cx={x} cy={y} r="1" fill="currentColor" opacity="0.4" />;
+        }),
+      )}
+      <rect x="94" y="70" width="12" height="12" rx="1" fill="currentColor" opacity="0.85" />
+    </svg>
+  );
+}
+
+/** Handshake of two nested brackets around a node — partnership, scoping. */
+export function ArtBrackets({ className }: ArtProps) {
+  return (
+    <svg viewBox="0 0 200 140" fill="none" aria-hidden className={cn(base, className)}>
+      <g stroke="currentColor" strokeWidth="1.4" opacity="0.55" strokeLinecap="round">
+        <path d="M72 34 H52 V106 H72" />
+        <path d="M128 34 H148 V106 H128" />
+        <path d="M88 46 H62 M88 70 H62 M88 94 H62" opacity="0.4" strokeWidth="1" />
+      </g>
+      <circle cx="100" cy="70" r="12" stroke="currentColor" strokeWidth="1" opacity="0.7" />
+      <circle cx="100" cy="70" r="4" fill="currentColor" opacity="0.85" />
+    </svg>
+  );
+}
+
 /* Name → component, so data (content.ts) can reference an illustration by a
    string key without importing React. */
 export const lineArt = {
@@ -176,6 +312,12 @@ export const lineArt = {
   wave: ArtWave,
   layers: ArtLayers,
   globe: ArtGlobe,
+  orbit: ArtOrbit,
+  circuit: ArtCircuit,
+  growth: ArtGrowth,
+  radar: ArtRadar,
+  shield: ArtShield,
+  brackets: ArtBrackets,
 } as const;
 
 export type LineArtName = keyof typeof lineArt;

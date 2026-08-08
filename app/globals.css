@@ -1235,6 +1235,18 @@
   }
 }
 
+/* Lit dots on the dotted-world motif breathe on a staggered loop, so the map
+   reads as live telemetry rather than a static stipple. Opacity-only. */
+@keyframes world-pulse {
+  0%,
+  100% {
+    opacity: 0.35;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
 /* A vertical scan sweep for the grid — a faint band of extra brightness that
    travels down the field, like a radar refresh. */
 @keyframes scan {

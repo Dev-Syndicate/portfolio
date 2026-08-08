@@ -36,21 +36,31 @@ export function Faq() {
 
       {/* One bordered panel; items share dividers rather than floating apart.
           Native <details> keeps it keyboard/SR-accessible with zero JS. */}
-      <Reveal className="mt-9 overflow-hidden rounded-xl border border-border bg-card divide-y divide-border">
-        {faq.items.map((item) => (
+      <Reveal className="mt-9 overflow-hidden rounded-2xl border border-border bg-card shadow-[var(--elevation-1)] divide-y divide-border">
+        {faq.items.map((item, i) => (
           <details
             key={item.q}
             className="group [&[open]]:bg-surface-subtle/60"
           >
-            <summary className="flex cursor-pointer list-none items-center justify-between gap-4 p-5 text-left font-medium transition-colors hover:text-primary sm:p-6 [&::-webkit-details-marker]:hidden">
-              {item.q}
-              <Plus
-                aria-hidden
-                className="size-5 shrink-0 text-muted-foreground transition-transform duration-[var(--duration-base)] ease-out-soft group-open:rotate-45 group-open:text-primary"
-              />
+            <summary className="flex cursor-pointer list-none items-center gap-4 p-5 text-left font-medium transition-colors hover:text-primary sm:p-6 [&::-webkit-details-marker]:hidden">
+              {/* Mono index — FAQ questions are enumerable, so this is honest
+                  structure, and it anchors the answer's left padding below. */}
+              <span className="font-mono text-[0.75rem] tabular-nums text-muted-foreground">
+                {String(i + 1).padStart(2, "0")}
+              </span>
+              <span className="flex-1">{item.q}</span>
+              {/* Bordered square reads as a control, matching the site's
+                  mono-square idiom; Plus rotates to × on open. */}
+              <span className="grid size-8 shrink-0 place-items-center rounded-md border border-border text-muted-foreground transition-colors group-open:text-primary">
+                <Plus
+                  aria-hidden
+                  className="size-4 transition-transform duration-[var(--duration-base)] ease-out-soft group-open:rotate-45"
+                />
+              </span>
             </summary>
-            <div className="px-5 pb-5 sm:px-6 sm:pb-6">
-              <p className="max-w-2xl leading-relaxed text-muted-foreground">
+            {/* Left padding aligns the answer under the question, past the index. */}
+            <div className="px-5 pb-5 pl-[3.75rem] sm:px-6 sm:pb-6 sm:pl-[4.25rem]">
+              <p className="max-w-2xl leading-relaxed text-brand-100/90">
                 {item.a}
               </p>
             </div>
