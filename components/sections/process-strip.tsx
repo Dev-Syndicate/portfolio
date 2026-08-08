@@ -4,34 +4,22 @@ import { process } from "@/lib/content";
 import { Section, SectionHeader } from "@/components/ui/section";
 import { Reveal } from "@/components/ui/reveal";
 import { Button } from "@/components/ui/button";
-import { lineArt, type LineArtName } from "@/components/artwork/line-art";
 
 /**
  * Home-page version of Process: a numbered five-station sequence.
  *
  * The stages are a real ordered process, so the number markers (01–05) stay
  * and a connecting spine threads them into one line — desktop reads left to
- * right, mobile top to bottom. Each station carries a distinct line-art
- * illustration so the row isn't five identical boxes; the drawing is the
- * signature that turns flat text into something worth reading.
+ * right, mobile top to bottom. Text-led: the marker, the stage name, the
+ * visitor question it answers. A distinct rhythm from the card grids above and
+ * below, so the scroll has texture.
  *
  * The description of what actually happens at each stage lives on /services.
  */
 
-/* One distinct illustration per stage, position-indexed so each of the five
-   is unique and reads for its step: discover→scan, design→layers, build→wiring,
-   verify→shield, support→growth. */
-const stepArt: readonly LineArtName[] = [
-  "radar",
-  "layers",
-  "circuit",
-  "shield",
-  "growth",
-];
-
 export function ProcessStrip() {
   return (
-    <Section id="process" aria-labelledby="process-strip-heading">
+    <Section id="process" tone="light" aria-labelledby="process-strip-heading">
       <SectionHeader
         id="process-strip-heading"
         eyebrow="Process"
@@ -86,22 +74,21 @@ export function ProcessStrip() {
         })}
       </ol>
 
-      {/* Desktop (lg+): a five-across row of station cards. A hairline spine sits
+      {/* Desktop (lg+): a five-across row of stations. A hairline spine sits
           behind the number markers, fading left→right so the eye follows the
-          sequence forward. Each station stacks illustration → marker → title →
-          question → body. */}
-      <div className="relative mt-12 hidden lg:block">
-        {/* The spine, aligned to the vertical centre of the marker row that sits
-            below the illustration frame. Inset by half a column each side so it
-            starts and ends under the first/last markers, not the card edges. */}
+          sequence forward. Each station: marker → title → question — clean and
+          type-led, no illustration competing with the sequence. */}
+      <div className="relative mt-14 hidden lg:block">
+        {/* The spine, aligned to the vertical centre of the marker row. Inset by
+            half a column each side so it starts and ends under the first/last
+            markers, not the card edges. */}
         <span
           aria-hidden
-          className="pointer-events-none absolute top-[calc(9.5rem+1.5rem)] right-[10%] left-[10%] h-px bg-gradient-to-r from-primary/50 via-border to-transparent"
+          className="pointer-events-none absolute top-6 right-[10%] left-[10%] h-px bg-gradient-to-r from-primary/50 via-border to-transparent"
         />
 
-        <ol className="grid grid-cols-5 gap-4">
+        <ol className="grid grid-cols-5 gap-6">
           {process.steps.map((step, i) => {
-            const Art = lineArt[stepArt[i]];
             const active = i === 0;
             return (
               <Reveal
@@ -111,23 +98,10 @@ export function ProcessStrip() {
                 direction="up"
                 className="group relative flex flex-col items-center text-center"
               >
-                {/* Framed illustration — the per-step signature. */}
-                <div className="relative flex h-[9.5rem] w-full items-center justify-center overflow-hidden rounded-xl border border-border bg-card p-6 shadow-[var(--elevation-1)] transition-colors duration-[var(--duration-base)] ease-out-soft group-hover:border-border-strong">
-                  {/* Corner glow, warmer on the active first station. */}
-                  <div
-                    aria-hidden
-                    className={`pointer-events-none absolute -top-8 -right-8 size-24 blur-[80px] ${
-                      active ? "opacity-90" : "opacity-40"
-                    }`}
-                    style={{ background: "var(--glow-a)" }}
-                  />
-                  <Art className="relative h-full w-auto text-primary" />
-                </div>
-
                 {/* Number marker — sits over the spine to thread the stations. */}
                 <span
                   aria-hidden
-                  className={`relative z-10 mt-6 flex size-12 items-center justify-center rounded-full border bg-card font-mono text-[0.875rem] font-semibold tabular-nums shadow-[var(--elevation-1)] ${
+                  className={`relative z-10 flex size-12 items-center justify-center rounded-full border bg-card font-mono text-[0.875rem] font-semibold tabular-nums shadow-[var(--elevation-1)] ${
                     active
                       ? "conic-sweep border-primary/40 text-primary"
                       : "border-border text-primary"
@@ -136,7 +110,7 @@ export function ProcessStrip() {
                   {String(i + 1).padStart(2, "0")}
                 </span>
 
-                <h3 className="mt-4 text-base font-semibold">{step.title}</h3>
+                <h3 className="mt-5 text-base font-semibold">{step.title}</h3>
                 <p className="mt-1.5 text-[0.9375rem] leading-[1.5] text-primary">
                   {step.question}
                 </p>

@@ -7,8 +7,9 @@ import { lineArt, type LineArtName } from "@/components/artwork/line-art";
  * The "why us" band, held in the same dark language as the rest of the page —
  * but lifted: an elevated panel a shade above the void, edged with a hairline
  * highlight and a pooled glow, so it reads as a distinct, brighter surface
- * without breaking into a jarring white slab. The line-art and bright body
- * copy carry the readability; the contrast comes from elevation, not colour.
+ * without breaking into a jarring white slab. Bright body copy carries the
+ * readability; a faint line-art drawing sits in each card's corner as texture.
+ * The contrast comes from elevation, not colour — the About page's one lit band.
  */
 
 const arts: LineArtName[] = ["burst", "wave", "nodes", "layers"];
@@ -53,10 +54,10 @@ export function WhyUs() {
               return (
                 <Reveal key={reason.title} delay={0.06 + i * 0.06} className="flex">
                   <article className="group relative flex w-full flex-col gap-3 overflow-hidden rounded-2xl border border-border bg-card p-6 transition-colors duration-[var(--duration-base)] ease-out-soft hover:border-border-strong sm:p-7">
-                    {/* illustration, top-right */}
+                    {/* faint corner illustration — texture, not a centrepiece */}
                     <div
                       aria-hidden
-                      className="pointer-events-none absolute -top-2 -right-2 h-20 w-28 text-muted-foreground/40 transition-colors duration-[var(--duration-slow)] group-hover:text-muted-foreground/70"
+                      className="pointer-events-none absolute -top-2 -right-2 h-20 w-28 text-muted-foreground/25 transition-colors duration-[var(--duration-slow)] group-hover:text-muted-foreground/45"
                     >
                       <Art />
                     </div>
