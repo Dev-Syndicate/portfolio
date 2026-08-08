@@ -270,6 +270,19 @@
 
   html {
     scroll-behavior: smooth;
+    /* There is one theme and it is dark. Declaring it is what stops every
+       widget the BROWSER draws for itself — <select> popups, scrollbars,
+       autofill, the password reveal, the <textarea> resize grip, spinners —
+       being painted from the light system palette and landing white-on-void.
+       This single line themes all of them; the NATIVE CONTROLS block at the
+       end of this layer only refines what it leaves generic.
+       It also has to sit on <html>, not <body>: the browser reads it from the
+       root to colour the viewport scrollbar and the overscroll area. */
+    color-scheme: dark;
+    /* Tick, fill, and thumb colour for anything the browser fills in itself
+       (checkbox, radio, range, progress). None exist yet — this is here so the
+       first one added is already on-palette rather than system blue. */
+    accent-color: var(--primary);
     /* Safety net against a decorative element pushing the page sideways.
        `clip` rather than `hidden`: hidden would make <html> a scroll
        container and break every `position: sticky` on the site, including
@@ -318,6 +331,126 @@
 
   p {
     text-wrap: pretty;
+  }
+
+  /* ------------------------------------------------------------------
+     NATIVE CONTROLS
+     The handful of things the browser still draws itself after
+     `color-scheme: dark` has told it which palette to use. Each rule below
+     exists because that declaration alone leaves the control looking like a
+     system widget rather than part of this design system.
+
+     All of it is token-driven, so a tone scope or a palette swap carries
+     through here the same as anywhere else.
+     ------------------------------------------------------------------ */
+
+  /* --- Scrollbars ---------------------------------------------------
+     `scrollbar-color` is the standard property (Firefox, and Chromium 121+).
+     The ::-webkit rules cover Safari and older Chromium, which ignore it.
+     Both are stated so the bar is the same hairline everywhere. */
+  html {
+    scrollbar-color: var(--border-strong) transparent;
+    scrollbar-width: thin;
+  }
+
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    /* `background-clip: padding-box` behind a transparent border is what
+       insets the thumb from the track — WebKit has no padding on the thumb. */
+    background-color: var(--border-strong);
+    background-clip: padding-box;
+    border: 2px solid transparent;
+    border-radius: 999px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background-color: var(--muted-foreground);
+  }
+
+  ::-webkit-scrollbar-corner {
+    background: transparent;
+  }
+
+  /* --- Select popups ------------------------------------------------
+     `background-color` on <option> is honoured, so the list itself takes our
+     popover tokens. The SELECTED row is not: browsers paint it with the
+     system accent, and nothing in CSS reaches it — not `accent-color`, not
+     the background-image and inset-shadow tricks. That is why the dropdowns
+     on this site are <Select> (components/ui/select.tsx) and not <select>.
+
+     This rule stays as the floor for any native one that appears later: the
+     list will at least be on-palette, with a blue current row. */
+  option {
+    background-color: var(--popover);
+    color: var(--popover-foreground);
+  }
+
+  /* --- Autofill -----------------------------------------------------
+     Chromium and Safari paint autofilled fields a pale yellow/blue that no
+     `background-color` can override. The one thing that does cover it is a
+     large inset shadow, so we fill the field with our own surface colour and
+     restate the text and caret colours on top.
+
+     The absurd transition delay is the standard trick for the flash: the
+     browser animates its fill in, and a delay that never elapses means our
+     shadow is what is on screen the whole time. */
+  input:-webkit-autofill,
+  input:-webkit-autofill:hover,
+  input:-webkit-autofill:focus,
+  input:-webkit-autofill:active,
+  textarea:-webkit-autofill,
+  select:-webkit-autofill {
+    -webkit-text-fill-color: var(--foreground);
+    -webkit-box-shadow: 0 0 0 1000px var(--background) inset;
+    box-shadow: 0 0 0 1000px var(--background) inset;
+    /* Restated because `:-webkit-autofill` outranks the element rule below. */
+    caret-color: var(--primary);
+    transition: background-color 100000s ease-in-out 0s;
+  }
+
+  /* --- Text entry ---------------------------------------------------
+     A visible caret on the void canvas, and no WebKit resize grip: every
+     textarea carries `resize-y`, so the drag affordance is the bottom edge
+     and its cursor. The grip is the one piece of system grey the design
+     language has no place for. */
+  input,
+  textarea,
+  select {
+    caret-color: var(--primary);
+  }
+
+  ::-webkit-resizer {
+    display: none;
+  }
+
+  /* --- Edge's in-field glyphs ---------------------------------------
+     Edge injects its own reveal (password) and clear (text) buttons inside
+     the field, in its own colours and outside our padding. Nothing else on
+     the site has them, and they overlap the field's right inset. */
+  ::-ms-reveal,
+  ::-ms-clear {
+    display: none;
+  }
+
+  /* --- Disclosure markers -------------------------------------------
+     The FAQ's <summary> supplies its own +/× icon. `list-style` covers
+     Firefox; the ::-webkit- pseudo-element covers Safari, which still ships
+     the older marker. Set here rather than per-component so any future
+     <details> is consistent by default. */
+  summary {
+    list-style: none;
+  }
+
+  summary::-webkit-details-marker {
+    display: none;
   }
 }
 

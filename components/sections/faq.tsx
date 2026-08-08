@@ -42,7 +42,10 @@ export function Faq() {
             key={item.q}
             className="group [&[open]]:bg-surface-subtle/60"
           >
-            <summary className="flex cursor-pointer list-none items-center justify-between gap-4 p-5 text-left font-medium transition-colors hover:text-primary sm:p-6 [&::-webkit-details-marker]:hidden">
+            {/* The disclosure marker is hidden in the base layer's NATIVE
+                CONTROLS block, for both Firefox and Safari, so it isn't
+                repeated here. */}
+            <summary className="flex cursor-pointer items-center justify-between gap-4 p-5 text-left font-medium transition-colors hover:text-primary sm:p-6">
               {item.q}
               <Plus
                 aria-hidden

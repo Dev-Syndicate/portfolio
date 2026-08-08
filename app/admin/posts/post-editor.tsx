@@ -1,11 +1,13 @@
 "use client";
 
 import { useActionState, useState } from "react";
+import Link from "next/link";
 import { Loader2, Upload } from "lucide-react";
 
 import { createClient } from "@/lib/supabase/client";
 import { cn } from "@/lib/utils";
 import { buttonVariants } from "@/components/ui/button";
+import { Select } from "@/components/ui/select";
 import type { Post } from "@/lib/posts";
 import {
   createPost,
@@ -291,21 +293,28 @@ export function PostEditor({ post }: { post?: Post }) {
       </div>
 
       <div className="flex flex-col gap-2">
-        <label htmlFor="status" className={label}>
+        <label id="status-label" htmlFor="status" className={label}>
           Status{" "}
           <span className="font-normal text-muted-foreground">
             (Draft = only you can see it; Published = live on the public blog)
           </span>
         </label>
-        <select
-          id="status"
-          name="status"
-          defaultValue={post?.status ?? "draft"}
-          className={cn(field, "max-w-xs bg-background text-foreground")}
-        >
-          <option value="draft">Draft — not visible publicly</option>
-          <option value="published">Published — live on /blog</option>
-        </select>
+        {/* Themed <Select> for the same reason as the enquiry form's: a native
+            popup's selected row is painted with the system accent and no CSS
+            reaches it. `status` still submits as a plain form field. */}
+        <div className="max-w-xs">
+          <Select
+            id="status"
+            name="status"
+            labelledBy="status-label"
+            defaultValue={post?.status ?? "draft"}
+            options={[
+              { value: "draft", label: "Draft — not visible publicly" },
+              { value: "published", label: "Published — live on /blog" },
+            ]}
+            className={field}
+          />
+        </div>
       </div>
 
       {state.error ? (
@@ -331,12 +340,12 @@ export function PostEditor({ post }: { post?: Post }) {
             "Create post"
           )}
         </button>
-        <a
+        <Link
           href="/admin"
           className="text-sm text-muted-foreground transition-colors hover:text-foreground"
         >
           Cancel
-        </a>
+        </Link>
       </div>
     </form>
   );
