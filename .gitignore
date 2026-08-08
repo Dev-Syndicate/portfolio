@@ -45,6 +45,7 @@ next-env.d.ts
 # Supabase
 supabase_query/
 
-# Docs
+# TEMP
 BLOG-SETUP.md
 ref_designs/
+.review-shots/
