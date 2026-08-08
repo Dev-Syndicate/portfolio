@@ -1,12 +1,37 @@
 import { Mail, MessageSquare, ShieldCheck } from "lucide-react";
 
-import { site } from "@/lib/content";
+import { seo, site } from "@/lib/content";
 import { pageMetadata, webPageSchema, breadcrumbSchema } from "@/lib/seo";
 import { JsonLd } from "@/components/seo/json-ld";
 import { PageHeader } from "@/components/ui/page-header";
 import { Reveal } from "@/components/ui/reveal";
 import { Conversation } from "@/components/artwork/conversation";
 import { ContactForm } from "./contact-form";
+
+/** Instagram glyph — lucide-react dropped its brand icons, so it's inline.
+ *  Accepts the same props the render passes to lucide icons. */
+function InstagramIcon(props: React.SVGProps<SVGSVGElement>) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden
+      {...props}
+    >
+      <rect x="2" y="2" width="20" height="20" rx="5" />
+      <circle cx="12" cy="12" r="4" />
+      <circle cx="17.5" cy="6.5" r="0.75" fill="currentColor" stroke="none" />
+    </svg>
+  );
+}
+
+const instagramUrl =
+  seo.sameAs.find((u) => u.includes("instagram.com")) ??
+  "https://www.instagram.com/dev.syndicate/";
+const instagramHandle = "@dev.syndicate";
 
 const description =
   "Tell us what you're building and what it needs to achieve. We'll come back with an honest view of scope and approach. Contact Dev Syndicate to start your project.";
@@ -24,6 +49,12 @@ const details = [
     title: "Email us",
     body: site.email,
     href: `mailto:${site.email}`,
+  },
+  {
+    icon: InstagramIcon,
+    title: "Follow us",
+    body: instagramHandle,
+    href: instagramUrl,
   },
   {
     icon: MessageSquare,
@@ -74,6 +105,9 @@ export default function ContactPage() {
                 {href ? (
                   <a
                     href={href}
+                    {...(href.startsWith("http")
+                      ? { target: "_blank", rel: "noopener noreferrer" }
+                      : {})}
                     className="text-[0.9375rem] text-muted-foreground underline-offset-4 transition-colors hover:text-foreground hover:underline"
                   >
                     {body}

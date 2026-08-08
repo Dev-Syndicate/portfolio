@@ -1,8 +1,32 @@
 import Image from "next/image";
 import Link from "next/link";
 
-import { nav, site } from "@/lib/content";
+import { nav, seo, site } from "@/lib/content";
 import { technology } from "@/lib/content";
+
+const instagramUrl =
+  seo.sameAs.find((u) => u.includes("instagram.com")) ??
+  "https://www.instagram.com/dev.syndicate/";
+
+/** Instagram glyph — lucide-react dropped its brand icons, so it's inline. */
+function InstagramIcon(props: React.SVGProps<SVGSVGElement>) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={1.75}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden
+      {...props}
+    >
+      <rect x="2" y="2" width="20" height="20" rx="5" />
+      <circle cx="12" cy="12" r="4" />
+      <circle cx="17.5" cy="6.5" r="0.75" fill="currentColor" stroke="none" />
+    </svg>
+  );
+}
 
 export function SiteFooter() {
   return (
@@ -33,6 +57,19 @@ export function SiteFooter() {
             Syndicate — is a software development company building websites, web
             and mobile applications, and automation.
           </p>
+
+          {/* Social */}
+          <div className="mt-1 flex items-center gap-3">
+            <a
+              href={instagramUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Dev Syndicate on Instagram"
+              className="inline-flex size-9 items-center justify-center rounded-lg border border-border text-muted-foreground transition-colors hover:border-border-strong hover:text-foreground"
+            >
+              <InstagramIcon className="size-4.5" />
+            </a>
+          </div>
         </div>
 
         <nav aria-labelledby="footer-nav-heading" className="flex flex-col gap-3">

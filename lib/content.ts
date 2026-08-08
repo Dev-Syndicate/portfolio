@@ -77,6 +77,7 @@ export const seo = {
      Add more (LinkedIn, X) here as they exist — one place, flows everywhere. */
   sameAs: [
     "https://github.com/Dev-Syndicate",
+    "https://www.instagram.com/dev.syndicate/",
     "https://www.google.com/maps?cid=2237191391923509099",
   ] as string[],
 } as const;
