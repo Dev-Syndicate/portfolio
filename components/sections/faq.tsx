@@ -42,7 +42,10 @@ export function Faq() {
             key={item.q}
             className="group [&[open]]:bg-surface-subtle/60"
           >
-            <summary className="flex cursor-pointer list-none items-center gap-4 p-5 text-left font-medium transition-colors hover:text-primary sm:p-6 [&::-webkit-details-marker]:hidden">
+            {/* The disclosure marker is hidden globally in the base layer's
+                NATIVE CONTROLS block (Firefox + Safari), so it isn't repeated
+                here. */}
+            <summary className="flex cursor-pointer list-none items-center gap-4 p-5 text-left font-medium transition-colors hover:text-primary sm:p-6">
               {/* Mono index — FAQ questions are enumerable, so this is honest
                   structure, and it anchors the answer's left padding below. */}
               <span className="font-mono text-[0.75rem] tabular-nums text-muted-foreground">

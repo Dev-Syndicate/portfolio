@@ -1,18 +1,13 @@
 "use client";
 
 import { useActionState, useId } from "react";
-import {
-  ArrowRight,
-  ChevronDown,
-  CircleAlert,
-  CircleCheck,
-  Loader2,
-} from "lucide-react";
+import { ArrowRight, CircleAlert, CircleCheck, Loader2 } from "lucide-react";
 
 import { submitContact, type ContactState } from "./actions";
 import { services } from "@/lib/content";
 import { cn } from "@/lib/utils";
 import { buttonVariants } from "@/components/ui/button";
+import { Select } from "@/components/ui/select";
 
 const initialState: ContactState = { status: "idle" };
 
@@ -64,6 +59,7 @@ export function ContactForm() {
 
         <div className="flex flex-col gap-2">
           <label
+            id={`${id}-interest-label`}
             htmlFor={`${id}-interest`}
             className="text-sm font-medium text-foreground"
           >
@@ -73,26 +69,23 @@ export function ContactForm() {
               we have no published pricing, so asking for a range would imply
               one exists.
 
-              `appearance-none` drops the native arrow, so the control would
-              otherwise be indistinguishable from the text inputs beside it.
-              The chevron below replaces it. */}
-          <div className="relative">
-            <select
-              id={`${id}-interest`}
-              name="interest"
-              defaultValue=""
-              className={cn(fieldBase, "appearance-none pr-11")}
-            >
-              <option value="">Not sure yet</option>
-              {services.items.map((service) => (
-                <option key={service.title}>{service.title}</option>
-              ))}
-            </select>
-            <ChevronDown
-              aria-hidden
-              className="pointer-events-none absolute top-1/2 right-4 size-4 -translate-y-1/2 text-muted-foreground"
-            />
-          </div>
+              A themed <Select> rather than a native one: the browser paints
+              the selected row of a native popup with the system accent, and no
+              CSS reaches it. The submitted field is unchanged — the action
+              still reads `interest` off the form data. */}
+          <Select
+            id={`${id}-interest`}
+            name="interest"
+            labelledBy={`${id}-interest-label`}
+            options={[
+              { value: "", label: "Not sure yet" },
+              ...services.items.map((service) => ({
+                value: service.title,
+                label: service.title,
+              })),
+            ]}
+            className={fieldBase}
+          />
         </div>
       </div>
 

@@ -29,11 +29,16 @@ import { DottedWorld } from "@/components/artwork/dotted-world";
  */
 
 /* The three sub-paths of the mark, in draw order. Fixed geometry — the source
-   logo's, on a 0 0 624 600 viewBox. */
+   logo's, on a 0 0 624 600 viewBox.
+
+   The counter's top edge in `mark-d` runs 82.2,85.8 → 299.7,102.8 as ONE
+   segment. The exported path doubled back through 261,84.5 → 83,83.8 first:
+   harmless on a filled shape, but these are stroked, so the out-and-back drew
+   a razor-thin wedge across the inside of the D. */
 const STROKES = [
   {
     id: "mark-d",
-    d: "M20.3,20 L20.3,555.3 L239.9,556.6 L471.5,349.4 L394.7,349.7 L233.6,494.4 L82.7,494.6 L82.2,85.8 L261,84.5 L83,83.8 L299.7,102.8 L299,40.3 Z",
+    d: "M20.3,20 L20.3,555.3 L239.9,556.6 L471.5,349.4 L394.7,349.7 L233.6,494.4 L82.7,494.6 L82.2,85.8 L299.7,102.8 L299,40.3 Z",
   },
   {
     id: "mark-chevron",
