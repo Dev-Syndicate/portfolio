@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { pingIndexNow } from "@/lib/indexnow";
 
 /**
  * Post management server actions. Every one of them RE-VERIFIES the caller's
@@ -75,11 +76,18 @@ function readForm(formData: FormData) {
   };
 }
 
-/** Revalidate every surface a post appears on. */
-function revalidateBlog(slug?: string) {
+/** Revalidate every surface a post appears on, and notify search engines via
+ *  IndexNow that those URLs changed. The IndexNow ping is fire-and-forget and
+ *  never throws (see lib/indexnow.ts), so it can't break a save. */
+async function revalidateBlog(slug?: string) {
   revalidatePath("/blog");
   revalidatePath("/sitemap.xml");
   if (slug) revalidatePath(`/blog/${slug}`);
+
+  await pingIndexNow([
+    "/blog",
+    ...(slug ? [`/blog/${slug}`] : []),
+  ]);
 }
 
 /**
@@ -142,7 +150,7 @@ export async function createPost(
     };
   }
 
-  revalidateBlog(f.slug);
+  await revalidateBlog(f.slug);
   redirect("/admin");
 }
 
@@ -207,7 +215,7 @@ export async function updatePost(
     await deleteCoverByUrl(admin, oldCoverUrl);
   }
 
-  revalidateBlog(f.slug);
+  await revalidateBlog(f.slug);
   redirect("/admin");
 }
 
@@ -230,6 +238,6 @@ export async function deletePost(formData: FormData): Promise<void> {
   await admin.from("posts").delete().eq("id", id);
   await deleteCoverByUrl(admin, existing?.cover_url ?? null);
 
-  revalidateBlog(slug || undefined);
+  await revalidateBlog(slug || undefined);
   redirect("/admin");
 }
