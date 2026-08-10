@@ -8,12 +8,25 @@ import { createClient } from "@/lib/supabase/client";
 import { cn } from "@/lib/utils";
 import { buttonVariants } from "@/components/ui/button";
 import { Select } from "@/components/ui/select";
+import { ImageCropper } from "@/components/admin/image-cropper";
+import { RichEditor } from "@/components/admin/rich-editor";
 import type { Post } from "@/lib/posts";
 import {
   createPost,
   updatePost,
   type PostFormState,
 } from "./actions";
+
+/* Raster formats next/image can optimise. SVG is excluded on purpose — it isn't
+   optimised and carries an XSS risk. Maps MIME → file extension. */
+const ALLOWED: Record<string, string> = {
+  "image/png": "png",
+  "image/jpeg": "jpg",
+  "image/webp": "webp",
+  "image/gif": "gif",
+  "image/avif": "avif",
+};
+const MAX_BYTES = 8 * 1024 * 1024; // 8 MB — plenty for a cover, keeps pages fast
 
 const field = cn(
   "w-full rounded-xl border border-input bg-background px-4 py-3 text-[0.9375rem]",
@@ -33,45 +46,51 @@ export function PostEditor({ post }: { post?: Post }) {
   const [coverUrl, setCoverUrl] = useState(post?.coverUrl ?? "");
   const [uploading, setUploading] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
+  // The picked file waiting to be cropped. Non-null → the crop dialog is open.
+  const [pendingFile, setPendingFile] = useState<File | null>(null);
+  // The rich editor writes Markdown here; a hidden field submits it as `body`,
+  // so the server action and storage format are unchanged.
+  const [body, setBody] = useState(post?.body ?? "");
 
-  async function handleCover(e: React.ChangeEvent<HTMLInputElement>) {
+  // Step 1 — validate the pick and open the cropper. Nothing uploads yet.
+  function handlePick(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
+    // Reset the input so re-picking the same file fires onChange again.
+    e.target.value = "";
     if (!file) return;
 
-    // Accept common raster formats that next/image can optimise. (SVG is
-    // excluded on purpose — it isn't optimised and carries an XSS risk.)
-    const allowed: Record<string, string> = {
-      "image/png": "png",
-      "image/jpeg": "jpg",
-      "image/webp": "webp",
-      "image/gif": "gif",
-      "image/avif": "avif",
-    };
-    if (!allowed[file.type]) {
-      setUploadError(
-        "Use a PNG, JPG, WebP, GIF, or AVIF image (not SVG).",
-      );
+    if (!ALLOWED[file.type]) {
+      setUploadError("Use a PNG, JPG, WebP, GIF, or AVIF image (not SVG).");
       return;
     }
-    const MAX = 8 * 1024 * 1024; // 8 MB — plenty for a cover, keeps pages fast
-    if (file.size > MAX) {
+    if (file.size > MAX_BYTES) {
       setUploadError("Image is over 8 MB — please use a smaller file.");
       return;
     }
+    setUploadError(null);
+    setPendingFile(file);
+  }
+
+  // Step 2 — the cropper hands back a blob (cropped) or the original file. A
+  // crop is always re-encoded to PNG/JPEG, so pick the extension from the blob
+  // type rather than the source file. Then upload.
+  async function handleCropped(blob: Blob, usedCrop: boolean) {
+    setPendingFile(null);
+    const type = usedCrop ? blob.type : (blob as File).type;
+    const ext = ALLOWED[type] ?? "jpg";
 
     setUploading(true);
     setUploadError(null);
     try {
       const supabase = createClient();
-      const ext = allowed[file.type];
       // Unique, unpredictable name; timestamp keeps ordering readable.
       const path = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
       const { error } = await supabase.storage
         .from("blog-covers")
-        .upload(path, file, {
+        .upload(path, blob, {
           cacheControl: "31536000",
           upsert: false,
-          contentType: file.type,
+          contentType: type,
         });
       if (error) {
         // Surface the real reason — the most common one during setup is that
@@ -183,18 +202,20 @@ export function PostEditor({ post }: { post?: Post }) {
             <input
               type="file"
               accept="image/png,image/jpeg,image/webp,image/gif,image/avif"
-              onChange={handleCover}
+              onChange={handlePick}
               className="hidden"
               disabled={uploading}
             />
           </label>
           {coverUrl ? (
             <div className="flex items-center gap-3">
+              {/* Preview shows the whole stored image (object-contain), so the
+                  admin sees exactly what the article page will show. */}
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={coverUrl}
                 alt="Cover preview"
-                className="h-16 w-28 rounded-lg border border-border object-cover"
+                className="h-16 w-28 rounded-lg border border-border bg-brand-950/40 object-contain"
               />
               <button
                 type="button"
@@ -209,26 +230,35 @@ export function PostEditor({ post }: { post?: Post }) {
             </div>
           ) : null}
         </div>
+        <p className="text-xs text-muted-foreground">
+          Pick an image to crop it — drag to frame and choose a ratio, or keep
+          the original. The article page shows the full image you save here.
+        </p>
         {uploadError ? (
           <p className="text-sm text-destructive">{uploadError}</p>
         ) : null}
       </div>
 
+      {/* Crop dialog — opens once a file is picked, uploads on apply. */}
+      {pendingFile ? (
+        <ImageCropper
+          file={pendingFile}
+          onApply={handleCropped}
+          onCancel={() => setPendingFile(null)}
+        />
+      ) : null}
+
       <div className="flex flex-col gap-2">
         <label htmlFor="body" className={label}>
           Body{" "}
           <span className="font-normal text-muted-foreground">
-            (Markdown — # headings, **bold**, - lists, [links](url))
+            (format with the toolbar — bold, headings, lists, quotes, links)
           </span>
         </label>
-        <textarea
-          id="body"
-          name="body"
-          rows={18}
-          defaultValue={post?.body}
-          className={cn(field, "resize-y font-mono text-sm leading-relaxed")}
-          placeholder={"## Section heading\n\nWrite your article in Markdown…"}
-        />
+        {/* The rich editor formats as you type and keeps `body` in Markdown. The
+            hidden field is what the form actually submits. */}
+        <input type="hidden" name="body" value={body} />
+        <RichEditor id="body" defaultMarkdown={post?.body} onChange={setBody} />
       </div>
 
       <div className="flex flex-col gap-2">

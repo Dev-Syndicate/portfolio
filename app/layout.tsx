@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Geist, Geist_Mono, Caveat } from "next/font/google";
+import { Geist, Geist_Mono, Caveat, Newsreader } from "next/font/google";
 
 import { seo, site } from "@/lib/content";
 import "./globals.css";
@@ -13,6 +13,18 @@ const geistSans = Geist({
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
+  display: "swap",
+});
+
+// Reading serif for long-form article body. Newsreader is a warm, screen-tuned
+// text serif with a genuine italic — it makes a post read like a publication
+// rather than a UI. Used only in the article body (prose-blog); the rest of the
+// site stays in Geist. Optical-size + italic pulled in for pull-quotes/emphasis.
+const newsreader = Newsreader({
+  variable: "--font-reading",
+  subsets: ["latin"],
+  weight: ["400", "500", "600"],
+  style: ["normal", "italic"],
   display: "swap",
 });
 
@@ -64,10 +76,16 @@ export const metadata: Metadata = {
       "max-video-preview": -1,
     },
   },
-  // Google Search Console ownership verification for www.devsyndicate.in.
-  // A public ownership claim, not a secret — safe to commit.
+  // Search-engine ownership verification for www.devsyndicate.in. Public
+  // ownership claims, not secrets — safe to commit. Bing has no dedicated key
+  // in Next's metadata API, so it goes under `other` as its raw meta name;
+  // this also powers Yahoo/DuckDuckGo/Ecosia and Brave's fallback, all of
+  // which read Bing's index.
   verification: {
     google: "nGPRdcdcn94uKBjsLzkBK2Nebm0oO5gOwPqVE_qANzk",
+    other: {
+      "msvalidate.01": "0611280D65CAB22F1BFACEEB1B035BD7",
+    },
   },
 };
 
@@ -92,7 +110,7 @@ export default function RootLayout({
       // animates the scroll to top instead of jumping.
       // See node_modules/next/dist/docs/01-app/02-guides/upgrading/version-16.md
       data-scroll-behavior="smooth"
-      className={`${geistSans.variable} ${geistMono.variable} ${caveat.variable} h-full`}
+      className={`${geistSans.variable} ${geistMono.variable} ${newsreader.variable} ${caveat.variable} h-full`}
     >
       {/* Root layout is just the document shell. The public site chrome lives
           in app/(site)/layout.tsx and the admin area in app/admin/layout.tsx,

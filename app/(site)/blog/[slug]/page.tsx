@@ -79,6 +79,7 @@ function extractToc(body: string): TocItem[] {
   return items;
 }
 
+
 export default async function ArticlePage({
   params,
 }: {
@@ -95,7 +96,9 @@ export default async function ArticlePage({
     day: "numeric",
   });
 
-  const toc = extractToc(post.body);
+  // Render the body exactly as authored — headings (including H1) show as set.
+  const articleBody = post.body;
+  const toc = extractToc(articleBody);
   const more = (await getPublishedPosts())
     .filter((p) => p.slug !== post.slug)
     .slice(0, 3);
@@ -131,7 +134,7 @@ export default async function ArticlePage({
         </div>
 
         <div className="container-page">
-          <Reveal className="flex max-w-4xl flex-col gap-5">
+          <Reveal className="flex max-w-5xl flex-col gap-5">
             <Link
               href="/blog"
               className="inline-flex w-fit items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
@@ -142,7 +145,10 @@ export default async function ArticlePage({
 
             <InstrumentLabel>{post.category || "Blog"}</InstrumentLabel>
 
-            <h1 className="text-[clamp(2.2rem,4.8vw,3.75rem)] leading-[1.05] font-semibold tracking-[-0.035em] text-balance">
+            {/* `text-pretty` (not balance) lets each line fill the available
+                width — so the title runs wide instead of stacking into a narrow
+                balanced block while space sits empty to the right. */}
+            <h1 className="text-[clamp(2.2rem,4.8vw,3.75rem)] leading-[1.06] font-semibold tracking-[-0.035em] text-pretty">
               {post.title}
             </h1>
 
@@ -163,45 +169,57 @@ export default async function ArticlePage({
         </div>
       </header>
 
-      {/* Wide cover */}
+      {/* Cover — the full uploaded image at its own aspect ratio, never cropped
+          and with no surrounding card: just the image, centered, height-capped
+          so a tall image doesn't dominate. A plain <img> is used on purpose:
+          covers come from storage with unknown dimensions, and next/image needs
+          known width/height (or `fill`, which crops) — a native img renders the
+          true intrinsic ratio with no layout assumptions. When there is no cover
+          we fall back to the generated CoverArt in its own framed panel. */}
       <div className="container-page">
-        <Reveal className="relative aspect-[21/8] overflow-hidden rounded-2xl border border-border shadow-[var(--elevation-3)]">
-          {post.coverUrl ? (
-            <Image
+        {post.coverUrl ? (
+          <Reveal className="flex justify-center">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
               src={post.coverUrl}
               alt={post.title}
-              fill
-              sizes="(max-width: 1400px) 100vw, 1400px"
-              className="object-cover"
-              priority
+              className="h-auto max-h-[75vh] w-auto max-w-full rounded-2xl"
+              loading="eager"
+              fetchPriority="high"
+              decoding="async"
             />
-          ) : (
+          </Reveal>
+        ) : (
+          <Reveal className="relative aspect-[21/8] overflow-hidden rounded-2xl border border-border shadow-[var(--elevation-3)]">
             <CoverArt
               slug={post.slug}
               title={post.title}
               className="h-full w-full"
               monoClassName="text-[20rem]"
             />
-          )}
-        </Reveal>
+          </Reveal>
+        )}
       </div>
 
       {/* ── Two-column body: article + sticky sidebar ─────────────────── */}
       <div className="container-page py-14 sm:py-16">
         <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_18rem] lg:gap-16 xl:grid-cols-[minmax(0,1fr)_20rem]">
-          {/* Article */}
+          {/* Article — left-aligned in its column so the body shares the same
+              left edge as the title and cover above it (an editorial column,
+              not a floating centred block). Measure capped for comfortable
+              line-length. */}
           <article className="min-w-0">
-            <div className="prose-blog mx-auto max-w-3xl">
+            <div className="prose-blog max-w-[68ch]">
               <ReactMarkdown
                 remarkPlugins={[remarkGfm]}
                 rehypePlugins={[rehypeSlug]}
               >
-                {post.body}
+                {articleBody}
               </ReactMarkdown>
             </div>
 
-            {/* End CTA */}
-            <div className="mx-auto mt-14 flex max-w-3xl flex-col items-start gap-4 border-t border-border pt-10">
+            {/* End CTA — shares the article's left edge and measure. */}
+            <div className="mt-16 flex max-w-[68ch] flex-col items-start gap-4 border-t border-border pt-10">
               <h2 className="text-xl font-semibold">
                 Want this thinking applied to your project?
               </h2>
