@@ -201,6 +201,9 @@ export function SiteFooter() {
               <InstagramIcon className="size-4" />
               <span className="normal-case">@dev.syndicate</span>
             </a>
+            <span aria-hidden className="hidden text-border-strong sm:inline">
+              /
+            </span>
             <a
               href={linkedinUrl}
               target="_blank"
