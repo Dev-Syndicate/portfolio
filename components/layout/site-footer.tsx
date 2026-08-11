@@ -8,6 +8,10 @@ const instagramUrl =
   seo.sameAs.find((u) => u.includes("instagram.com")) ??
   "https://www.instagram.com/dev.syndicate/";
 
+const linkedinUrl =
+  seo.sameAs.find((u) => u.includes("linkedin.com")) ??
+  "https://www.linkedin.com/in/devsyndicate/";
+
 /** Instagram glyph — lucide-react dropped its brand icons, so it's inline. */
 function InstagramIcon(props: React.SVGProps<SVGSVGElement>) {
   return (
@@ -24,6 +28,15 @@ function InstagramIcon(props: React.SVGProps<SVGSVGElement>) {
       <rect x="2" y="2" width="20" height="20" rx="5" />
       <circle cx="12" cy="12" r="4" />
       <circle cx="17.5" cy="6.5" r="0.75" fill="currentColor" stroke="none" />
+    </svg>
+  );
+}
+
+/** LinkedIn glyph — inline for the same reason as Instagram. */
+function LinkedInIcon(props: React.SVGProps<SVGSVGElement>) {
+  return (
+    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden {...props}>
+      <path d="M20.45 20.45h-3.56v-5.57c0-1.33-.02-3.04-1.85-3.04-1.85 0-2.14 1.45-2.14 2.94v5.67H9.35V9h3.42v1.56h.05c.48-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.46v6.28zM5.34 7.43a2.07 2.07 0 1 1 0-4.14 2.07 2.07 0 0 1 0 4.14zM7.12 20.45H3.55V9h3.57v11.45zM22.22 0H1.77C.79 0 0 .77 0 1.73v20.54C0 23.23.79 24 1.77 24h20.45c.98 0 1.78-.77 1.78-1.73V1.73C24 .77 23.2 0 22.22 0z" />
     </svg>
   );
 }
@@ -155,7 +168,7 @@ export function SiteFooter() {
         {/* ── Baseline readout strip — status · social · legal ───────── */}
         <div className="flex flex-col gap-4 border-t border-border py-5 font-mono text-[0.6875rem] tracking-[0.06em] text-muted-foreground uppercase sm:flex-row sm:items-center sm:justify-between">
           <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
-            <span className="flex items-center gap-2">
+            {/* <span className="flex items-center gap-2">
               <span aria-hidden className="relative flex size-1.5">
                 <span className="absolute inline-flex size-full animate-ping rounded-full bg-primary opacity-70" />
                 <span className="relative inline-flex size-1.5 rounded-full bg-primary" />
@@ -164,7 +177,7 @@ export function SiteFooter() {
             </span>
             <span aria-hidden className="text-border-strong">
               /
-            </span>
+            </span> */}
             <span>Worldwide</span>
             <span aria-hidden className="hidden text-border-strong sm:inline">
               /
@@ -182,10 +195,21 @@ export function SiteFooter() {
               href={instagramUrl}
               target="_blank"
               rel="noopener noreferrer"
+              aria-label="Dev Syndicate on Instagram"
               className="flex items-center gap-2 transition-colors hover:text-foreground"
             >
               <InstagramIcon className="size-4" />
               <span className="normal-case">@dev.syndicate</span>
+            </a>
+            <a
+              href={linkedinUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Dev Syndicate on LinkedIn"
+              className="flex items-center gap-2 transition-colors hover:text-foreground"
+            >
+              <LinkedInIcon className="size-4" />
+              <span className="normal-case">LinkedIn</span>
             </a>
             <span aria-hidden className="text-border-strong">
               /
