@@ -8,24 +8,22 @@ import {
   useTransform,
 } from "motion/react";
 
-import { DottedWorld } from "@/components/artwork/dotted-world";
-
 /**
- * The hero's visual anchor: the Dev Syndicate mark as a powered component,
- * lit over a dotted world — the studio as a signal hub with worldwide reach.
+ * The hero's visual anchor: the Dev Syndicate mark as a powered component.
  *
- * A faint halftone world map (ref #3) sits behind the mark as an ambient field,
- * drifting on its own parallax layer so the mark floats above it with depth.
- * The mark itself draws on once, then stays lit — silver signal packets flow
- * down its outline forever, the chrome gradient sweeps across the strokes, and
- * the whole board tilts gently with the cursor. Perpetual, subtle motion is the
- * point: a living instrument over a live map, not a one-shot load animation.
+ * The mark draws on once, then stays lit — silver signal packets flow down its
+ * outline forever, the chrome gradient sweeps across the strokes, and the whole
+ * board tilts gently with the cursor. Perpetual, subtle motion is the point: a
+ * living instrument, not a one-shot load animation.
  *
- * The only soft elements are the world field and one tight glow behind the
- * mark, reading as lit silicon. Everything else is hard-edged linework.
+ * Nothing sits behind the mark. A halftone world map used to, but the hero now
+ * carries `CircuitField` across its full width, and a dot field layered under
+ * linework read as texture-on-texture — two competing patterns in the same
+ * space with neither winning. The board is the ambient layer now; this is the
+ * one component on it. Everything here is hard-edged linework, no soft fills.
  *
  * Motion is gated on `useReducedMotion`: those users get the final composed
- * still — mark drawn, world present but not pulsing, readout at target.
+ * still — mark drawn, no packets, no tilt.
  */
 
 /* The three sub-paths of the mark, in draw order. Fixed geometry — the source
@@ -66,9 +64,6 @@ export function HeroVisual() {
   const rotateX = useTransform(py, [-0.5, 0.5], ["-7deg", "7deg"]);
   const markX = useTransform(px, [-0.5, 0.5], ["18px", "-18px"]);
   const markY = useTransform(py, [-0.5, 0.5], ["18px", "-18px"]);
-  // World drifts opposite and further than the mark for layered depth.
-  const worldX = useTransform(px, [-0.5, 0.5], ["-26px", "26px"]);
-  const worldY = useTransform(py, [-0.5, 0.5], ["-14px", "14px"]);
 
   function handleMove(e: React.PointerEvent<HTMLDivElement>) {
     if (reduceMotion || e.pointerType !== "mouse") return;
@@ -97,19 +92,6 @@ export function HeroVisual() {
             : { rotateX, rotateY, transformStyle: "preserve-3d" }
         }
       >
-        {/* Ambient world field — wider than the frame, sits furthest back on
-            its own parallax layer, kept faint so the lit mark stays the hero. */}
-        <motion.div
-          className="pointer-events-none absolute inset-0 flex items-center justify-center"
-          style={
-            reduceMotion
-              ? undefined
-              : { x: worldX, y: worldY, translateZ: "-60px" }
-          }
-        >
-          <DottedWorld className="w-[135%] max-w-none text-brand-300/45 [mask-image:radial-gradient(ellipse_at_center,#000_55%,transparent_82%)]" />
-        </motion.div>
-
         <motion.svg
           viewBox="0 0 624 600"
           className="absolute inset-0 h-full w-full overflow-visible"

@@ -158,15 +158,36 @@ export const services = {
      claim — so the two pages never print the same paragraph twice. */
   overview: {
     heading: "What We Build",
+    /* Names the axis the items are ordered along, so the `where` labels on the
+       cards read as one scale rather than five loose captions. */
     intro:
-      "Five kinds of engagement, each starting from a business goal rather than a technology.",
+      "Five kinds of engagement, ordered from the surface everyone sees to the work that runs when nobody’s watching.",
     cta: { label: "See what each involves", href: "/services" },
   },
 
+  /* Per-item fields beyond the copy:
+
+     `slug`  — the fragment id of this service's card on /services. It is a
+               public URL (`/services#web-applications`), so treat it as
+               permanent: changing one breaks every inbound link and the
+               footer/home deep links that resolve through it.
+     `short` — the nav-length name, for the footer's "What we build" column.
+               Lives here so that column is generated from the real service
+               list and can never drift out of step with it again.
+     `where` — the place in the customer's world the engagement occupies, i.e.
+               how close it sits to the people who use it. The home-page
+               overview orders the items along that axis (most visible →
+               least) and prints the label on each card, so the ordering
+               carries information a visitor can use to find themselves rather
+               than being decoration. Keep the array in that order; the labels
+               stop being a scale if it is shuffled. */
   items: [
     {
       /* PRD-COPY */
       icon: "globe",
+      slug: "website-development",
+      short: "Websites",
+      where: "Public surface",
       title: "Website Development",
       summary:
         "Sites that balance aesthetics with performance, built to carry real business value.",
@@ -183,6 +204,9 @@ export const services = {
     {
       /* DRAFT-COPY */
       icon: "app-window",
+      slug: "web-applications",
+      short: "Web apps",
+      where: "Behind the login",
       title: "Web Applications",
       summary:
         "Dashboards, portals, and internal tools designed to be lived in every day.",
@@ -197,6 +221,9 @@ export const services = {
     {
       /* DRAFT-COPY */
       icon: "tablet-smartphone",
+      slug: "mobile-applications",
+      short: "Mobile apps",
+      where: "In the pocket",
       title: "Mobile Applications",
       summary:
         "One Flutter codebase that ships to both the App Store and Play Store.",
@@ -212,6 +239,9 @@ export const services = {
     {
       /* DRAFT-COPY */
       icon: "plug",
+      slug: "api-integrations",
+      short: "APIs & integrations",
+      where: "Between systems",
       title: "APIs & Integrations",
       summary:
         "Connecting the systems you already pay for, so data moves without anyone copying it.",
@@ -226,6 +256,9 @@ export const services = {
     {
       /* DRAFT-COPY */
       icon: "sparkles",
+      slug: "ai-automation",
+      short: "AI & automation",
+      where: "Runs unattended",
       title: "AI & Automation",
       summary: "Practical automation applied where it actually pays back.",
       body: "Practical automation applied where it pays back: support triage, content pipelines, and the repetitive work quietly consuming your team’s week.",

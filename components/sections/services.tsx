@@ -51,7 +51,10 @@ export function Services() {
             by side on lg so the band reads wide, not tall. A faint drawing sits
             top-right as texture. */}
         <Reveal>
-          <article className="ring-glow group relative overflow-hidden rounded-2xl border border-primary/25 bg-card p-7 shadow-[var(--elevation-2)] sm:p-9">
+          <article
+            id={featured.slug}
+            className="ring-glow target-card group relative overflow-hidden rounded-2xl border border-primary/25 bg-card p-7 shadow-[var(--elevation-2)] sm:p-9"
+          >
             <div
               aria-hidden
               className="pointer-events-none absolute -top-1/3 right-0 h-72 w-72 rounded-full blur-[80px]"
@@ -113,7 +116,10 @@ export function Services() {
         <div className="grid gap-4 sm:grid-cols-2">
           {rest.map((service, i) => (
             <Reveal key={service.title} delay={0.06 + i * 0.05} className="flex">
-              <article className="group flex w-full flex-col gap-4 rounded-2xl border border-border bg-card p-7 transition-colors duration-[var(--duration-base)] ease-out-soft hover:border-border-strong">
+              <article
+                id={service.slug}
+                className="target-card group relative flex w-full flex-col gap-4 overflow-hidden rounded-2xl border border-border bg-card p-7 transition-colors duration-[var(--duration-base)] ease-out-soft hover:border-border-strong"
+              >
                 <div className="flex items-center gap-3">
                   <IconTile name={service.icon as IconName} className="size-11" />
                   <h3 className="text-xl font-semibold tracking-[-0.01em]">

@@ -19,12 +19,22 @@ export function Section({
   children,
   className,
   tone = "default",
+  field,
   "aria-labelledby": ariaLabelledBy,
 }: {
   id?: string;
   children: ReactNode;
   className?: string;
   tone?: "default" | "subtle" | "sky" | "light";
+  /**
+   * Decorative full-bleed artwork painted behind the content (see
+   * `CircuitField`). It is a sibling of the container rather than a child,
+   * because the container is width-capped at `--container-max` — anything
+   * absolutely positioned inside it would stop at that cap instead of running
+   * edge to edge. Purely decorative; the field is responsible for its own
+   * `aria-hidden` and pointer-events.
+   */
+  field?: ReactNode;
   "aria-labelledby"?: string;
 }) {
   const scope =
@@ -34,9 +44,16 @@ export function Section({
     <section
       id={id}
       aria-labelledby={ariaLabelledBy}
-      className={cn("section-y relative isolate", scope, className)}
+      className={cn(
+        "section-y relative isolate",
+        // Keep the board from bleeding past the section it belongs to.
+        field && "overflow-hidden",
+        scope,
+        className,
+      )}
       style={id ? { scrollMarginTop: "5.5rem" } : undefined}
     >
+      {field}
       <div className="relative container-page">{children}</div>
     </section>
   );

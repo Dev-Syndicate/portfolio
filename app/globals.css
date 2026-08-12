@@ -528,6 +528,59 @@
   color: var(--foreground);
 }
 
+/* Inversion — the one light surface on the site.
+   -----------------------------------------------------------------------
+   The ladder above deliberately has no light rung: a whole SECTION flipped to
+   white reads washed-out, which is why depth comes from elevation instead.
+   This scope is the exception at CARD scale, and it exists for exactly one
+   job — the single loud element in a palette that has no accent hue to shout
+   with. Tonal inversion is the only shout available here, so it is spent once
+   per page and never on a band.
+
+   It re-points the same semantic tokens as the other scopes, so `surface-card`,
+   `card-node`, `Button` and the rest render their normal selves in reverse
+   with no component changes. Do not add a background here — the element that
+   opts in supplies its own surface via `--card`.
+   ----------------------------------------------------------------------- */
+@utility tone-invert {
+  --background: var(--ref-white);
+  --foreground: var(--ref-deep);
+
+  --surface-subtle: color-mix(in oklab, var(--ref-white) 94%, var(--ref-navy));
+  --card: var(--ref-white);
+  --card-foreground: var(--ref-deep);
+  --popover: var(--ref-white);
+  --popover-foreground: var(--ref-deep);
+
+  /* Primary flips to ink so filled controls read as black-on-white. */
+  --primary: var(--ref-deep);
+  --primary-hover: var(--ref-navy);
+  --primary-foreground: var(--ref-white);
+
+  --secondary: color-mix(in oklab, var(--ref-white) 88%, var(--ref-navy));
+  --secondary-foreground: var(--ref-deep);
+
+  --muted: color-mix(in oklab, var(--ref-white) 92%, var(--ref-navy));
+  /* 68% navy lands ≈5.6:1 on the white card — AA for body-size text. */
+  --muted-foreground: color-mix(in oklab, var(--ref-navy) 68%, var(--ref-white));
+
+  --accent: var(--ref-navy);
+  --accent-foreground: var(--ref-white);
+
+  --border: color-mix(in oklab, var(--ref-white) 78%, var(--ref-navy));
+  --border-strong: color-mix(in oklab, var(--ref-white) 52%, var(--ref-navy));
+  --input: color-mix(in oklab, var(--ref-white) 84%, var(--ref-navy));
+  /* Focus rings inside an inverted card must be ink, not silver. */
+  --ring: var(--ref-deep);
+
+  /* Highlights are shadows on a light surface, not white lifts. */
+  --highlight: rgba(0, 0, 0, 0.06);
+  --highlight-strong: rgba(0, 0, 0, 0.1);
+  --texture-dot: rgba(0, 0, 0, 0.06);
+
+  color: var(--foreground);
+}
+
 /* ==========================================================================
    6. UTILITIES
    ========================================================================== */
@@ -618,6 +671,29 @@
   );
 }
 
+/* The chamfer on its own, with no surface attached — for media and panels that
+   bring their own background (a cover photo, an inverted panel) but should
+   still read as a machined part from the same shop as `surface-card`.
+   -----------------------------------------------------------------------
+   Same 45° routed top-right corner and the same lightly-rounded remainder, so
+   an image cropped with this sits in the system rather than beside it.
+
+   NOTE: like `surface-card`, the clip removes anything painted outside the
+   polygon — box-shadow and outline included. Elements using this need their
+   separation to come from tone or a border, and their focus ring drawn inset. */
+@utility routed {
+  --chamfer: 18px;
+  border-radius: var(--radius-lg);
+  border-top-right-radius: 0;
+  clip-path: polygon(
+    0 0,
+    calc(100% - var(--chamfer)) 0,
+    100% var(--chamfer),
+    100% 100%,
+    0 100%
+  );
+}
+
 /* Pin-1-style node at a card's routed corner. Applied to an aria-hidden span. */
 @utility card-node {
   position: absolute;
@@ -627,6 +703,72 @@
   height: 4px;
   background-color: color-mix(in oklab, var(--primary) 80%, transparent);
   pointer-events: none;
+}
+
+/* A card that can be arrived at by fragment link (`/services#web-applications`).
+   -----------------------------------------------------------------------
+   Two jobs, and they are different jobs:
+
+     scroll-margin  — stop the fixed header (h-18, h-24 at 2xl) covering the
+                      card the visitor was just sent to.
+     :target        — answer "which one did I land on?". The hairline goes
+                      primary and HOLDS, so the answer survives the arrival;
+                      a single light pulse runs the top edge at the moment of
+                      arrival, because `scroll-behavior: smooth` means a purely
+                      static change happens mid-scroll and is never seen.
+
+   The pulse fires once and stops — this is a signal, not ambience (contrast
+   `edge-flow`, which loops). Reduced motion keeps the border and drops it.
+   ----------------------------------------------------------------------- */
+@utility target-card {
+  scroll-margin-top: 6.5rem;
+
+  @media (width >= 96rem) {
+    scroll-margin-top: 8rem;
+  }
+
+  &:target {
+    border-color: color-mix(in oklab, var(--primary) 60%, var(--border));
+  }
+
+  &:target::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 1px;
+    width: 45%;
+    background: linear-gradient(
+      to right,
+      transparent,
+      var(--primary),
+      transparent
+    );
+    animation: target-arrive 1.5s var(--ease-out-soft) 1 both;
+    pointer-events: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    &:target::after {
+      content: none;
+    }
+  }
+}
+
+/* One pass of the arrival pulse. Travels from just off the left edge to fully
+   past the right (45% wide × 240% ≈ 108% of the card), then holds cleared. */
+@keyframes target-arrive {
+  from {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+  18% {
+    opacity: 1;
+  }
+  to {
+    transform: translateX(240%);
+    opacity: 0;
+  }
 }
 
 

@@ -2,7 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 
-import { nav, seo, site } from "@/lib/content";
+import { nav, seo, services, site } from "@/lib/content";
 
 const instagramUrl =
   seo.sameAs.find((u) => u.includes("instagram.com")) ??
@@ -68,13 +68,19 @@ function Label({ children }: { children: React.ReactNode }) {
 }
 
 /* The link matrix is the true information: two real groupings, each an honest
-   set — the site's own pages, and what the studio builds (pointing at the one
-   page that carries them in full). No decorative column headers. */
-const build = [
-  { label: "Websites", href: "/services" },
-  { label: "Web & mobile apps", href: "/services" },
-  { label: "APIs & automation", href: "/services" },
-];
+   set — the site's own pages, and what the studio builds. No decorative column
+   headers.
+
+   Generated from `services.items` rather than hand-listed. The hand-listed
+   version had three entries ("Web & mobile apps" collapsed two services into
+   one link) against the studio's actual five, and all three pointed at the top
+   of /services — so the column both misdescribed the offering and sent every
+   click to the same place. Deriving it means the column is the service list,
+   and each entry lands on that service's own card. */
+const build = services.items.map((service) => ({
+  label: service.short,
+  href: `/services#${service.slug}`,
+}));
 
 export function SiteFooter() {
   const year = new Date().getFullYear();

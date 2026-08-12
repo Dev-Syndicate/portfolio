@@ -2,6 +2,7 @@ import { trust } from "@/lib/content";
 import { IconTile, type IconName } from "@/components/ui/icon";
 import { Section, SectionHeader } from "@/components/ui/section";
 import { Reveal } from "@/components/ui/reveal";
+import { CircuitField } from "@/components/artwork/circuit-field";
 import { lineArt, type LineArtName } from "@/components/artwork/line-art";
 
 /**
@@ -28,7 +29,11 @@ export function Trust() {
   const LeadArt = lineArt[art[lead.icon] ?? "nodes"];
 
   return (
-    <Section id="trust" aria-labelledby="trust-heading">
+    <Section
+      id="trust"
+      aria-labelledby="trust-heading"
+      field={<CircuitField id="trust-board" variant="band" />}
+    >
       <SectionHeader
         id="trust-heading"
         eyebrow="Outcomes first"
