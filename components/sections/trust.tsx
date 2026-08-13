@@ -17,11 +17,11 @@ import { lineArt, type LineArtName } from "@/components/artwork/line-art";
 /* The lead card's faint background illustration, keyed by its icon so content
    stays a plain data module. Only the lead carries one; the rest stay clean. */
 const art: Record<string, LineArtName> = {
-  gauge: "burst",
+  plug: "circuit",
   layers: "coil",
-  search: "nodes",
+  database: "nodes",
   shield: "chip",
-  smartphone: "globe",
+  gauge: "burst",
 };
 
 export function Trust() {

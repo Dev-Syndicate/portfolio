@@ -19,9 +19,10 @@
 export const site = {
   name: "Dev Syndicate",
   /* Brand promise / default meta description — general, no filler. Feeds the
-     search snippet, OG/Twitter, schema, and footer. */
+     search snippet, OG/Twitter, schema, and footer. Leads with the operational
+     positioning so the snippet matches the hero. */
   promise:
-    "Dev Syndicate is a software development company that solves complex problems with software, AI, and automation — from websites and web or mobile apps to API integrations and intelligent workflows.",
+    "Dev Syndicate is a software development company that builds software systems to solve operational problems for organisations — using software, AI, and automation to remove manual work, connect disconnected tools, and streamline how a business runs.",
   email: "contact@devsyndicate.in",
   /* Canonical domain. Everything SEO (canonicals, sitemap, robots, OG)
      resolves from this one value. It must match where the live host actually
@@ -97,12 +98,15 @@ export const nav = [
 
 export const hero = {
   eyebrow: "Software development company",
-  /* Split for the word-stagger animation the PRD specifies. */
-  headline: "Building Digital Experiences That Help Businesses Grow.",
+  /* Split for the word-stagger animation the PRD specifies.
+     8 words: We(0) Build(1) Software(2) Systems(3) That(4) Solve(5)
+     Real(6) Operational(7) Problems.(8) — the gradient accent starts at
+     "Solve", so the payoff phrase carries the highlight. */
+  headline: "We Build Software Systems That Solve Real Operational Problems.",
   /* Words rendered in gradient within the headline stagger. */
   headlineAccentFrom: 5,
   supporting:
-    "Your website is often the first impression customers have of your business. We create high-performance websites that combine thoughtful design, modern technology, and seamless user experiences to help you build trust, generate leads, and support long-term growth.",
+    "Dev Syndicate builds software, AI, and automation that fix how an organisation actually runs — the manual work, the disconnected tools, the processes that break as you grow. We engineer systems around the problem in front of you, so your team spends less time fighting operations and more time moving the business forward.",
   primaryCta: { label: "Start Your Project", href: "/contact" },
   secondaryCta: { label: "Explore Our Process", href: "#process" },
 } as const;
@@ -112,34 +116,34 @@ export const hero = {
 /* -------------------------------------------------------------------------- */
 
 export const trust = {
-  heading: "Built Around Business Outcomes",
+  heading: "Built Around How You Operate",
   intro:
-    "Every decision we make is driven by the impact it creates for your business.",
+    "Every system we build is judged on one thing: whether it makes the day-to-day work of your organisation measurably easier.",
   points: [
     {
-      icon: "gauge",
-      title: "Faster websites",
-      body: "Performance budgets and edge delivery keep pages fast, so visitors stay engaged instead of leaving while the page loads.",
+      icon: "plug",
+      title: "Less manual work",
+      body: "We connect the tools and steps your team repeats by hand, so the work that used to eat hours runs on its own.",
     },
     {
       icon: "layers",
-      title: "Scalable architecture",
-      body: "Systems designed to grow with your company, so a good quarter never becomes an engineering emergency.",
+      title: "Scales with your operations",
+      body: "Systems designed to absorb more volume, users, and process without a rebuild — a good quarter never becomes an engineering emergency.",
     },
     {
-      icon: "search",
-      title: "SEO-ready foundations",
-      body: "Semantic markup, structured data, and server rendering that improve discoverability from day one.",
+      icon: "database",
+      title: "One source of truth",
+      body: "Disconnected tools and spreadsheets pulled into one place, so everyone works from the same data instead of reconciling it.",
     },
     {
       icon: "shield",
-      title: "Secure and maintainable",
-      body: "Typed, tested, reviewed codebases that the next developer — ours or yours — can pick up without friction.",
+      title: "Reliable and maintainable",
+      body: "Typed, tested, reviewed codebases that keep running quietly — and that the next developer, ours or yours, can pick up without friction.",
     },
     {
-      icon: "smartphone",
-      title: "Responsive everywhere",
-      body: "Experiences that hold their shape across every device, from a 320px phone to an ultrawide display.",
+      icon: "gauge",
+      title: "Faster to deliver",
+      body: "Automated, well-instrumented workflows cut the time between a decision and it actually happening across the business.",
     },
   ],
 } as const;

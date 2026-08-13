@@ -9,7 +9,7 @@ import { PrincipleOrbit } from "@/components/artwork/principle-orbit";
 import { Reveal } from "@/components/ui/reveal";
 
 const description =
-  "Dev Syndicate (DS) is a software development company that treats your website as business infrastructure — building high-performance digital experiences that help businesses grow.";
+  "Dev Syndicate (DS) is a software development company that builds software systems to solve operational problems for organisations — removing manual work, connecting disconnected tools, and streamlining how a business runs with software, AI, and automation.";
 
 export const metadata = pageMetadata({
   title: "About",
@@ -55,7 +55,7 @@ export default function AboutPage() {
       />
       <PageHeader
         eyebrow="About"
-        title="A small team that treats your website as business infrastructure."
+        title="A small team that builds software systems to solve real operational problems."
         intro={site.promise}
         visual={<PrincipleOrbit />}
       />
