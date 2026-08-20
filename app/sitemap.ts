@@ -12,7 +12,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const deployDate = new Date();
 
   const pages: MetadataRoute.Sitemap = nav.map((item) => ({
-    url: new URL(item.href, site.url).toString(),
+    // Strip the trailing slash the URL constructor adds to the root ("/" →
+    // origin + "/"). Next serves and self-canonicalises every route WITHOUT a
+    // trailing slash (its default trailingSlash: false), so the home entry has
+    // to be slash-less too — otherwise the sitemap advertises a URL that
+    // disagrees with the page's own canonical, which is what left the homepage
+    // "Discovered but not crawled" in Bing. Interior paths are unaffected.
+    url: new URL(item.href, site.url).toString().replace(/\/$/, ""),
     lastModified: deployDate,
     changeFrequency: item.href === "/blog" ? "weekly" : "monthly",
     priority: item.href === "/" ? 1 : 0.8,
