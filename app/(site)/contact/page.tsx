@@ -34,7 +34,7 @@ const instagramUrl =
 const instagramHandle = "@dev.syndicate";
 
 const description =
-  "Tell us what you're building and what it needs to achieve. We'll come back with an honest view of scope and approach. Contact Dev Syndicate to start your project.";
+  "Tell us what you're building and what it needs to achieve, and we'll come back with an honest view of scope and approach. Start your project with Dev Syndicate.";
 
 export const metadata = pageMetadata({
   title: "Contact",

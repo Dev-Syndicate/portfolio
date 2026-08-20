@@ -40,6 +40,13 @@ export const seo = {
   /* A short, keyword-bearing tagline used after the brand name in titles. */
   tagline: "Software Development Company",
 
+  /* Home-page meta description. Kept to the search-snippet limit (≤160 chars)
+     so Bing/Google show it in full and don't flag it as too long — `site.promise`
+     is the fuller brand statement used for schema, OG-nothing, and the footer,
+     and is deliberately longer than a snippet should be. */
+  metaDescription:
+    "Dev Syndicate builds software, AI, and automation that solve real operational problems — removing manual work and connecting the tools a business runs on.",
+
   /* Every way people spell or shorten the brand. Google uses Organization
      `alternateName` to understand these all refer to one entity, which is what
      lets the site rank for each variant. Keep these ALSO present in real page

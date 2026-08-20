@@ -39,10 +39,15 @@ const caveat = Caveat({
 export const metadata: Metadata = {
   metadataBase: new URL(site.url),
   title: {
-    default: `${site.name} — ${seo.tagline} | Building Digital Experiences That Help Businesses Grow`,
+    // Kept under ~60 chars so it isn't truncated or flagged as too long. The
+    // longer "Building Digital Experiences…" strapline lives in the hero copy,
+    // not the title tag.
+    default: `${site.name} — ${seo.tagline}`,
     template: `%s — ${site.name}`,
   },
-  description: site.promise,
+  // Search-snippet description (≤160). site.promise is the fuller brand
+  // statement and stays reserved for schema/footer.
+  description: seo.metaDescription,
   applicationName: site.name,
   keywords: [...seo.keywords],
   authors: [{ name: site.name, url: site.url }],
@@ -56,14 +61,14 @@ export const metadata: Metadata = {
     locale: "en",
     url: site.url,
     title: `${site.name} — ${seo.tagline}`,
-    description: site.promise,
+    description: seo.metaDescription,
     // OG image URL + alt come from app/opengraph-image.tsx (file convention),
     // which exports `alt` — no manual image entry needed here.
   },
   twitter: {
     card: "summary_large_image",
     title: `${site.name} — ${seo.tagline}`,
-    description: site.promise,
+    description: seo.metaDescription,
   },
   robots: {
     index: true,

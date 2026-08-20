@@ -14,7 +14,7 @@ import { cn } from "@/lib/utils";
 export const revalidate = 60;
 
 const description =
-  "The Dev Syndicate blog — practical writing on software, AI, and automation: choosing a stack, performance, platforms, and the decisions behind building for the web.";
+  "The Dev Syndicate blog — practical writing on software, AI, and automation: choosing a stack, performance, and the decisions behind building for the web.";
 
 export const metadata = pageMetadata({
   title: "Blog",

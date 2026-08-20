@@ -8,8 +8,9 @@ import { ContactCta } from "@/components/sections/contact-cta";
 import { PrincipleOrbit } from "@/components/artwork/principle-orbit";
 import { Reveal } from "@/components/ui/reveal";
 
+// Kept ≤160 chars for the search snippet; the full positioning is in the page body.
 const description =
-  "Dev Syndicate (DS) is a software development company that builds software systems to solve operational problems for organisations — removing manual work, connecting disconnected tools, and streamlining how a business runs with software, AI, and automation.";
+  "Dev Syndicate (DS) is a software company that builds systems to solve operational problems — cutting manual work and connecting the tools a business runs on.";
 
 export const metadata = pageMetadata({
   title: "About",
