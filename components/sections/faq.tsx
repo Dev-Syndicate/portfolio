@@ -3,7 +3,6 @@ import { Plus } from "lucide-react";
 import { faq } from "@/lib/content";
 import { Section, SectionHeader } from "@/components/ui/section";
 import { Reveal } from "@/components/ui/reveal";
-import { CircuitField } from "@/components/artwork/circuit-field";
 
 export function Faq() {
   // FAQPage structured data — part of the "SEO-ready foundations" claim.
@@ -22,7 +21,6 @@ export function Faq() {
       id="faq"
       tone="sky"
       aria-labelledby="faq-heading"
-      field={<CircuitField id="faq-board" variant="band" />}
     >
       <script
         type="application/ld+json"

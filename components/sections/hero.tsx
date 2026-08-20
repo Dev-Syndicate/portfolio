@@ -9,7 +9,6 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Magnetic } from "@/components/ui/magnetic";
 import { HeroVisual } from "@/components/sections/hero-visual";
-import { CircuitField } from "@/components/artwork/circuit-field";
 
 const words = hero.headline.split(" ");
 
@@ -45,10 +44,6 @@ export function Hero() {
       aria-labelledby="hero-heading"
       className="relative isolate flex min-h-svh flex-col justify-center overflow-hidden pt-24 pb-16 sm:pt-28 lg:pb-20"
     >
-      {/* The board the mark is soldered to. Static by design — the mark is the
-          only live component in this composition. */}
-      <CircuitField id="hero-board" variant="hero" />
-
       <div className="container-page relative grid items-center gap-y-12 lg:grid-cols-12 lg:gap-x-8">
         <motion.div
           style={reduceMotion ? undefined : { y: copyY, opacity: fade }}

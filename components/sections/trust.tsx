@@ -2,7 +2,6 @@ import { trust } from "@/lib/content";
 import { IconTile, type IconName } from "@/components/ui/icon";
 import { Section, SectionHeader } from "@/components/ui/section";
 import { Reveal } from "@/components/ui/reveal";
-import { CircuitField } from "@/components/artwork/circuit-field";
 import { lineArt, type LineArtName } from "@/components/artwork/line-art";
 
 /**
@@ -17,7 +16,7 @@ import { lineArt, type LineArtName } from "@/components/artwork/line-art";
 /* The lead card's faint background illustration, keyed by its icon so content
    stays a plain data module. Only the lead carries one; the rest stay clean. */
 const art: Record<string, LineArtName> = {
-  plug: "circuit",
+  plug: "wave",
   layers: "coil",
   database: "nodes",
   shield: "chip",
@@ -32,7 +31,6 @@ export function Trust() {
     <Section
       id="trust"
       aria-labelledby="trust-heading"
-      field={<CircuitField id="trust-board" variant="band" />}
     >
       <SectionHeader
         id="trust-heading"

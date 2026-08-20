@@ -4,7 +4,6 @@ import { process } from "@/lib/content";
 import { Section, SectionHeader } from "@/components/ui/section";
 import { Reveal } from "@/components/ui/reveal";
 import { Button } from "@/components/ui/button";
-import { CircuitField } from "@/components/artwork/circuit-field";
 
 /**
  * Home-page version of Process: a numbered five-station sequence.
@@ -24,9 +23,6 @@ export function ProcessStrip() {
       id="process"
       tone="light"
       aria-labelledby="process-strip-heading"
-      /* Mirrored against Trust so consecutive bands never read as the same
-         drawing pasted twice. */
-      field={<CircuitField id="process-board" variant="band" flip />}
     >
       <SectionHeader
         id="process-strip-heading"
