@@ -1,168 +1,119 @@
-import { ArrowRight, Check } from "lucide-react";
+import { Check } from "lucide-react";
 
 import { services } from "@/lib/content";
+import { Bloom, type BloomFrom } from "@/components/ui/bloom";
+import { Icon } from "@/components/ui/icon";
 import { Section, SectionHeader } from "@/components/ui/section";
-import { IconTile, type IconName } from "@/components/ui/icon";
 import { Reveal } from "@/components/ui/reveal";
-import { Button } from "@/components/ui/button";
-import { lineArt, type LineArtName } from "@/components/artwork/line-art";
+import {
+  SurfaceDiagram,
+  PortalDiagram,
+  DeviceDiagram,
+  MeshDiagram,
+  LoopDiagram,
+} from "@/components/artwork/service-diagrams";
 
 /**
- * The detailed Services section: one lit flagship band above a tidy 2×2 of the
- * other four. Type-led and spacious — the flagship carries a single restrained
- * line-art drawing as background texture (the page's one deliberate illustration
- * moment), while the four quiet cards stay clean: icon, title, body, and a
- * `benefits` checklist that earns each card its keep. Spec-sheet, not teaser.
+ * Services in full — the page the home bento links into.
  *
- *   ┌───────────────────────────────┐
- *   │  copy  │  ✓ benefits           │   ← lit flagship (items[0])
- *   ├───────────────┬───────────────┤
- *   │       2       │       3       │
- *   ├───────────────┼───────────────┤
- *   │       4       │       5       │
- *   └───────────────┴───────────────┘
+ * Home shows five compact cards; this shows the same five as full-width panels
+ * with the body copy and the benefit list, alternating which side the diagram
+ * sits on so the eye zig-zags down the page instead of scanning one gutter.
+ *
+ * Each panel carries the service's `slug` as its element id. Those are public
+ * URLs (`/services#web-applications`) linked from the home bento and the
+ * footer, so they are permanent — renaming one breaks inbound links.
  */
 
-/* The flagship's faint background drawing, keyed by icon so content stays a
-   plain data module. Only the flagship carries one; the rest stay clean. */
-const art: Record<string, LineArtName> = {
-  globe: "globe", // Website Development
-  "app-window": "layers", // Web Applications
-  "tablet-smartphone": "orbit", // Mobile Applications
-  plug: "circuit", // APIs & Integrations
-  sparkles: "wave", // AI & Automation
-};
+const DIAGRAMS = [
+  SurfaceDiagram,
+  PortalDiagram,
+  DeviceDiagram,
+  MeshDiagram,
+  LoopDiagram,
+] as const;
+
+/* Light enters from the side the diagram is on, so each panel is lit from
+   whichever half carries the artwork. Alternating both together is what makes
+   the zig-zag legible rather than arbitrary. */
+const FROM: BloomFrom[] = ["tr", "tl", "tr", "tl", "tr"];
 
 export function Services() {
-  const [featured, ...rest] = services.items;
-  const FeaturedArt = lineArt[art[featured.icon] ?? "globe"];
-
   return (
-    <Section id="services" tone="sky" aria-labelledby="services-heading">
+    <Section aria-labelledby="services-detail-heading">
       <SectionHeader
-        id="services-heading"
-        eyebrow="Services"
-        heading={services.heading}
+        id="services-detail-heading"
+        eyebrow="What we build"
+        heading={{ lead: "Five engagements.", lit: "One standard." }}
         intro={services.intro}
       />
 
-      <div className="mt-12 grid gap-4">
-        {/* Featured — the one lit card, full width. Copy and benefits sit side
-            by side on lg so the band reads wide, not tall. A faint drawing sits
-            top-right as texture. */}
-        <Reveal>
-          <article
-            id={featured.slug}
-            className="ring-glow target-card group relative overflow-hidden rounded-2xl border border-primary/25 bg-card p-7 shadow-[var(--elevation-2)] sm:p-9"
-          >
-            <div
-              aria-hidden
-              className="pointer-events-none absolute -top-1/3 right-0 h-72 w-72 rounded-full blur-[80px]"
-              style={{ background: "var(--glow-a)" }}
-            />
-            {/* Line-art as quiet background texture, not a boxed viewport. */}
-            <div
-              aria-hidden
-              className="pointer-events-none absolute -top-6 -right-6 hidden h-48 w-64 text-primary/15 sm:block"
-            >
-              <FeaturedArt />
-            </div>
+      <div className="mt-14 flex flex-col gap-4">
+        {services.items.map((service, i) => {
+          const Diagram = DIAGRAMS[i];
+          // Alternate which column the artwork occupies.
+          const flip = i % 2 === 1;
 
-            <div className="relative grid gap-7 lg:grid-cols-[1fr_minmax(0,18rem)] lg:items-start lg:gap-12">
-              {/* Copy. */}
-              <div className="flex flex-col gap-4">
-                <div className="flex items-center gap-4">
-                  <IconTile
-                    name={featured.icon as IconName}
-                    className="size-12 border-primary/30 text-primary"
-                  />
-                  <h3 className="text-2xl font-semibold tracking-[-0.01em] sm:text-[1.75rem]">
-                    {featured.title}
-                  </h3>
-                </div>
-                <p className="max-w-xl text-[1.0625rem] leading-[1.75] text-brand-100">
-                  {featured.body}
-                </p>
-              </div>
-
-              {/* Benefits — divided off with a rule that flips from top (stacked)
-                  to left (side by side) at lg. */}
-              <div className="flex flex-col gap-4 border-t border-border pt-6 lg:border-t-0 lg:border-l lg:pt-0 lg:pl-12">
-                <h4 className="text-xs font-semibold tracking-[0.14em] uppercase text-muted-foreground">
-                  Client benefits
-                </h4>
-                <ul className="grid gap-2.5 sm:grid-cols-2 lg:grid-cols-1">
-                  {featured.benefits.map((benefit) => (
-                    <li
-                      key={benefit}
-                      className="flex items-start gap-2.5 text-[0.9375rem] text-brand-100/90"
-                    >
-                      <Check
-                        aria-hidden
-                        className="mt-0.5 size-4 shrink-0 text-primary"
-                        strokeWidth={2.5}
-                      />
-                      {benefit}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </div>
-          </article>
-        </Reveal>
-
-        {/* The other four — a tidy 2×2 of quiet, type-led cards with benefits
-            pinned to the foot so they align regardless of body length. */}
-        <div className="grid gap-4 sm:grid-cols-2">
-          {rest.map((service, i) => (
-            <Reveal key={service.title} delay={0.06 + i * 0.05} className="flex">
-              <article
+          return (
+            <Reveal key={service.slug} delay={0.04}>
+              <Bloom
+                from={FROM[i]}
+                as="article"
+                // The anchor target for /services#slug deep links.
                 id={service.slug}
-                className="target-card group relative flex w-full flex-col gap-4 overflow-hidden rounded-2xl border border-border bg-card p-7 transition-colors duration-[var(--duration-base)] ease-out-soft hover:border-border-strong"
+                className="scroll-mt-28"
               >
-                <div className="flex items-center gap-3">
-                  <IconTile name={service.icon as IconName} className="size-11" />
-                  <h3 className="text-xl font-semibold tracking-[-0.01em]">
-                    {service.title}
-                  </h3>
-                </div>
-                <p className="text-[0.9375rem] leading-relaxed text-brand-100/90">
-                  {service.body}
-                </p>
+                <div
+                  className={[
+                    "grid items-center gap-10 p-8 sm:p-10 lg:grid-cols-2 lg:gap-14 lg:p-12",
+                    flip ? "lg:[&>*:first-child]:order-2" : "",
+                  ].join(" ")}
+                >
+                  {/* Copy */}
+                  <div className="flex flex-col items-start">
+                    <span className="chip mb-6">{service.where}</span>
 
-                <ul className="mt-auto flex flex-col gap-2.5 border-t border-border pt-5">
-                  {service.benefits.map((benefit) => (
-                    <li
-                      key={benefit}
-                      className="flex items-start gap-2.5 text-[0.875rem] text-brand-100/90"
-                    >
-                      <Check
-                        aria-hidden
-                        className="mt-0.5 size-3.5 shrink-0 text-primary"
-                        strokeWidth={2.5}
+                    <div className="flex items-start gap-4">
+                      <Icon
+                        name={service.icon}
+                        className="mt-1 size-11 shrink-0 rounded-full border border-hairline bg-wash p-2.5 text-foreground"
                       />
-                      {benefit}
-                    </li>
-                  ))}
-                </ul>
-              </article>
-            </Reveal>
-          ))}
-        </div>
-      </div>
+                      <h3 className="text-[1.75rem] leading-tight font-medium tracking-tight text-balance sm:text-3xl">
+                        {service.title}
+                      </h3>
+                    </div>
 
-      {/* Closing CTA — kept as-is. */}
-      <Reveal delay={0.3}>
-        <div className="mt-10 flex flex-col items-center gap-4 text-center sm:flex-row sm:justify-center">
-          <p className="text-muted-foreground">
-            Not sure which of these you need?
-          </p>
-          <Button href="/contact" variant="outline">
-            Talk it through with us
-            <ArrowRight className="size-4" aria-hidden />
-          </Button>
-        </div>
-      </Reveal>
+                    <p className="mt-5 text-[1.0625rem] leading-[1.75] text-muted-foreground text-pretty">
+                      {service.body}
+                    </p>
+
+                    <ul className="mt-7 flex flex-col gap-3">
+                      {service.benefits.map((benefit) => (
+                        <li
+                          key={benefit}
+                          className="flex items-start gap-3 text-[0.9375rem] leading-[1.5] text-muted-foreground"
+                        >
+                          <Check
+                            aria-hidden
+                            className="mt-0.5 size-4 shrink-0 text-primary"
+                            strokeWidth={2}
+                          />
+                          {benefit}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+
+                  {/* Diagram — decorative; the copy already carries the meaning. */}
+                  <div className="pointer-events-none mx-auto w-full max-w-md select-none">
+                    <Diagram />
+                  </div>
+                </div>
+              </Bloom>
+            </Reveal>
+          );
+        })}
+      </div>
     </Section>
   );
 }

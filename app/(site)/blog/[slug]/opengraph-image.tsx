@@ -38,7 +38,7 @@ export default async function ArticleOgImage({
           flexDirection: "column",
           justifyContent: "space-between",
           background:
-            "radial-gradient(1200px 600px at 80% -10%, #1b1d22 0%, #0a0a0c 60%)",
+            "radial-gradient(1200px 600px at 80% -10%, #f2f2f2 0%, #050505 60%)",
           padding: "72px",
           fontFamily: "sans-serif",
         }}
@@ -48,19 +48,19 @@ export default async function ArticleOgImage({
             display: "flex",
             alignItems: "center",
             gap: "14px",
-            color: "#afb4bc",
+            color: "#f2f2f2",
             fontSize: 22,
             letterSpacing: "0.14em",
             textTransform: "uppercase",
           }}
         >
-          <span style={{ width: 10, height: 10, background: "#afb4bc" }} />
+          <span style={{ width: 10, height: 10, background: "#f2f2f2" }} />
           Blog
         </div>
 
         <div
           style={{
-            color: "#f6f6f7",
+            color: "#f2f2f2",
             fontSize: 60,
             fontWeight: 700,
             lineHeight: 1.08,
@@ -75,10 +75,10 @@ export default async function ArticleOgImage({
         <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={logoSrc} width={44} height={44} alt="" />
-          <span style={{ color: "#f6f6f7", fontSize: 26, fontWeight: 700 }}>
+          <span style={{ color: "#f2f2f2", fontSize: 26, fontWeight: 700 }}>
             {site.name}
           </span>
-          <span style={{ color: "#6b7280", fontSize: 22 }}>
+          <span style={{ color: "#737373", fontSize: 22 }}>
             · devsyndicate.in
           </span>
         </div>

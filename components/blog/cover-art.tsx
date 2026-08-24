@@ -9,13 +9,18 @@ import { cn } from "@/lib/utils";
  * Colours stay on the monochrome brand ramp; only the composition varies.
  */
 
-/* Five on-brand gradient recipes. The slug hash picks one. */
+/* Five on-brand gradient recipes. The slug hash picks one.
+
+   Every stop is a neutral grey (R=G=B). The previous set leaned blue — #3a3d44
+   is 58/61/68 — which read as slate against the site's true black once the
+   palette went monochrome. These can't be CSS variables: the same recipes are
+   rasterised by Satori for OG images, which resolves no custom properties. */
 const GRADIENTS = [
-  "radial-gradient(120% 120% at 20% 10%, #3a3d44, transparent 60%), linear-gradient(135deg, #23262c, #0d0e11)",
-  "radial-gradient(120% 120% at 80% 15%, #4a4f57, transparent 55%), linear-gradient(200deg, #1a1c21, #0b0c0f)",
-  "radial-gradient(130% 100% at 30% 90%, #565b64, transparent 60%), linear-gradient(115deg, #20232a, #0c0d10)",
-  "radial-gradient(120% 120% at 70% 30%, #41454d, transparent 58%), linear-gradient(160deg, #191b20, #0a0b0e)",
-  "conic-gradient(from 200deg at 70% 30%, #3a3d44, #14161a, #2a2e35, #0d0e11, #3a3d44)",
+  "radial-gradient(120% 120% at 20% 10%, #3f3f3f, transparent 60%), linear-gradient(135deg, #262626, #0d0d0d)",
+  "radial-gradient(120% 120% at 80% 15%, #4f4f4f, transparent 55%), linear-gradient(200deg, #1c1c1c, #0b0b0b)",
+  "radial-gradient(130% 100% at 30% 90%, #5c5c5c, transparent 60%), linear-gradient(115deg, #222222, #0c0c0c)",
+  "radial-gradient(120% 120% at 70% 30%, #464646, transparent 58%), linear-gradient(160deg, #1a1a1a, #0a0a0a)",
+  "conic-gradient(from 200deg at 70% 30%, #3f3f3f, #151515, #2d2d2d, #0d0d0d, #3f3f3f)",
 ];
 
 // Inline SVG grain as a data URI — no external request.

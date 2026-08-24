@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
@@ -17,6 +16,7 @@ import { nav, site } from "@/lib/content";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Magnetic } from "@/components/ui/magnetic";
+import { Mark } from "@/components/ui/mark";
 
 /** Distance scrolled before the bar picks up its blurred background. */
 const BLUR_AFTER = 24;
@@ -85,7 +85,7 @@ export function SiteHeader() {
         "fixed inset-x-0 top-0 z-50",
         "transition-[background-color,border-color,backdrop-filter] duration-[var(--duration-base)] ease-out-soft",
         scrolled || menuOpen
-          ? "border-b border-border/70 bg-background/70 shadow-[0_1px_0_var(--highlight)] backdrop-blur-xl backdrop-saturate-150"
+          ? "border-b border-border/60 bg-background/60 backdrop-blur-xl backdrop-saturate-150"
           : "border-b border-transparent bg-transparent",
       )}
     >
@@ -95,15 +95,12 @@ export function SiteHeader() {
       >
         <Link
           href="/"
-          className="group flex items-center gap-2.5 text-base font-semibold tracking-tight 2xl:gap-3 2xl:text-xl"
+          className="group flex items-center gap-2.5 text-base font-medium tracking-tight 2xl:gap-3 2xl:text-xl"
         >
-          <Image
-            src="/dev-syndicate-logo.png"
-            alt="Dev Syndicate logo"
-            width={44}
-            height={44}
+          <Mark
+            size={34}
             priority
-            className="size-8 transition-transform duration-[var(--duration-base)] ease-spring group-hover:rotate-6 2xl:size-11"
+            className="transition-transform duration-[var(--duration-base)] ease-spring group-hover:scale-105 motion-reduce:group-hover:scale-100"
           />
           {site.name}
         </Link>
@@ -146,7 +143,7 @@ export function SiteHeader() {
         <div className="hidden md:block">
           <Magnetic strength={0.25}>
             <Button href="/contact" size="sm" className="2xl:h-11 2xl:px-6 2xl:text-[0.9375rem]">
-              Start Your Project
+              Start your project
             </Button>
           </Magnetic>
         </div>
@@ -168,7 +165,7 @@ export function SiteHeader() {
       <motion.div
         aria-hidden
         style={{ scaleX: progress }}
-        className="h-px origin-left bg-gradient-to-r from-primary via-accent to-primary opacity-70"
+        className="h-px origin-left bg-gradient-to-r from-transparent via-primary to-transparent opacity-80"
       />
 
       <AnimatePresence>
@@ -194,7 +191,7 @@ export function SiteHeader() {
               ))}
               <li className="pt-2">
                 <Button href="/contact" className="w-full" size="lg">
-                  Start Your Project
+                  Start your project
                 </Button>
               </li>
             </ul>

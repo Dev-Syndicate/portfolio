@@ -30,6 +30,12 @@ export default function SiteLayout({
         {children}
       </main>
       <SiteFooter />
+
+      {/* Film grain over the whole document. Large fields of near-black band
+          badly on 8-bit panels, and this design is almost entirely soft
+          gradients over near-black — without it the blooms show visible rings.
+          Fixed and pointer-events-none, so it never interferes. */}
+      <div aria-hidden className="grain" />
     </>
   );
 }

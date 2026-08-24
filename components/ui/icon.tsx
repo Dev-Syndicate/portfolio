@@ -45,6 +45,31 @@ const icons = {
 
 export type IconName = keyof typeof icons;
 
+/**
+ * The bare glyph, with the surrounding treatment left to the caller.
+ *
+ * `IconTile` bakes in the old hard-edged instrument tile; the redesigned
+ * sections want a soft lit disc instead, and different sections want it at
+ * different sizes. Passing the container styling in keeps one glyph map
+ * serving both languages rather than forking it.
+ */
+export function Icon({
+  name,
+  className,
+  strokeWidth = 1.6,
+}: {
+  name: IconName;
+  className?: string;
+  strokeWidth?: number;
+}) {
+  const Glyph = icons[name];
+  return (
+    <span aria-hidden className={cn("inline-grid place-items-center", className)}>
+      <Glyph className="size-full" strokeWidth={strokeWidth} />
+    </span>
+  );
+}
+
 /** Decorative icon in a tinted rounded tile. Hidden from assistive tech. */
 export function IconTile({
   name,

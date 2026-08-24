@@ -3,9 +3,9 @@ import { pageMetadata, webPageSchema, breadcrumbSchema } from "@/lib/seo";
 import { JsonLd } from "@/components/seo/json-ld";
 import { PageHeader } from "@/components/ui/page-header";
 import { Section, SectionHeader } from "@/components/ui/section";
-import { WhyUs } from "@/components/sections/why-us";
+import { Bloom, type BloomFrom } from "@/components/ui/bloom";
+import { Commitments } from "@/components/sections/commitments";
 import { ContactCta } from "@/components/sections/contact-cta";
-import { PrincipleOrbit } from "@/components/artwork/principle-orbit";
 import { Reveal } from "@/components/ui/reveal";
 
 const description =
@@ -15,13 +15,17 @@ export const metadata = pageMetadata({
   title: "About",
   description,
   path: "/about",
-  keywords: ["about Dev Syndicate", "software development company", "Developer Syndicate"],
+  keywords: [
+    "about Dev Syndicate",
+    "software development company",
+    "Developer Syndicate",
+  ],
 });
 
 const principles = [
   {
     title: "Clarity before creativity",
-    body: "A clever interface that nobody understands is a failed interface. We earn the flourishes by getting the fundamentals right first.",
+    body: "A clever interface nobody understands is a failed interface. We earn the flourishes by getting the fundamentals right first.",
   },
   {
     title: "Motion with purpose",
@@ -29,16 +33,31 @@ const principles = [
   },
   {
     title: "Performance first",
-    body: "Speed is a feature your visitors feel before they can name it. We hold every page to a budget and measure it before launch.",
+    body: "Speed is a feature your visitors feel before they can name it. Every page gets a budget, and we measure it before launch.",
   },
   {
     title: "Every section earns its place",
-    body: "Each part of a page should answer a question a visitor is actually asking. If it doesn't, it is decoration taking up scroll.",
+    body: "Each part of a page should answer a question someone is actually asking. If it doesn’t, it’s decoration eating scroll.",
   },
   {
     title: "Technology framed as outcomes",
-    body: "You should not need to know what a framework is to understand what we built you or why it was the right call.",
+    body: "You shouldn’t need to know what a framework is to understand what we built you, or why it was the right call.",
   },
+];
+
+/* Five cards over a SIX-column grid: three of two columns, then two of three.
+   Both rows fill exactly, which four columns cannot do with five items — that
+   left a two-column hole beside the last row. The wider pair at the bottom also
+   gives the two longest rules more room to breathe.
+   On `sm` (two columns) the last card spans both so the odd item out fills its
+   row instead of hanging half-width. Light alternates so no two neighbours are
+   lit the same way. */
+const LAYOUT: { span: string; from: BloomFrom }[] = [
+  { span: "lg:col-span-2", from: "tl" },
+  { span: "lg:col-span-2", from: "tr" },
+  { span: "lg:col-span-2", from: "bl" },
+  { span: "lg:col-span-3", from: "br" },
+  { span: "sm:col-span-2 lg:col-span-3", from: "tl" },
 ];
 
 export default function AboutPage() {
@@ -46,7 +65,11 @@ export default function AboutPage() {
     <>
       <JsonLd
         data={[
-          webPageSchema({ path: "/about", name: "About — Dev Syndicate", description }),
+          webPageSchema({
+            path: "/about",
+            name: "About — Dev Syndicate",
+            description,
+          }),
           breadcrumbSchema([
             { name: "Home", path: "/" },
             { name: "About", path: "/about" },
@@ -55,71 +78,55 @@ export default function AboutPage() {
       />
       <PageHeader
         eyebrow="About"
-        title="A small team that builds software systems to solve real operational problems."
+        title={{ lead: "A small team", lit: "that fixes big frictions." }}
         intro={site.promise}
-        visual={<PrincipleOrbit />}
       />
 
-      <Section
-        aria-labelledby="principles-heading"
-      >
+      <Section aria-labelledby="principles-heading">
         <SectionHeader
           id="principles-heading"
           eyebrow="Principles"
-          heading="How We Make Decisions"
-          intro="Five rules that settle most arguments before they start."
-          align="start"
+          heading={{ lead: "Five rules that settle", lit: "most arguments." }}
+          intro="Not a manifesto — just the decisions we've already made, so we don't relitigate them on your budget."
         />
 
-        {/* Quiet, type-led cards — a mono index, the rule, and its reasoning.
-            First card is lightly lifted as a focal point; the rest stay calm.
-            No illustrations: five short rules read best as clean type. */}
-        <div className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {principles.map((principle, i) => {
-            const lead = i === 0; // first rule gets the accent lift
-            return (
-              <Reveal key={principle.title} delay={i * 0.05} className="flex">
-                <article
-                  className={
-                    lead
-                      ? "ring-glow group relative flex w-full flex-col gap-3 overflow-hidden rounded-2xl border border-primary/25 bg-card p-7 shadow-[var(--elevation-2)] transition-transform duration-[var(--duration-base)] ease-out-soft hover:-translate-y-1"
-                      : "group relative flex w-full flex-col gap-3 overflow-hidden rounded-2xl border border-border bg-card p-7 transition-[border-color,transform] duration-[var(--duration-base)] ease-out-soft hover:-translate-y-1 hover:border-border-strong"
-                  }
+        <div className="mt-14 grid gap-3 sm:grid-cols-2 lg:grid-cols-6">
+          {principles.map((principle, i) => (
+            <Reveal
+              key={principle.title}
+              delay={i * 0.05}
+              className={LAYOUT[i].span}
+            >
+              <Bloom
+                from={LAYOUT[i].from}
+                as="article"
+                className="h-full p-7 sm:p-8"
+              >
+                {/* These are rules, not an ordered sequence, so the index reads
+                    as a quiet label rather than a step number. */}
+                <span
+                  aria-hidden
+                  className="font-mono text-xs tabular-nums text-primary"
                 >
-                  {/* Corner glow on the focal card only. */}
-                  {lead && (
-                    <div
-                      aria-hidden
-                      className="pointer-events-none absolute -top-1/4 right-0 h-56 w-56 rounded-full blur-[80px]"
-                      style={{ background: "var(--glow-a)" }}
-                    />
-                  )}
+                  {String(i + 1).padStart(2, "0")}
+                </span>
 
-                  {/* Mono index — these are rules, not an ordered sequence, so it
-                      reads as a light label rather than a step number. */}
-                  <span
-                    aria-hidden
-                    className={`relative font-mono text-[0.8125rem] tabular-nums ${
-                      lead ? "text-primary" : "text-muted-foreground"
-                    }`}
-                  >
-                    {String(i + 1).padStart(2, "0")}
-                  </span>
-                  <h3 className="relative text-lg font-semibold tracking-[-0.01em]">
-                    {principle.title}
-                  </h3>
-                  <p className="relative text-[0.9375rem] leading-relaxed text-brand-100/90">
-                    {principle.body}
-                  </p>
-                </article>
-              </Reveal>
-            );
-          })}
+                <h3 className="mt-4 text-lg leading-snug font-medium tracking-tight text-balance">
+                  {principle.title}
+                </h3>
+
+                <p className="mt-2.5 text-[0.9375rem] leading-[1.7] text-muted-foreground">
+                  {principle.body}
+                </p>
+              </Bloom>
+            </Reveal>
+          ))}
         </div>
       </Section>
 
-      {/* Process is not repeated here — /services carries it in full. */}
-      <WhyUs />
+      {/* The operational commitments in full. Home shows only their titles, as
+          chips under the hero; the four values live there instead. */}
+      <Commitments />
 
       <ContactCta
         heading={closingCta.variants.about.heading}

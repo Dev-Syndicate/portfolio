@@ -8,9 +8,9 @@ import {
 import { JsonLd } from "@/components/seo/json-ld";
 import { PageHeader } from "@/components/ui/page-header";
 import { Services } from "@/components/sections/services";
+import { TechnologySection } from "@/components/sections/technology";
 import { Process } from "@/components/sections/process";
 import { ContactCta } from "@/components/sections/contact-cta";
-import { LayerStack } from "@/components/artwork/layer-stack";
 
 const description =
   "Website development, web applications, mobile apps, API integrations, and automation — engineered around the business outcome, not the tech stack.";
@@ -29,12 +29,13 @@ export const metadata = pageMetadata({
 });
 
 /**
- * Owns the full detail for Services and Process. The home page shows
- * condensed versions of both and links here; nothing on this page is
- * duplicated there.
+ * Owns the full detail for Services, Technology, and Process. Home shows
+ * condensed versions of all three and links here; nothing on this page is a
+ * repeat of the home copy.
  *
- * Technology deliberately does not appear — /insights carries it, and this
- * page used to print the same stack lists a second time.
+ * Technology now lives here. The home constellation's "How we choose" link has
+ * always pointed at /services, but the page carried no technology content —
+ * the link promised an explanation the destination never delivered.
  */
 export default function ServicesPage() {
   return (
@@ -55,12 +56,12 @@ export default function ServicesPage() {
       />
       <PageHeader
         eyebrow="Services"
-        title="Engineering scoped to the outcome you need."
-        intro="Every engagement starts with the business result and works backward to the technology. That is why our proposals talk about conversion, load times, and maintenance cost before they talk about frameworks."
-        visual={<LayerStack />}
+        title={{ lead: "Engineering scoped to", lit: "the outcome you need." }}
+        intro="Every engagement starts with the business result and works backward to the technology. That’s why our proposals talk about conversion, load times, and maintenance cost long before they mention a framework."
       />
 
       <Services />
+      <TechnologySection />
       <Process />
 
       <ContactCta

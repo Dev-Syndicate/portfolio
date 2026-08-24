@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 
 import { cn } from "@/lib/utils";
 import { Reveal } from "@/components/ui/reveal";
-import { InstrumentLabel } from "@/components/ui/instrument";
+import { Chip } from "@/components/ui/chip";
 
 /**
  * Section shell — vertical rhythm and the page container, transparent.
@@ -61,92 +61,62 @@ export function Section({
 
 /**
  * Eyebrow + heading + intro, sharing one reveal so the block animates as a
- * unit. `align="start"` is the default now — a left-locked header reads as
- * structured; centred headers are what made sections feel like loose slides.
+ * unit.
+ *
+ * Rebuilt in the bloom language: the chip replaces the mono instrument label,
+ * and the heading takes the same optional two-part shape as the page and hero
+ * headlines — a muted lead over a lit payoff. Passing a plain string still
+ * works and simply renders lit, so a section with a one-line heading doesn't
+ * have to invent a split.
+ *
+ * Centred is the default here now. The interior pages carry left-locked
+ * content beneath their headers, and a centred header over a left-locked list
+ * is the alternation the reference uses to keep a long page from reading as
+ * one column.
  */
 export function SectionHeader({
   id,
   eyebrow,
   heading,
   intro,
-  align = "start",
+  align = "center",
   className,
 }: {
   id?: string;
   eyebrow?: string;
-  heading: string;
+  heading: { lead: string; lit: string } | string;
   intro?: string;
   align?: "center" | "start";
   className?: string;
 }) {
+  const split = typeof heading === "string" ? null : heading;
+
   return (
     <Reveal
       className={cn(
-        "flex max-w-3xl flex-col gap-4",
+        "flex max-w-2xl flex-col gap-5",
         align === "center" ? "mx-auto items-center text-center" : "items-start",
         className,
       )}
     >
-      {eyebrow ? <InstrumentLabel>{eyebrow}</InstrumentLabel> : null}
+      {eyebrow ? <Chip>{eyebrow}</Chip> : null}
 
-      <h2
-        id={id}
-        className="text-[clamp(1.875rem,3.4vw,3.5rem)] leading-[1.08] font-semibold tracking-[-0.03em]"
-      >
-        {heading}
+      <h2 id={id} className="display display-md">
+        {split ? (
+          <>
+            <span className="lead">{split.lead}</span>
+            <span className="lit">{split.lit}</span>
+          </>
+        ) : (
+          <span className="lit">{heading as string}</span>
+        )}
       </h2>
 
       {intro ? (
-        <p className="max-w-2xl text-[1.0625rem] leading-[1.7] text-muted-foreground sm:text-lg 2xl:max-w-3xl 2xl:text-xl">
+        <p className="text-[1.0625rem] leading-[1.7] text-muted-foreground text-pretty sm:text-lg">
           {intro}
         </p>
       ) : null}
     </Reveal>
-  );
-}
-
-/**
- * A shared-border grid: cells sit flush against one another separated by a
- * single hairline, framed by an outer border — the "spec sheet" structure.
- * This is what stops cards floating: everything locks to one grid, no gaps, no
- * raw void between them.
- *
- * Implemented with a 1px background showing through 1px gaps (the classic
- * `gap` + `bg-border` trick), so every internal and outer rule is exactly one
- * pixel and always aligned.
- */
-export function DividedGrid({
-  children,
-  className,
-  cols = "sm:grid-cols-2 lg:grid-cols-3",
-  mobileCards = false,
-}: {
-  children: ReactNode;
-  className?: string;
-  /** Responsive column classes. */
-  cols?: string;
-  /**
-   * On mobile, render as a gap-separated stack of standalone cards instead of
-   * the flush shared-border panel. The panel collapses to one column below
-   * `sm` anyway, and a stack of identical flush boxes reads as monotonous on a
-   * phone; separate on-brand cards give each item its own surface. Pair with
-   * `<GridCell mobileCard>` so the cells pick up the card styling to match.
-   * The flush spec-sheet returns unchanged at `sm`+.
-   */
-  mobileCards?: boolean;
-}) {
-  return (
-    <div
-      className={cn(
-        mobileCards
-          ? // Mobile: standalone cards. sm+: the flush shared-border panel.
-            "flex flex-col gap-3 sm:grid sm:gap-px sm:overflow-hidden sm:rounded-xl sm:border sm:border-border sm:bg-border"
-          : "grid gap-px overflow-hidden rounded-xl border border-border bg-border",
-        cols,
-        className,
-      )}
-    >
-      {children}
-    </div>
   );
 }

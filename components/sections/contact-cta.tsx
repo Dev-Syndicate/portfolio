@@ -1,17 +1,37 @@
+import Link from "next/link";
 import { ArrowRight, Mail } from "lucide-react";
 
 import { closingCta, site } from "@/lib/content";
-import { Button } from "@/components/ui/button";
-import { Magnetic } from "@/components/ui/magnetic";
+import { MarkLockup } from "@/components/ui/mark";
 import { Reveal } from "@/components/ui/reveal";
+import { buttonVariants } from "@/components/ui/button";
+
+/**
+ * The closing panel — the page's brightest moment, placed exactly where the
+ * click is being asked for.
+ *
+ * The reference builds this as a single large rounded card with light rising
+ * from below the bottom edge, the brand lockup centred above the headline. The
+ * light coming from *under* the card is the detail that matters: it makes the
+ * panel read as sitting on a lit surface, which is a different and warmer
+ * gesture than a glow behind it.
+ *
+ * `heading` accepts either the two-part display form (home) or a plain string
+ * (the per-page variants used by /services and /about), so one component
+ * serves every close on the site.
+ */
+
+type SplitHeading = { lead: string; lit: string };
 
 export function ContactCta({
   heading = closingCta.heading,
   body = closingCta.body,
 }: {
-  heading?: string;
+  heading?: SplitHeading | string;
   body?: string;
 } = {}) {
+  const split = typeof heading === "string" ? null : heading;
+
   return (
     <section
       id="contact"
@@ -21,41 +41,38 @@ export function ContactCta({
     >
       <div className="container-page">
         <Reveal>
-          {/* The most-elevated panel on the page — a lifted dark band with a
-              lit border and pooled glow, placed exactly where we are asking
-              for the click. The highest-contrast moment on the page. */}
-          <div className="tone-light ring-glow relative isolate overflow-hidden rounded-3xl border border-border-strong/60 bg-card px-6 py-16 text-center shadow-[var(--elevation-3)] sm:px-12 sm:py-20">
-            <div
-              aria-hidden
-              className="pointer-events-none absolute inset-0 -z-10"
-            >
-              <div
-                className="absolute -top-1/2 left-1/2 size-[46rem] -translate-x-1/2 rounded-full blur-[130px] motion-safe:animate-aurora"
-                style={{ background: "var(--glow-a)" }}
+          <div className="bloom bloom-b relative isolate overflow-hidden rounded-[2rem] px-6 py-16 text-center sm:px-12 sm:py-24">
+            <div className="relative z-10 mx-auto flex max-w-2xl flex-col items-center">
+              <MarkLockup
+                name={site.name}
+                size={40}
+                nameClassName="text-lg tracking-tight"
               />
-              <div
-                className="absolute -right-24 -bottom-1/2 size-[34rem] rounded-full blur-[130px] motion-safe:animate-aurora"
-                style={{ background: "var(--glow-b)", animationDelay: "-18s" }}
-              />
-            </div>
-            <div className="mx-auto flex max-w-2xl flex-col items-center gap-6">
-              <h2
-                id="cta-heading"
-                className="text-[clamp(1.875rem,4vw,3rem)] leading-[1.06] font-semibold tracking-[-0.03em]"
-              >
-                {heading}
+
+              <h2 id="cta-heading" className="display display-md mt-8">
+                {split ? (
+                  <>
+                    <span className="lead">{split.lead}</span>
+                    <span className="lit">{split.lit}</span>
+                  </>
+                ) : (
+                  <span className="lit">{heading as string}</span>
+                )}
               </h2>
-              <p className="text-[1.0625rem] leading-[1.7] text-muted-foreground sm:text-lg">
+
+              <p className="mt-6 text-[1.0625rem] leading-[1.7] text-muted-foreground text-pretty sm:text-lg">
                 {body}
               </p>
 
-              <div className="mt-2 flex flex-col items-center gap-4 sm:flex-row">
-                <Magnetic>
-                  <Button href={closingCta.button.href} size="lg">
-                    {closingCta.button.label}
-                    <ArrowRight className="size-4" aria-hidden />
-                  </Button>
-                </Magnetic>
+              <div className="mt-10 flex flex-col items-center gap-5 sm:flex-row sm:gap-6">
+                <Link
+                  href={closingCta.button.href}
+                  className={buttonVariants({ size: "lg" })}
+                >
+                  {closingCta.button.label}
+                  <ArrowRight className="size-4" aria-hidden />
+                </Link>
+
                 <a
                   href={`mailto:${site.email}`}
                   className="inline-flex items-center gap-2 text-sm font-medium text-muted-foreground underline-offset-4 transition-colors hover:text-foreground hover:underline"

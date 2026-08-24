@@ -1,140 +1,111 @@
-"use client";
-
-import { useRef, type ReactNode } from "react";
-import { motion, useReducedMotion, useScroll, useTransform } from "motion/react";
+import type { ReactNode } from "react";
 
 import { cn } from "@/lib/utils";
-import { InstrumentLabel } from "@/components/ui/instrument";
+import { Chip } from "@/components/ui/chip";
 
 /**
- * Interior-page hero.
+ * Interior-page header.
  *
- * Shares the home hero's language: the mono instrument label, oversized
- * editorial type, an asymmetric composition, and scroll-linked parallax on the
- * copy and artwork. It paints no background of its own — the site-wide liquid
- * ground shows straight through, so every hero sits in the same lit space.
+ * The home hero opens on a horizon — a light source below the fold throwing an
+ * arc up into the frame. An interior page shouldn't repeat that: it is a
+ * chapter, not the cover. So the light here arrives from *above* instead, as a
+ * soft dome pressing down onto the title. Same source, same palette, opposite
+ * direction — which reads as a deliberate variation rather than a weaker copy.
+ *
+ * Now a server component. The old one was `"use client"` for scroll-linked
+ * parallax on every interior page; the entrance is CSS-only staggered
+ * `rise-in`, so five pages stopped shipping a motion bundle for their header.
+ *
+ * `title` takes the same two-part shape as the home headline — a muted lead and
+ * a lit payoff — or a plain string when the page's title doesn't split well.
  */
 export function PageHeader({
   eyebrow,
   title,
   intro,
-  visual,
+  align = "center",
   children,
 }: {
   eyebrow: string;
-  title: string;
+  title: { lead: string; lit: string } | string;
   intro: string;
-  /** Page-specific artwork. See `components/artwork/`. */
-  visual?: ReactNode;
+  /** Centre for narrative pages; start when a page's content is a left-locked list. */
+  align?: "center" | "start";
   children?: ReactNode;
 }) {
-  const ref = useRef<HTMLElement>(null);
-  const reduceMotion = useReducedMotion();
-
-  const { scrollYProgress } = useScroll({
-    target: ref,
-    offset: ["start start", "end start"],
-  });
-
-  const copyY = useTransform(scrollYProgress, [0, 1], ["0%", "22%"]);
-  // Artwork counter-moves against the copy, the same arrangement the home hero
-  // uses.
-  const visualY = useTransform(scrollYProgress, [0, 1], ["0%", "-12%"]);
-  const fade = useTransform(scrollYProgress, [0, 0.85], [1, 0]);
-
-  const words = title.split(" ");
+  const split = typeof title === "string" ? null : title;
+  const centred = align === "center";
 
   return (
-    <section ref={ref} className="relative isolate overflow-hidden">
-      <div
-        className={cn(
-          "container-page grid items-center gap-12 pt-32 pb-16 sm:pt-36 sm:pb-20",
-          // Copy takes 7 of 12 when there is artwork, matching the home hero's
-          // asymmetry. Without artwork it stays a single measured column.
-          visual && "lg:grid-cols-12 lg:gap-8",
-        )}
-      >
-        <motion.div
-          style={reduceMotion ? undefined : { y: copyY, opacity: fade }}
-          initial="hidden"
-          animate="visible"
-          transition={{ staggerChildren: reduceMotion ? 0 : 0.045 }}
+    <section className="relative isolate overflow-hidden">
+      {/* The dome. Wider than the viewport and pulled above the top edge, so
+          only its lower falloff lands on the type. */}
+      <div aria-hidden className="pointer-events-none absolute inset-0 -z-10">
+        <div
           className={cn(
-            "flex max-w-3xl flex-col items-start gap-6",
-            visual && "lg:col-span-7",
+            "animate-bloom-breathe absolute -top-[26rem] h-[44rem] w-[80rem] max-w-[160vw] rounded-[50%]",
+            "bg-[radial-gradient(closest-side,var(--bloom-core),var(--bloom-mid)_38%,var(--bloom-none)_70%)]",
+            "opacity-55 blur-2xl",
+            centred ? "left-1/2 -translate-x-1/2" : "-left-40",
+          )}
+        />
+        {/* Pulls the frame edges back to true black so the dome has somewhere
+            dark to fall off into. */}
+        <div className="absolute inset-0 bg-[radial-gradient(120%_90%_at_50%_0%,transparent_30%,var(--background)_82%)]" />
+      </div>
+
+      <div className="container-page">
+        <div
+          className={cn(
+            "flex flex-col gap-6 pt-32 pb-14 sm:pt-40 sm:pb-20",
+            centred ? "items-center text-center" : "items-start",
           )}
         >
-          <Rise reduceMotion={reduceMotion}>
-            <InstrumentLabel>{eyebrow}</InstrumentLabel>
-          </Rise>
+          <div
+            className="animate-rise-in"
+            style={{ "--rise-delay": "80ms" } as React.CSSProperties}
+          >
+            <Chip>{eyebrow}</Chip>
+          </div>
 
           <h1
-            aria-label={title}
-            // Height-aware, same as the home hero: a short laptop viewport
-            // should not push the intro copy below the fold.
-            className="text-[clamp(2rem,min(4.8vw,7vh),4.75rem)] leading-[1.05] font-semibold tracking-[-0.035em]"
+            className={cn(
+              "display display-lg animate-rise-in max-w-4xl",
+              !centred && "text-balance",
+            )}
+            style={{ "--rise-delay": "180ms" } as React.CSSProperties}
           >
-            {words.map((word, i) => (
-              <Rise key={`${word}-${i}`} reduceMotion={reduceMotion} inline>
-                <span
-                  aria-hidden
-                  className={cn(
-                    "mr-[0.2em] inline-block",
-                    // Emphasis on the closing third, matching the home hero.
-                    i >= Math.ceil(words.length * 0.66) && "text-emphasis",
-                  )}
-                >
-                  {word}
-                </span>
-              </Rise>
-            ))}
+            {split ? (
+              <>
+                <span className="lead">{split.lead}</span>
+                <span className="lit">{split.lit}</span>
+              </>
+            ) : (
+              <span className="lit">{title as string}</span>
+            )}
           </h1>
 
-          <Rise reduceMotion={reduceMotion}>
-            <p className="max-w-2xl text-[1.0625rem] leading-[1.75] text-muted-foreground sm:text-lg 2xl:max-w-3xl 2xl:text-xl">
-              {intro}
-            </p>
-          </Rise>
-
-          {children ? <Rise reduceMotion={reduceMotion}>{children}</Rise> : null}
-        </motion.div>
-
-        {visual ? (
-          <motion.div
-            style={reduceMotion ? undefined : { y: visualY, opacity: fade }}
-            className="relative w-full max-w-md justify-self-center lg:col-span-5 lg:max-w-none lg:justify-self-end"
+          <p
+            className="animate-rise-in max-w-2xl text-[1.0625rem] leading-[1.75] text-muted-foreground text-pretty sm:text-lg"
+            style={{ "--rise-delay": "300ms" } as React.CSSProperties}
           >
-            {visual}
-          </motion.div>
-        ) : null}
+            {intro}
+          </p>
+
+          {children ? (
+            <div
+              className="animate-rise-in mt-2"
+              style={{ "--rise-delay": "420ms" } as React.CSSProperties}
+            >
+              {children}
+            </div>
+          ) : null}
+        </div>
+      </div>
+
+      <div className="container-page">
+        <div className="rule-fade" />
       </div>
     </section>
-  );
-}
-
-function Rise({
-  children,
-  reduceMotion,
-  inline = false,
-}: {
-  children: ReactNode;
-  reduceMotion: boolean | null;
-  inline?: boolean;
-}) {
-  const variants = reduceMotion
-    ? { hidden: {}, visible: {} }
-    : {
-        hidden: { opacity: 0, y: 22, filter: "blur(10px)" },
-        visible: { opacity: 1, y: 0, filter: "blur(0px)" },
-      };
-
-  return (
-    <motion.span
-      variants={variants}
-      transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-      className={inline ? "inline-block" : "block"}
-    >
-      {children}
-    </motion.span>
   );
 }

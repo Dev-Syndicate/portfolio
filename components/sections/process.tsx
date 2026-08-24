@@ -1,81 +1,80 @@
 import { process } from "@/lib/content";
+import { Bloom } from "@/components/ui/bloom";
 import { Section, SectionHeader } from "@/components/ui/section";
 import { Reveal } from "@/components/ui/reveal";
 
 /**
- * Full Process timeline for /services — a detailed vertical sequence.
+ * Process in full — the five stages with what actually happens in each.
  *
- * Distinct from the home strip (a five-across horizontal row): here each stage
- * is read top to bottom, with a connecting spine on the left threading the
- * numbered markers into one line. Text-led — the numbered marker, the stage
- * name, the visitor question it answers, and what actually happens. No
- * screen-filling illustrations: the sequence itself is the structure, and the
- * words are the information.
+ * Drawn as a timeline rather than a grid, because the content is a sequence:
+ * you cannot Verify before you Build. A rail runs down the left with a lit node
+ * per stage, and the rail brightens through the first stage and fades out after
+ * the last, so it reads as a path with a beginning and an end.
+ *
+ * Home carries the condensed version (names + questions only); this owns the
+ * descriptions, so the two pages never print the same paragraph.
  */
-
 export function Process() {
   return (
-    <Section id="process" aria-labelledby="process-heading">
+    <Section id="process" aria-labelledby="process-detail-heading">
       <SectionHeader
-        id="process-heading"
-        eyebrow="Process"
-        heading={process.heading}
+        id="process-detail-heading"
+        eyebrow="The process"
+        heading={{ lead: "How the work", lit: "actually runs." }}
         intro={process.intro}
       />
 
-      <ol className="relative mt-14 flex flex-col gap-10 sm:gap-12">
-        {/* Timeline spine — threads the numbered markers into one sequence,
-            fading toward the end so the eye follows the process forward. */}
-        <span
+      <div className="relative mx-auto mt-14 max-w-3xl">
+        {/* The rail. Sits behind the nodes, fading in and out at the ends so it
+            doesn't terminate on a hard stub. Hidden on mobile, where the
+            stacked cards already read as a sequence without it. */}
+        <div
           aria-hidden
-          className="absolute top-2 bottom-2 left-[1.4375rem] w-px bg-gradient-to-b from-primary/50 via-border to-transparent sm:left-[1.6875rem]"
+          className="pointer-events-none absolute top-0 bottom-0 left-[1.4375rem] hidden w-px sm:block"
+          style={{
+            background:
+              "linear-gradient(180deg, transparent 0%, var(--border-strong) 8%, var(--border-strong) 92%, transparent 100%)",
+          }}
         />
 
-        {process.steps.map((step, i) => {
-          // First station is lit — it's where the process begins.
-          const active = i === 0;
-
-          return (
-            <Reveal
-              as="li"
-              key={step.title}
-              delay={i * 0.06}
-              direction="left"
-              className="relative"
-            >
-              <div className="flex items-start gap-6">
-                {/* Number marker — sits over the spine. Active one gets a lit
-                    border + always-on conic sweep. */}
+        <ol className="flex flex-col gap-4">
+          {process.steps.map((step, i) => (
+            <Reveal key={step.title} delay={i * 0.06} as="li" className="block">
+              <div className="flex gap-6">
+                {/* Node */}
                 <span
                   aria-hidden
-                  className={`relative z-10 grid size-12 shrink-0 place-items-center rounded-full border bg-card font-mono text-sm font-semibold tabular-nums shadow-[var(--elevation-1)] sm:size-14 ${
-                    active
-                      ? "conic-sweep border-primary/40 text-primary"
-                      : "border-border text-primary"
-                  }`}
+                  className="relative z-10 hidden size-12 shrink-0 place-items-center rounded-full border border-hairline bg-card font-mono text-xs tabular-nums text-primary shadow-[0_0_0_6px_var(--background)] sm:grid"
                 >
                   {String(i + 1).padStart(2, "0")}
                 </span>
 
-                <div className="flex min-w-0 flex-1 flex-col gap-2 pt-1.5 sm:pt-2.5">
-                  <h3 className="text-xl font-semibold tracking-[-0.01em] sm:text-2xl">
-                    {step.title}
-                  </h3>
-                  {/* The visitor question this stage exists to answer. */}
-                  <p className="text-[0.9375rem] font-medium text-primary">
-                    {step.question}
-                  </p>
-                  {/* Body lifted to bright brand ink — the muted grey read as
-                      unreadable on the dark ground. */}
-                  <p className="max-w-2xl leading-relaxed text-brand-100/90">
+                <Bloom from="tl" className="min-w-0 flex-1 p-7 sm:p-8">
+                  <div className="flex flex-wrap items-baseline gap-x-4 gap-y-1">
+                    {/* Mobile keeps the number inline, since the rail is hidden. */}
+                    <span
+                      aria-hidden
+                      className="font-mono text-xs tabular-nums text-primary sm:hidden"
+                    >
+                      {String(i + 1).padStart(2, "0")}
+                    </span>
+                    <h3 className="text-xl font-medium tracking-tight">
+                      {step.title}
+                    </h3>
+                    <span className="text-sm text-muted-foreground">
+                      {step.question}
+                    </span>
+                  </div>
+
+                  <p className="mt-3 text-[0.9375rem] leading-[1.75] text-muted-foreground text-pretty">
                     {step.body}
                   </p>
-                </div>
+                </Bloom>
               </div>
             </Reveal>
-          );
-        })}
-      </ol>
+          ))}
+        </ol>
+      </div>
     </Section>
   );
 }

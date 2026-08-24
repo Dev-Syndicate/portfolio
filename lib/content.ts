@@ -98,17 +98,25 @@ export const nav = [
 
 export const hero = {
   eyebrow: "Software development company",
-  /* Split for the word-stagger animation the PRD specifies.
-     8 words: We(0) Build(1) Software(2) Systems(3) That(4) Solve(5)
-     Real(6) Operational(7) Problems.(8) — the gradient accent starts at
-     "Solve", so the payoff phrase carries the highlight. */
-  headline: "We Build Software Systems That Solve Real Operational Problems.",
-  /* Words rendered in gradient within the headline stagger. */
-  headlineAccentFrom: 5,
+  /* Set on two lines in the hero, the second carrying the emphasis — the
+     reference opens with a short declarative pair rather than one long
+     sentence, and the shorter line lands harder. Same claim as before:
+     software systems, aimed at operations rather than at websites. */
+  headline: { lead: "Software that fixes", lit: "how you actually work." },
+  /* Kept as a single string for metadata/OG, where the line break is noise. */
+  headlinePlain: "Software that fixes how you actually work.",
   supporting:
-    "Dev Syndicate builds software, AI, and automation that fix how an organisation actually runs — the manual work, the disconnected tools, the processes that break as you grow. We engineer systems around the problem in front of you, so your team spends less time fighting operations and more time moving the business forward.",
-  primaryCta: { label: "Start Your Project", href: "/contact" },
-  secondaryCta: { label: "Explore Our Process", href: "#process" },
+    "The manual work. The tools that don’t talk to each other. The process that quietly breaks the moment you grow. We build the software, AI, and automation that take those off your team’s plate — so the business moves instead of firefighting.",
+  primaryCta: { label: "Start your project", href: "/contact" },
+  secondaryCta: { label: "See how we work", href: "#process" },
+  /* The strip beneath the hero. The reference runs client logos here; we have
+     none to name — and content.ts has always refused to invent them — so the
+     row carries the five operational promises instead. Same visual rhythm,
+     nothing unverifiable in it. */
+  proof: {
+    lead: "Every system we build is judged on one thing:",
+    emphasis: "does the work actually get easier?",
+  },
 } as const;
 
 /* -------------------------------------------------------------------------- */
@@ -116,34 +124,36 @@ export const hero = {
 /* -------------------------------------------------------------------------- */
 
 export const trust = {
-  heading: "Built Around How You Operate",
+  heading: "Built around how you operate",
   intro:
     "Every system we build is judged on one thing: whether it makes the day-to-day work of your organisation measurably easier.",
   points: [
     {
       icon: "plug",
       title: "Less manual work",
-      body: "We connect the tools and steps your team repeats by hand, so the work that used to eat hours runs on its own.",
+      /* Same claim, tightened: the old line explained the mechanism first and
+         the payoff last. This one leads with the hours. */
+      body: "The hours your team loses to copy-paste, re-keying, and chasing updates. We wire those steps together and hand the time back.",
     },
     {
       icon: "layers",
-      title: "Scales with your operations",
-      body: "Systems designed to absorb more volume, users, and process without a rebuild — a good quarter never becomes an engineering emergency.",
+      title: "Scales with you",
+      body: "Built to absorb more volume, more users, more process — without a rebuild. A good quarter should never turn into an engineering emergency.",
     },
     {
       icon: "database",
       title: "One source of truth",
-      body: "Disconnected tools and spreadsheets pulled into one place, so everyone works from the same data instead of reconciling it.",
+      body: "Scattered tools and rival spreadsheets pulled into one place, so your team stops reconciling numbers and starts trusting them.",
     },
     {
       icon: "shield",
-      title: "Reliable and maintainable",
-      body: "Typed, tested, reviewed codebases that keep running quietly — and that the next developer, ours or yours, can pick up without friction.",
+      title: "Quietly reliable",
+      body: "Typed, tested, reviewed code that just keeps running — and that the next developer, ours or yours, can open without wincing.",
     },
     {
       icon: "gauge",
-      title: "Faster to deliver",
-      body: "Automated, well-instrumented workflows cut the time between a decision and it actually happening across the business.",
+      title: "Faster to act",
+      body: "We close the gap between deciding something and it actually happening across the business.",
     },
   ],
 } as const;
@@ -161,11 +171,12 @@ export const services = {
      benefits. Each summary is a condensation of the body below it, not a new
      claim — so the two pages never print the same paragraph twice. */
   overview: {
-    heading: "What We Build",
+    eyebrow: "What we build",
+    heading: "Five ways in.",
     /* Names the axis the items are ordered along, so the `where` labels on the
        cards read as one scale rather than five loose captions. */
     intro:
-      "Five kinds of engagement, ordered from the surface everyone sees to the work that runs when nobody’s watching.",
+      "Ordered from the surface everyone sees to the work that runs at 3am when nobody’s watching.",
     cta: { label: "See what each involves", href: "/services" },
   },
 
@@ -194,7 +205,7 @@ export const services = {
       where: "Public surface",
       title: "Website Development",
       summary:
-        "Sites that balance aesthetics with performance, built to carry real business value.",
+        "A site that looks like you mean it — and loads like it too.",
       body: "We design and develop websites that balance aesthetics with performance. Every project is crafted to represent your brand while delivering measurable business value.",
       benefits: [
         "Strong first impressions",
@@ -213,7 +224,7 @@ export const services = {
       where: "Behind the login",
       title: "Web Applications",
       summary:
-        "Dashboards, portals, and internal tools designed to be lived in every day.",
+        "Dashboards, portals and internal tools your team will actually live in.",
       body: "Dashboards, portals, and internal tools built on the same foundations as our marketing work — typed, tested, and designed to be lived in every day.",
       benefits: [
         "Workflows tailored to your team",
@@ -230,7 +241,7 @@ export const services = {
       where: "In the pocket",
       title: "Mobile Applications",
       summary:
-        "One Flutter codebase that ships to both the App Store and Play Store.",
+        "One Flutter codebase. Both app stores. Half the bill.",
       body: "Cross-platform apps built in Flutter, so iOS and Android come from a single codebase rather than two separate builds — and stay in step with each other as the product changes.",
       benefits: [
         "One codebase, both platforms",
@@ -248,7 +259,7 @@ export const services = {
       where: "Between systems",
       title: "APIs & Integrations",
       summary:
-        "Connecting the systems you already pay for, so data moves without anyone copying it.",
+        "Make the tools you already pay for finally talk to each other.",
       body: "We connect the systems you already pay for — CRMs, payment providers, ERPs — so data moves without anyone copying it between tabs.",
       benefits: [
         "Fewer manual handoffs",
@@ -264,7 +275,7 @@ export const services = {
       short: "AI & automation",
       where: "Runs unattended",
       title: "AI & Automation",
-      summary: "Practical automation applied where it actually pays back.",
+      summary: "Point automation at the work that’s quietly eating your week.",
       body: "Practical automation applied where it pays back: support triage, content pipelines, and the repetitive work quietly consuming your team’s week.",
       benefits: [
         "Faster response times",
@@ -289,9 +300,10 @@ export const technology = {
      (The old technology-explainer page was folded away when Insights became
      the Blog.) */
   strip: {
-    heading: "Six areas, one standard",
+    eyebrow: "The stack",
+    heading: "Six areas. One standard.",
     intro:
-      "We pick per project rather than forcing one stack onto every problem.",
+      "We pick the tool per problem rather than bending every problem to one stack. Here's the ground we cover.",
     cta: { label: "How we choose", href: "/services" },
   },
 
@@ -302,7 +314,7 @@ export const technology = {
       title: "Modern Frontend",
       /* Short, on-message distillation of `impact` — used where a full
          paragraph won't fit (mobile cards). Not a new claim; a condensation. */
-      outcome: "Fast, responsive interfaces that keep visitors engaged.",
+      outcome: "Interfaces quick enough that nobody thinks about them.",
       stack: [
         "Next.js",
         "React",
@@ -318,7 +330,7 @@ export const technology = {
       id: "mobile",
       icon: "tablet-smartphone",
       title: "Mobile Development",
-      outcome: "One codebase ships to both app stores.",
+      outcome: "Write once. Ship to both stores.",
       stack: ["Flutter", "Dart", "iOS", "Android"],
       impact:
         "A single Flutter codebase covers both app stores, so you fund one build instead of two and every release reaches iOS and Android at the same time.",
@@ -327,7 +339,7 @@ export const technology = {
       id: "backend",
       icon: "server",
       title: "Backend Engineering",
-      outcome: "Secure, scalable systems built to grow with you.",
+      outcome: "The engine room — secure, and built to grow.",
       stack: ["Node.js", "Express", "Django", "FastAPI"],
       impact:
         "A reliable backend keeps your business running smoothly by handling data securely, supporting future expansion, and enabling advanced business functionality.",
@@ -336,7 +348,7 @@ export const technology = {
       id: "databases",
       icon: "database",
       title: "Databases",
-      outcome: "Reliable data foundations that scale.",
+      outcome: "Data you can trust at three in the morning.",
       stack: ["PostgreSQL", "MongoDB", "Firebase"],
       impact:
         "Choosing the right database ensures reliability, security, and the flexibility to support future business growth.",
@@ -345,7 +357,7 @@ export const technology = {
       id: "cloud",
       icon: "cloud",
       title: "Cloud & Deployment",
-      outcome: "Dependable delivery with minimal downtime.",
+      outcome: "Ships on demand. Stays up after.",
       stack: ["Docker", "Vercel", "Cloudflare", "GitHub Actions"],
       impact:
         "Reliable deployment pipelines and cloud infrastructure minimise downtime while ensuring your website remains available and performs consistently.",
@@ -354,7 +366,7 @@ export const technology = {
       id: "ai",
       icon: "bot",
       title: "AI & Automation",
-      outcome: "Automated workflows that free up your team.",
+      outcome: "The repetitive work, quietly handled.",
       stack: ["OpenAI", "LangChain", "Workflow Automation"],
       impact:
         "Automating repetitive workflows helps your business operate more efficiently, respond faster to customers, and focus on higher-value work.",
@@ -374,9 +386,21 @@ export const process = {
   /* Home shows the stage names and their questions; /services carries the
      full description of each. */
   strip: {
-    heading: "How We Work",
-    intro: "Five stages, each answering a question you shouldn’t have to guess the answer to.",
+    eyebrow: "The process",
+    heading: "Five stages. No surprises.",
+    intro:
+      "Each one answers a question you shouldn’t have to guess the answer to — and you'll know where we are at every point.",
     cta: { label: "What happens at each stage", href: "/services" },
+    /* The right-hand panel of the process block. Concrete commitments rather
+       than another paragraph — the reference sets a checklist here and the
+       specificity is what makes it land. Every line is already promised
+       elsewhere on the site; none of it is new. */
+    promises: [
+      "A live preview URL from week one",
+      "Lighthouse targets agreed before we build",
+      "Typed, reviewed code at every merge",
+      "Support that doesn't stop at launch",
+    ],
   },
 
   steps: [
@@ -418,25 +442,33 @@ export const process = {
 /* -------------------------------------------------------------------------- */
 
 export const whyUs = {
-  heading: "Why Teams Choose Us",
+  /* Set as a two-line display headline in the values section, mirroring the
+     reference's left column. `lit` is the half that steps up to full white. */
+  heading: { lead: "The deliberate", lit: "choice." },
+  headingPlain: "The deliberate choice",
+  eyebrow: "Our values",
   intro:
-    "Four commitments that shape every decision on a project.",
+    "Four commitments we hold on every project — and every one of them is something you can check rather than take our word for.",
   reasons: [
     {
-      title: "Outcomes lead the conversation",
-      body: "Every decision is driven by the impact it creates for your business. We explain technology through what it does for you, not through what it is called.",
+      icon: "gauge",
+      title: "Outcomes first",
+      body: "We talk about what technology does for you, not what it’s called. Every decision traces back to a result you asked for.",
     },
     {
-      title: "Quality is measured, not asserted",
-      body: "Performance, accessibility, SEO, and best practices are held to a fixed target and audited with Lighthouse before launch. Our claims come with numbers you can re-run yourself.",
+      icon: "search",
+      title: "Measured, not claimed",
+      body: "Performance, accessibility, SEO and best practice audited with Lighthouse before launch — against numbers you can re-run yourself.",
     },
     {
-      title: "Accessible to everyone, by default",
-      body: "Keyboard navigation, visible focus states, semantic HTML, proper heading order, and WCAG AA contrast are part of the build — never a later phase.",
+      icon: "shield",
+      title: "Accessible by default",
+      body: "Keyboard paths, visible focus, semantic HTML and WCAG AA contrast are in the build from day one. Never a phase-two promise.",
     },
     {
-      title: "Built to be handed over",
-      body: "Secure, maintainable, typed codebases with a clear component structure, so the next developer to open the project is never starting from scratch.",
+      icon: "layers",
+      title: "Yours to keep",
+      body: "Typed, documented, cleanly structured code. If you walk away tomorrow, the next developer picks it up without a handover call.",
     },
   ],
 } as const;
@@ -446,9 +478,10 @@ export const whyUs = {
 /* -------------------------------------------------------------------------- */
 
 export const faq = {
-  heading: "Questions, Answered",
+  eyebrow: "FAQ",
+  heading: "Straight answers.",
   intro:
-    "If yours isn’t here, ask us directly — we would rather answer it properly than have you guess.",
+    "If yours isn’t here, just ask. We’d rather answer it properly than let you guess.",
   items: [
     {
       /* Points at /services rather than restating its copy — the two used to
@@ -470,20 +503,20 @@ export const faq = {
       a: "We build in Flutter, which compiles to genuinely native iOS and Android from one codebase — so you fund one build rather than two, and both stores stay in step. If what you actually need is your website working offline on a phone, we will say so rather than sell you an app you do not need.",
     },
     {
-      q: "How do you make sure the site is fast?",
-      a: "Performance is a target, not a hope. Every project is audited with Lighthouse before launch against a 95+ performance score, and modern frontend architecture keeps pages responsive and quick across devices.",
+      q: "How do you know it will be fast?",
+      a: "Because speed is a target we agree up front, not a hope. Every project is audited with Lighthouse before launch against a 95+ performance score, and the frontend architecture is built to hold it across devices.",
     },
     {
-      q: "Will the site be accessible?",
+      q: "Will it work for everyone?",
       a: "Yes. Keyboard navigation, visible focus states, semantic HTML, proper heading hierarchy, and WCAG AA colour contrast are built in from the start, and audited to a score of 100 before we ship.",
     },
     {
-      q: "Does it work properly on mobile?",
-      a: "Every build is responsive across devices by default. Layouts are designed for the small screen as a first-class case, not adapted down from a desktop design at the end.",
+      q: "And on a phone?",
+      a: "Properly, yes. The small screen is designed first as a case in its own right — never squeezed down from a desktop layout once the real work is finished.",
     },
     {
-      q: "How do we get started?",
-      a: "Tell us what you are building and what it needs to achieve. We will come back with an honest view of scope and approach before anyone commits to anything.",
+      q: "So how do we start?",
+      a: "Tell us what you are building and what it has to achieve. You get an honest read on scope and approach before anyone signs anything or commits a rupee.",
     },
   ],
 } as const;
@@ -494,9 +527,10 @@ export const faq = {
 
 export const closingCta = {
   /* PRD-COPY — the canonical close, used on the home page only. */
-  heading: "Ready to Build Something Exceptional?",
-  body: "Whether you’re launching a new business or elevating an existing brand, we’re here to build digital experiences that create lasting impact.",
-  button: { label: "Let’s Talk", href: "/contact" },
+  heading: { lead: "Let's fix the part", lit: "that keeps breaking." },
+  headingPlain: "Let's fix the part that keeps breaking.",
+  body: "Tell us where the work gets stuck. We’ll come back with an honest read on what it takes to unstick it — including the parts you can skip.",
+  button: { label: "Start the conversation", href: "/contact" },
 
   /* Per-page closes. The same two sentences repeated at the foot of every
      page reads as a template; each variant picks up the thread of the page

@@ -34,7 +34,7 @@ export default async function OpengraphImage() {
           flexDirection: "column",
           justifyContent: "space-between",
           background:
-            "radial-gradient(1200px 600px at 80% -10%, #1b1d22 0%, #0a0a0c 60%)",
+            "radial-gradient(1200px 600px at 80% -10%, #f2f2f2 0%, #050505 60%)",
           padding: "72px",
           fontFamily: "sans-serif",
         }}
@@ -45,7 +45,7 @@ export default async function OpengraphImage() {
           <img src={logoSrc} width={72} height={72} alt="" />
           <span
             style={{
-              color: "#f6f6f7",
+              color: "#f2f2f2",
               fontSize: 34,
               fontWeight: 700,
               letterSpacing: "-0.01em",
@@ -62,20 +62,20 @@ export default async function OpengraphImage() {
               display: "flex",
               alignItems: "center",
               gap: "14px",
-              color: "#afb4bc",
+              color: "#f2f2f2",
               fontSize: 22,
               letterSpacing: "0.14em",
               textTransform: "uppercase",
             }}
           >
             <span
-              style={{ width: 10, height: 10, background: "#afb4bc" }}
+              style={{ width: 10, height: 10, background: "#f2f2f2" }}
             />
             {seo.tagline}
           </div>
           <div
             style={{
-              color: "#f6f6f7",
+              color: "#f2f2f2",
               fontSize: 68,
               fontWeight: 700,
               lineHeight: 1.05,
@@ -91,7 +91,7 @@ export default async function OpengraphImage() {
         <div
           style={{
             display: "flex",
-            color: "#6b7280",
+            color: "#737373",
             fontSize: 26,
             letterSpacing: "0.02em",
           }}

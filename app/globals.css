@@ -31,11 +31,19 @@
      other colour on the site is one of these five or a mix of two of them,
      so the palette can never drift off-reference.
      ------------------------------------------------------------------ */
-  --ref-deep: #0a0a0c; /* void          — the page canvas       */
-  --ref-navy: #1b1d22; /* panel grey    — surfaces and lines    */
-  --ref-blue: #6b7280; /* steel grey    — accent and ambient light */
-  --ref-sky: #afb4bc; /* silver        — primary action        */
-  --ref-white: #f6f6f7; /* near white    — text                  */
+  /* Strictly neutral: every one is a pure grey (R=G=B), so no hue can enter
+     the system through any mix of them.
+
+     The ramp runs dark → light, deep to white, and the SEMANTIC layer below
+     decides which end is the ground. Dark theme: --background points at
+     --ref-deep and --foreground at --ref-white. Flipping those two lines (plus
+     the bloom's medium) is the whole difference between this and a light
+     theme — the ramp itself never has to change. */
+  --ref-deep: #050505; /* black         — the page canvas       */
+  --ref-navy: #131313; /* carbon        — surfaces and lines    */
+  --ref-blue: #737373; /* mid grey      — ambient light, dividers */
+  --ref-sky: #ffffff; /* pure white    — primary action, the glow */
+  --ref-white: #f2f2f2; /* soft white    — text                  */
 
   /* ------------------------------------------------------------------
      BRAND RAMP
@@ -65,11 +73,13 @@
      repointing one line here re-tones the site.
      ------------------------------------------------------------------ */
 
-  /* Page canvas and the text sitting on it */
+  /* Page canvas and the text sitting on it. Void ground, light text. */
   --background: var(--ref-deep);
   --foreground: var(--ref-white);
 
-  /* Surface levels, each a further step from canvas toward navy */
+  /* Surface levels, each a further step from canvas toward carbon. On a dark
+     theme a card lifts by getting LIGHTER — the opposite of paper, where it
+     lifts by casting a shadow. */
   --surface-subtle: color-mix(in oklab, var(--ref-deep) 86%, var(--ref-navy));
   --card: color-mix(in oklab, var(--ref-deep) 72%, var(--ref-navy));
   --card-foreground: var(--ref-white);
@@ -77,18 +87,19 @@
   --popover-foreground: var(--ref-white);
 
   /* Primary action — buttons, active states, icons, emphasis.
-     Light-on-dark: silver clears ~8:1 against the void canvas, so it is safe
-     as a fill and as text. Steel grey was the obvious pick here but only
-     reaches ~4:1 either way, which fails AA for body-sized text. */
+     Pure white on the void: the brightest thing on the page, so a white pill
+     CTA outranks even the lit headline text (which sits at --ref-white, a
+     softer white). Hover has to step DOWN — #fff has no brighter state — and
+     dimming deliberately reads as a press. */
   --primary: var(--ref-sky);
-  --primary-hover: var(--ref-white);
+  --primary-hover: color-mix(in oklab, var(--ref-sky) 86%, var(--ref-blue));
   --primary-foreground: var(--ref-deep);
 
   /* Quiet fills: chips, tag pills, hover backgrounds */
   --secondary: color-mix(in oklab, var(--ref-deep) 58%, var(--ref-navy));
   --secondary-foreground: var(--brand-100);
 
-  /* Supporting text. Roughly 9:1 on the canvas, well past AA. */
+  /* Supporting text. Lands near #d6d6d6 — about 14:1 on the void, well past AAA. */
   --muted: color-mix(in oklab, var(--ref-deep) 80%, var(--ref-navy));
   --muted-foreground: color-mix(in oklab, var(--ref-sky) 72%, var(--ref-blue));
 
@@ -98,6 +109,8 @@
   --accent: var(--ref-blue);
   --accent-foreground: var(--ref-white);
 
+  /* The one hue in the system. Error states need to be distinguishable by
+     colour, which is an accessibility requirement rather than a theme choice. */
   --destructive: #e5484d;
   --destructive-foreground: var(--ref-white);
 
@@ -118,6 +131,40 @@
   --glow-b: color-mix(in oklab, var(--ref-navy) 65%, transparent);
   --glow-c: color-mix(in oklab, var(--ref-sky) 14%, transparent);
 
+  /* ------------------------------------------------------------------
+     THE BLOOM  —  the signature of this design
+
+     A soft white light that bleeds in from an edge or corner of a surface, as
+     though a source sits just outside the frame. It is the one device that
+     carries the whole page: the hero horizon, the cross between the four value
+     cards, the wash under the closing panel and the footer.
+
+     Three stops so a single radial-gradient fades convincingly instead of
+     banding: hot core → mid falloff → nothing. Every bloom on the site is
+     built from these, so brightening the design is a one-line change.
+
+     (The direction system — bloom-tl/tr/bl/br/t/b/c — is medium-agnostic: on a
+     light ground these same tokens become ink shade instead of light, and no
+     composition needs to change.)
+     ------------------------------------------------------------------ */
+  --bloom-core: color-mix(in oklab, var(--ref-sky) 50%, transparent);
+  --bloom-mid: color-mix(in oklab, var(--ref-sky) 16%, transparent);
+  --bloom-edge: color-mix(in oklab, var(--ref-sky) 4%, transparent);
+  --bloom-none: color-mix(in oklab, var(--ref-sky) 0%, transparent);
+
+  /* ------------------------------------------------------------------
+     HAIRLINE + WASH
+     The subtle border and fill used on discs, chips and icon tiles. These
+     were once hardcoded as `white/10` and `white/5` in a dozen components,
+     which meant a theme flip needed a sweep through all of them. Tokenised
+     here, switching ground is one edit — flip these to `--ref-deep` and every
+     overlay on the site inverts with the palette.
+     ------------------------------------------------------------------ */
+  --hairline: color-mix(in oklab, var(--ref-sky) 10%, transparent);
+  --hairline-strong: color-mix(in oklab, var(--ref-sky) 18%, transparent);
+  --wash: color-mix(in oklab, var(--ref-sky) 5%, transparent);
+  --wash-strong: color-mix(in oklab, var(--ref-sky) 9%, transparent);
+
   /* Headline emphasis gradient — see the `text-emphasis` utility.
      Runs white → sky → mid blue, putting three of the five references into
      the largest type on the page. */
@@ -132,7 +179,11 @@
      raised surface: the single detail that most separates a surface that
      looks lit from a flat div.
      ------------------------------------------------------------------ */
-  --shadow-color: 213 72% 3%;
+  /* Neutral: hue 213 at 72% saturation made every shadow on the site a cold
+     blue-black rather than a black one. */
+  --shadow-color: 0 0% 2%;
+  /* The thin light catch along the top edge of a raised surface — the single
+     detail that most separates a surface that looks lit from a flat div. */
   --highlight: rgba(255, 255, 255, 0.07);
   --highlight-strong: rgba(255, 255, 255, 0.14);
   --texture-dot: rgba(255, 255, 255, 0.06);
@@ -143,7 +194,10 @@
    ========================================================================== */
 
 :root {
-  --radius: 0.75rem;
+  /* Generous radius. The reference language is built on large, soft-cornered
+     panels — at 0.75rem the cards read as UI chrome; at 1.25rem they read as
+     objects with weight sitting on the void. */
+  --radius: 1.25rem;
 
   /* Motion — PRD: buttons 250ms ease-out, cards spring */
   --duration-fast: 150ms;
@@ -167,6 +221,8 @@
 
   /* Layered elevation. A tight contact shadow plus a wide ambient one, over
      an inner top highlight — one soft blur alone reads as a grey smudge. */
+  /* Layered: a tight contact shadow plus a wide ambient one, over an inner top
+     highlight — one soft blur alone reads as a grey smudge on a dark ground. */
   --elevation-1: 0 1px 2px hsl(var(--shadow-color) / 0.5),
     inset 0 1px 0 var(--highlight);
   --elevation-2: 0 1px 2px hsl(var(--shadow-color) / 0.6),
@@ -216,6 +272,11 @@
   --color-destructive: var(--destructive);
   --color-destructive-foreground: var(--destructive-foreground);
 
+  --color-hairline: var(--hairline);
+  --color-hairline-strong: var(--hairline-strong);
+  --color-wash: var(--wash);
+  --color-wash-strong: var(--wash-strong);
+
   --color-border: var(--border);
   --color-border-strong: var(--border-strong);
   --color-input: var(--input);
@@ -233,7 +294,13 @@
   --color-brand-900: var(--brand-900);
   --color-brand-950: var(--brand-950);
 
-  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  /* One voice. Instrument Sans carries UI, body copy, and both halves of every
+     headline; there is no counter-face. `--font-display` used to sit here as a
+     Playfair italic and is gone with it — nothing referenced the `font-display`
+     utility, and `.lead` now simply inherits. `--font-mono` and `--font-hand`
+     remain, each doing one narrow job (spec labels; the admin editor's note
+     field). See the `.display` block for how a headline splits. */
+  --font-sans: var(--font-instrument-sans), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-geist-mono), ui-monospace, monospace;
   --font-hand: var(--font-caveat), ui-rounded, cursive;
   --font-reading: var(--font-reading), Newsreader, Georgia, ui-serif, serif;
@@ -474,113 +541,6 @@
    light backgrounds.
    ========================================================================== */
 
-/* Raised band — one step up the ladder (carbon over void). */
-@utility tone-light {
-  --background: color-mix(in oklab, var(--ref-deep) 82%, var(--ref-navy));
-
-  --surface-subtle: color-mix(in oklab, var(--ref-deep) 70%, var(--ref-navy));
-  --card: color-mix(in oklab, var(--ref-deep) 60%, var(--ref-navy));
-  --popover: color-mix(in oklab, var(--ref-deep) 60%, var(--ref-navy));
-
-  /* Brighter hairlines catch the light on a raised surface. */
-  --border: color-mix(in oklab, var(--ref-deep) 32%, var(--ref-navy));
-  --border-strong: color-mix(in oklab, var(--ref-navy) 78%, var(--ref-sky));
-  --input: color-mix(in oklab, var(--ref-deep) 40%, var(--ref-navy));
-
-  --secondary: color-mix(in oklab, var(--ref-deep) 48%, var(--ref-navy));
-
-  /* Silver ambient light, a touch stronger than on the base canvas. */
-  --glow-a: color-mix(in oklab, var(--ref-blue) 30%, transparent);
-  --glow-b: color-mix(in oklab, var(--ref-navy) 70%, transparent);
-  --glow-c: color-mix(in oklab, var(--ref-sky) 12%, transparent);
-
-  --highlight: rgba(255, 255, 255, 0.08);
-  --highlight-strong: rgba(255, 255, 255, 0.16);
-
-  /* No background here — the Section paints the band through a gradient-fade
-     mask so it dissolves into its neighbours. This scope only re-points the
-     tokens so cards/borders inside lift with the band. */
-  color: var(--foreground);
-}
-
-/* Highest band — two steps up (panel over void), for the boldest section on
-   a page. Same ladder, one rung higher. */
-@utility tone-sky {
-  --background: color-mix(in oklab, var(--ref-deep) 70%, var(--ref-navy));
-
-  --surface-subtle: color-mix(in oklab, var(--ref-deep) 58%, var(--ref-navy));
-  --card: color-mix(in oklab, var(--ref-deep) 46%, var(--ref-navy));
-  --popover: color-mix(in oklab, var(--ref-deep) 46%, var(--ref-navy));
-
-  --border: color-mix(in oklab, var(--ref-deep) 22%, var(--ref-navy));
-  --border-strong: color-mix(in oklab, var(--ref-navy) 65%, var(--ref-sky));
-  --input: color-mix(in oklab, var(--ref-deep) 30%, var(--ref-navy));
-
-  --secondary: color-mix(in oklab, var(--ref-deep) 38%, var(--ref-navy));
-
-  --glow-a: color-mix(in oklab, var(--ref-blue) 34%, transparent);
-  --glow-b: color-mix(in oklab, var(--ref-navy) 72%, transparent);
-  --glow-c: color-mix(in oklab, var(--ref-sky) 14%, transparent);
-
-  --highlight: rgba(255, 255, 255, 0.09);
-  --highlight-strong: rgba(255, 255, 255, 0.18);
-
-  color: var(--foreground);
-}
-
-/* Inversion — the one light surface on the site.
-   -----------------------------------------------------------------------
-   The ladder above deliberately has no light rung: a whole SECTION flipped to
-   white reads washed-out, which is why depth comes from elevation instead.
-   This scope is the exception at CARD scale, and it exists for exactly one
-   job — the single loud element in a palette that has no accent hue to shout
-   with. Tonal inversion is the only shout available here, so it is spent once
-   per page and never on a band.
-
-   It re-points the same semantic tokens as the other scopes, so `surface-card`,
-   `card-node`, `Button` and the rest render their normal selves in reverse
-   with no component changes. Do not add a background here — the element that
-   opts in supplies its own surface via `--card`.
-   ----------------------------------------------------------------------- */
-@utility tone-invert {
-  --background: var(--ref-white);
-  --foreground: var(--ref-deep);
-
-  --surface-subtle: color-mix(in oklab, var(--ref-white) 94%, var(--ref-navy));
-  --card: var(--ref-white);
-  --card-foreground: var(--ref-deep);
-  --popover: var(--ref-white);
-  --popover-foreground: var(--ref-deep);
-
-  /* Primary flips to ink so filled controls read as black-on-white. */
-  --primary: var(--ref-deep);
-  --primary-hover: var(--ref-navy);
-  --primary-foreground: var(--ref-white);
-
-  --secondary: color-mix(in oklab, var(--ref-white) 88%, var(--ref-navy));
-  --secondary-foreground: var(--ref-deep);
-
-  --muted: color-mix(in oklab, var(--ref-white) 92%, var(--ref-navy));
-  /* 68% navy lands ≈5.6:1 on the white card — AA for body-size text. */
-  --muted-foreground: color-mix(in oklab, var(--ref-navy) 68%, var(--ref-white));
-
-  --accent: var(--ref-navy);
-  --accent-foreground: var(--ref-white);
-
-  --border: color-mix(in oklab, var(--ref-white) 78%, var(--ref-navy));
-  --border-strong: color-mix(in oklab, var(--ref-white) 52%, var(--ref-navy));
-  --input: color-mix(in oklab, var(--ref-white) 84%, var(--ref-navy));
-  /* Focus rings inside an inverted card must be ink, not silver. */
-  --ring: var(--ref-deep);
-
-  /* Highlights are shadows on a light surface, not white lifts. */
-  --highlight: rgba(0, 0, 0, 0.06);
-  --highlight-strong: rgba(0, 0, 0, 0.1);
-  --texture-dot: rgba(0, 0, 0, 0.06);
-
-  color: var(--foreground);
-}
-
 /* ==========================================================================
    6. UTILITIES
    ========================================================================== */
@@ -619,22 +579,6 @@
   padding-block: var(--section-py-sm);
 }
 
-/* Headline emphasis. Starts at full foreground contrast and only resolves
-   into brand colour at the tail, so the text stays highly legible instead of
-   washing out the way an edge-to-edge gradient does. */
-@utility text-emphasis {
-  background-image: linear-gradient(
-    115deg,
-    var(--foreground) 0%,
-    var(--foreground) 22%,
-    var(--primary) 68%,
-    var(--accent) 100%
-  );
-  background-clip: text;
-  color: transparent;
-  -webkit-text-fill-color: transparent;
-}
-
 /* Gradient text that follows the active palette */
 @utility text-gradient {
   background-image: linear-gradient(
@@ -662,29 +606,6 @@
   border-radius: var(--radius-lg);
   border-top-right-radius: 0;
   box-shadow: var(--elevation-1);
-  clip-path: polygon(
-    0 0,
-    calc(100% - var(--chamfer)) 0,
-    100% var(--chamfer),
-    100% 100%,
-    0 100%
-  );
-}
-
-/* The chamfer on its own, with no surface attached — for media and panels that
-   bring their own background (a cover photo, an inverted panel) but should
-   still read as a machined part from the same shop as `surface-card`.
-   -----------------------------------------------------------------------
-   Same 45° routed top-right corner and the same lightly-rounded remainder, so
-   an image cropped with this sits in the system rather than beside it.
-
-   NOTE: like `surface-card`, the clip removes anything painted outside the
-   polygon — box-shadow and outline included. Elements using this need their
-   separation to come from tone or a border, and their focus ring drawn inset. */
-@utility routed {
-  --chamfer: 18px;
-  border-radius: var(--radius-lg);
-  border-top-right-radius: 0;
   clip-path: polygon(
     0 0,
     calc(100% - var(--chamfer)) 0,
@@ -804,13 +725,6 @@
   }
 }
 
-/* Film grain. Breaks up the banding that large blurred gradients produce on
-   8-bit displays — the main reason a big soft gradient can look cheap. */
-@utility bg-noise {
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.42'/%3E%3C/svg%3E");
-  mix-blend-mode: overlay;
-}
-
 /* Hairline rule that fades out at both ends */
 @utility rule-fade {
   height: 1px;
@@ -876,38 +790,6 @@
 
   &:hover::after {
     transform: translateX(120%);
-  }
-}
-
-/* Hairline gradient border that lights up on hover (PRD: card border glow) */
-@utility ring-glow {
-  position: relative;
-
-  &::after {
-    content: "";
-    position: absolute;
-    inset: -1px;
-    border-radius: inherit;
-    padding: 1px;
-    background: linear-gradient(
-      130deg,
-      color-mix(in oklab, var(--primary) 55%, transparent),
-      transparent 40%,
-      color-mix(in oklab, var(--accent) 45%, transparent)
-    );
-    -webkit-mask:
-      linear-gradient(#000 0 0) content-box,
-      linear-gradient(#000 0 0);
-    -webkit-mask-composite: xor;
-    mask-composite: exclude;
-    opacity: 0;
-    transition: opacity var(--duration-base) var(--ease-out-soft);
-    pointer-events: none;
-  }
-
-  &:hover::after,
-  &:focus-within::after {
-    opacity: 1;
   }
 }
 
@@ -991,8 +873,8 @@
      The body is set in a reading SERIF (Newsreader) at a larger size with a
      generous line-height — the single change that makes a post read like a
      publication instead of a UI. Headings stay in the sans below, so the
-     serif/sans contrast marks structure. Ink is lifted well above the muted grey
-     used elsewhere so a full article is comfortable, not fatiguing, on dark. */
+     serif/sans contrast marks structure. Ink is lifted well above the muted
+     grey used elsewhere so a full article is comfortable, not fatiguing. */
   font-family: var(--font-reading);
   color: color-mix(in oklab, var(--ref-white) 86%, var(--ref-sky));
   font-size: 1.25rem;
@@ -1196,6 +1078,7 @@
   }
 
   & pre code {
+    color: inherit;
     background: none;
     border: none;
     padding: 0;
@@ -1412,111 +1295,6 @@
   }
 }
 
-@keyframes polaroid-sway {
-  0%,
-  100% {
-    transform: rotate(var(--rot));
-  }
-  50% {
-    transform: rotate(calc(var(--rot) + var(--sway-amt)));
-  }
-}
-
-/* A single pinned/taped cream card. Rotation lives on `.polaroid-wrap`; this
-   element only lifts/scales on hover, so its transform never fights the sway. */
-@utility polaroid {
-  position: relative;
-  border-radius: 2px;
-  background: #f6f5f2;
-  color: #141414;
-  padding: 0.8rem 0.8rem 0.5rem;
-  box-shadow:
-    0 24px 48px -16px rgba(0, 0, 0, 0.65),
-    0 2px 6px rgba(0, 0, 0, 0.35);
-  transition:
-    transform 0.4s cubic-bezier(0.2, 0.7, 0.3, 1),
-    box-shadow 0.4s ease;
-  will-change: transform;
-}
-
-/* Hover: lift, straighten toward flat, and pop above neighbours. No animation
-   toggling — sway is on the wrapper, so this is a clean transform transition. */
-@utility polaroid-hover {
-  &:hover {
-    transform: translateY(-10px) scale(1.035);
-    box-shadow:
-      0 40px 70px -18px rgba(0, 0, 0, 0.75),
-      0 4px 10px rgba(0, 0, 0, 0.4);
-    z-index: 20;
-  }
-}
-
-/* The metal pin. */
-@utility pin {
-  position: absolute;
-  top: -11px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 16px;
-  height: 16px;
-  border-radius: 50%;
-  background: radial-gradient(
-    circle at 35% 30%,
-    #dedee1,
-    #97989d 55%,
-    #57585c 100%
-  );
-  box-shadow: 0 3px 5px rgba(0, 0, 0, 0.5);
-  z-index: 3;
-
-  &::after {
-    content: "";
-    position: absolute;
-    left: 50%;
-    top: 100%;
-    width: 1px;
-    height: 9px;
-    background: rgba(0, 0, 0, 0.25);
-    transform: translateX(-50%);
-  }
-}
-
-/* The strip of tape. `--tape-rot` flips its lean per card. */
-@utility tape {
-  --tape-rot: -3deg;
-  position: absolute;
-  top: -13px;
-  left: 50%;
-  width: 64px;
-  height: 26px;
-  transform: translateX(-50%) rotate(var(--tape-rot));
-  background: rgba(230, 228, 220, 0.5);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.35);
-  z-index: 3;
-}
-
-/* The settle-in entrance, on the card itself (rotation/sway live on the
-   wrapper). Opacity + rise + a touch of scale, once, then it holds. Because
-   this element never rotates, its transform is free for the hover lift with no
-   conflict. */
-@utility polaroid-settle {
-  opacity: 0;
-  animation: polaroid-settle 0.7s cubic-bezier(0.2, 0.7, 0.3, 1)
-    var(--settle-delay, 0s) forwards;
-}
-
-@keyframes polaroid-settle {
-  from {
-    opacity: 0;
-    transform: translateY(28px) scale(0.96);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-}
-
 /* --------------------------------------------------------------------------
    SITE BACKGROUND
 
@@ -1527,6 +1305,568 @@
    on the compositor and costs nothing to scroll.
    -------------------------------------------------------------------------- */
 
+
+/* ==========================================================================
+   BLOOM SYSTEM  —  the design's signature surface language
+   --------------------------------------------------------------------------
+   One idea, applied consistently: a soft sage-white light source sits just
+   outside a surface and bleeds across it. Nothing on the page is a flat fill;
+   every panel is lit from somewhere, and *where* it is lit from is the thing
+   that gives each section its own character.
+
+   `.bloom` is the panel. `.bloom-{tl,tr,bl,br,t,b,c}` says which way the
+   light comes from. They compose:  <div class="bloom bloom-tr">
+
+   The light is painted by a ::before so it can sit above the panel fill but
+   below the content, and so no extra DOM node is needed per card.
+   ========================================================================== */
+
+.bloom {
+  position: relative;
+  isolate: isolate;
+  border-radius: var(--radius-2xl);
+  border: 1px solid var(--border);
+  background-color: var(--card);
+  overflow: hidden;
+}
+
+.bloom::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  /* Default: a wide wash from the top-left. Each modifier below replaces the
+     gradient wholesale rather than nudging it, so the falloff stays smooth. */
+  background: radial-gradient(
+    120% 100% at 0% 0%,
+    var(--bloom-core) 0%,
+    var(--bloom-mid) 28%,
+    var(--bloom-edge) 52%,
+    var(--bloom-none) 72%
+  );
+  opacity: 0.5;
+  transition: opacity var(--duration-slow) var(--ease-out-soft);
+}
+
+/* Light entering from each corner. The ellipse is deliberately wider than it
+   is tall (120% × 100%) so the wash reads as a distant source rather than a
+   spotlight sitting on the card. */
+.bloom-tl::before {
+  background: radial-gradient(
+    120% 100% at 0% 0%,
+    var(--bloom-core) 0%,
+    var(--bloom-mid) 28%,
+    var(--bloom-edge) 52%,
+    var(--bloom-none) 72%
+  );
+}
+.bloom-tr::before {
+  background: radial-gradient(
+    120% 100% at 100% 0%,
+    var(--bloom-core) 0%,
+    var(--bloom-mid) 28%,
+    var(--bloom-edge) 52%,
+    var(--bloom-none) 72%
+  );
+}
+.bloom-bl::before {
+  background: radial-gradient(
+    120% 100% at 0% 100%,
+    var(--bloom-core) 0%,
+    var(--bloom-mid) 28%,
+    var(--bloom-edge) 52%,
+    var(--bloom-none) 72%
+  );
+}
+.bloom-br::before {
+  background: radial-gradient(
+    120% 100% at 100% 100%,
+    var(--bloom-core) 0%,
+    var(--bloom-mid) 28%,
+    var(--bloom-edge) 52%,
+    var(--bloom-none) 72%
+  );
+}
+/* Light rising from an edge — used on the closing panel and the footer, where
+   the source reads as a horizon below the frame. */
+.bloom-b::before {
+  background: radial-gradient(
+    90% 70% at 50% 118%,
+    var(--bloom-core) 0%,
+    var(--bloom-mid) 30%,
+    var(--bloom-edge) 55%,
+    var(--bloom-none) 76%
+  );
+  opacity: 0.72;
+}
+.bloom-t::before {
+  background: radial-gradient(
+    90% 70% at 50% -18%,
+    var(--bloom-core) 0%,
+    var(--bloom-mid) 30%,
+    var(--bloom-edge) 55%,
+    var(--bloom-none) 76%
+  );
+  opacity: 0.72;
+}
+/* Light from the dead centre — the 2×2 value grid uses four of these facing
+   inward, which is what draws the cross of light between the cards. */
+.bloom-c::before {
+  background: radial-gradient(
+    100% 100% at 50% 50%,
+    var(--bloom-core) 0%,
+    var(--bloom-mid) 26%,
+    var(--bloom-edge) 50%,
+    var(--bloom-none) 70%
+  );
+}
+
+/* Quieter by default so a grid of them doesn't turn into a wall of light;
+   the card brightens as you approach it. */
+/* Held back until hover: a grid where every card is lit at full strength
+   becomes a wall of glare. */
+.bloom-soft::before {
+  opacity: 0.46;
+}
+.group\/bloom:hover .bloom-soft::before,
+.bloom:hover::before {
+  opacity: 0.68;
+}
+
+/* --------------------------------------------------------------------------
+   THE HORIZON  —  the hero's arc of light
+
+   A circle far larger than the viewport, pushed mostly below the fold so only
+   its top edge shows. The visible sliver reads as a planet's limb catching the
+   sun, which is the reference's opening image. Two layers: a hard bright rim
+   (the arc itself) and a wide halo bleeding up from it.
+   -------------------------------------------------------------------------- */
+
+.horizon {
+  position: absolute;
+  left: 50%;
+  aspect-ratio: 1;
+  width: min(190vw, 132rem);
+  translate: -50% 0;
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+/* The rim — a hairline of light along the very top of the sphere. An inset
+   box-shadow draws it without a second element, and the blur softens it into
+   atmosphere rather than a drawn stroke. */
+/* The rim — a hairline of light along the very top of the sphere. An inset
+   box-shadow draws it without a second element, and the blur softens it into
+   atmosphere rather than a drawn stroke. */
+.horizon-rim {
+  box-shadow:
+    inset 0 1px 0 0 color-mix(in oklab, var(--ref-white) 78%, transparent),
+    inset 0 0 60px 0 var(--bloom-mid),
+    0 -1px 40px 6px var(--bloom-mid),
+    0 -2px 120px 30px var(--bloom-edge);
+  background: radial-gradient(
+    circle at 50% 0%,
+    var(--bloom-edge) 0%,
+    var(--bloom-none) 34%
+  );
+}
+
+/* The halo — a soft dome of light sitting above the rim, giving the arc
+   something to bleed into so it doesn't end abruptly against the void. */
+.horizon-halo {
+  background: radial-gradient(
+    50% 32% at 50% 0%,
+    var(--bloom-core) 0%,
+    var(--bloom-mid) 22%,
+    var(--bloom-edge) 44%,
+    var(--bloom-none) 66%
+  );
+  filter: blur(6px);
+}
+
+/* --------------------------------------------------------------------------
+   HALFTONE  —  the hero's ground
+
+   A dot matrix that is dense and coarse at the edges and dissolves to nothing
+   where the claim sits. It is not texture for its own sake: the studio's whole
+   pitch is turning scattered manual work into something ordered, and a field
+   that resolves from noise into clear space is that sentence drawn.
+
+   Built as three independent grids rather than one, because a real halftone
+   ramps DOT SIZE as well as density. Each layer carries its own mask, so the
+   coarse dots stay pinned to the outer edge while the fine ones reach further
+   in — which is what stops it reading as a flat, evenly-tiled pattern.
+
+   All three are pure CSS gradients: no image request, and it scales to any
+   viewport without resampling.
+   -------------------------------------------------------------------------- */
+
+.halftone-layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-repeat: repeat;
+}
+
+/* Coarse — biggest dots, held to the very bottom and the outer corners. */
+.halftone-coarse {
+  background-image: radial-gradient(
+    circle at center,
+    color-mix(in oklab, var(--ref-white) 34%, transparent) 1.5px,
+    transparent 1.6px
+  );
+  background-size: 30px 30px;
+  --mask: radial-gradient(
+    ellipse 78% 62% at 50% 32%,
+    transparent 46%,
+    #000 100%
+  );
+  -webkit-mask-image: var(--mask);
+  mask-image: var(--mask);
+  opacity: 0.55;
+}
+
+/* Mid — the transition band. */
+.halftone-mid {
+  background-image: radial-gradient(
+    circle at center,
+    color-mix(in oklab, var(--ref-white) 30%, transparent) 1.05px,
+    transparent 1.15px
+  );
+  background-size: 17px 17px;
+  background-position: 5px 5px;
+  --mask: radial-gradient(
+    ellipse 70% 56% at 50% 36%,
+    transparent 34%,
+    #000 92%
+  );
+  -webkit-mask-image: var(--mask);
+  mask-image: var(--mask);
+  opacity: 0.5;
+}
+
+/* Fine — reaches furthest toward the centre, so the field never has a hard
+   inner boundary. */
+.halftone-fine {
+  background-image: radial-gradient(
+    circle at center,
+    color-mix(in oklab, var(--ref-white) 26%, transparent) 0.7px,
+    transparent 0.8px
+  );
+  background-size: 10px 10px;
+  background-position: 3px 3px;
+  --mask: radial-gradient(
+    ellipse 62% 50% at 50% 38%,
+    transparent 22%,
+    #000 84%
+  );
+  -webkit-mask-image: var(--mask);
+  mask-image: var(--mask);
+  opacity: 0.45;
+}
+
+/* --------------------------------------------------------------------------
+   CAPSULE  —  the frosted lozenge
+
+   A dark glass pill that sits ON the halftone rather than beside it: the
+   backdrop blur smears the dots behind it, which is the detail that sells it as
+   a physical object with thickness instead of a rounded rectangle with a fill.
+
+   The inner smear is a second, brighter light source caught in the glass at the
+   upper left — the reference's most distinctive touch, and the reason the pill
+   reads as lit rather than merely translucent.
+   -------------------------------------------------------------------------- */
+
+.capsule {
+  position: relative;
+  isolation: isolate;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.875rem;
+  border-radius: 9999px;
+  overflow: hidden;
+
+  background: color-mix(in oklab, var(--ref-deep) 62%, transparent);
+  -webkit-backdrop-filter: blur(16px) saturate(150%);
+  backdrop-filter: blur(16px) saturate(150%);
+  border: 1px solid var(--hairline-strong);
+  box-shadow:
+    inset 0 1px 0 color-mix(in oklab, var(--ref-white) 26%, transparent),
+    0 18px 50px -18px rgb(0 0 0 / 0.85);
+}
+
+/* The caught highlight. Deliberately off-centre and soft-edged — a specular
+   smear, not a gradient sweep. */
+.capsule::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: radial-gradient(
+    58% 130% at 22% 8%,
+    color-mix(in oklab, var(--ref-white) 30%, transparent) 0%,
+    color-mix(in oklab, var(--ref-white) 8%, transparent) 38%,
+    transparent 72%
+  );
+}
+
+/* --------------------------------------------------------------------------
+   CHIP  —  the eyebrow pill
+
+   Replaces the old instrument label on redesigned surfaces. Small, centred,
+   uppercase, letterspaced, on a barely-there fill — the reference uses it to
+   announce every section.
+   -------------------------------------------------------------------------- */
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  border-radius: 9999px;
+  border: 1px solid var(--hairline);
+  background: var(--wash);
+  padding: 0.4375rem 0.875rem;
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted-foreground);
+  backdrop-filter: blur(8px);
+  white-space: nowrap;
+}
+
+/* --------------------------------------------------------------------------
+   MARK BADGE  —  the circular logo lockup
+
+   A sphere lit from the top-left, the way the reference draws its brand mark
+   at the apex of the hero arc and above the closing panel.
+   -------------------------------------------------------------------------- */
+
+.mark-badge {
+  /* `display` is load-bearing, not cosmetic: the element is a <span>, and an
+     inline box ignores the width/height the component sets — the logo then
+     escaped the circular clip and rendered as a full-size square with a small
+     disc floating over it. Grid keeps it a sized block box. */
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  position: relative;
+  overflow: hidden;
+  border-radius: 9999px;
+  background: var(--ref-deep);
+  box-shadow:
+    0 0 0 1px color-mix(in oklab, var(--ref-white) 14%, transparent),
+    0 8px 32px -8px var(--bloom-mid);
+}
+
+/* The lit rim. The brand asset is a white glyph on an OPAQUE black square, so
+   the artwork itself supplies the dark interior of the sphere — the badge only
+   has to crop it to a circle and light its upper-left edge. Painting a bright
+   gradient *behind* the logo instead would just frame a black square in light,
+   which is what it did before this was corrected. */
+.mark-badge::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  background: radial-gradient(
+    68% 68% at 28% 20%,
+    color-mix(in oklab, var(--ref-white) 30%, transparent) 0%,
+    color-mix(in oklab, var(--ref-sky) 10%, transparent) 42%,
+    transparent 70%
+  );
+  box-shadow: inset 0 1px 0 color-mix(in oklab, var(--ref-white) 42%, transparent);
+}
+
+/* --------------------------------------------------------------------------
+   GRAIN  —  a fine noise overlay
+
+   Large flat fields of near-black band badly on 8-bit displays, and the
+   reference's imagery is full of soft gradients that would show it. A faint
+   noise layer over the whole document breaks the banding up and adds the
+   photographic quality the reference has. Fixed, so it never scrolls.
+   -------------------------------------------------------------------------- */
+
+.grain {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  pointer-events: none;
+  opacity: 0.035;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* --------------------------------------------------------------------------
+   DISPLAY TYPE
+
+   The reference sets its headlines large, LIGHT, and tight. That combination
+   is what makes the geometry read as architecture instead of as a shouty
+   marketing header — the opposite of the usual bold-and-cramped default.
+   -------------------------------------------------------------------------- */
+
+/* --------------------------------------------------------------------------
+   DISPLAY TYPE  —  the two-part headline
+
+   Every headline on the site is authored as { lead, lit }, and the split is
+   now carried by COLOUR alone:
+
+       Software that fixes        ← lead: Instrument Sans 400, muted
+       how you actually work.     ← lit:  Instrument Sans 400, full contrast
+
+   One face, one weight, one size. The setup recedes and the payoff lands
+   because of where each sits on the contrast ramp, not because they are
+   different typefaces.
+
+   This replaced a Playfair-italic-over-Poppins-Bold pairing. No copy changed —
+   the { lead, lit } shape was always a semantic split, so re-pointing what it
+   means visually took two rules and touched nothing in any component. */
+/* Headlines are set at REGULAR weight, not bold, and that is the whole idea:
+   presence comes from size and tight tracking rather than from mass. A 400
+   weight at 100px reads as composed; the same words at 700 read as shouting,
+   and the old headline shouted.
+
+   Tracking is -0.025em, the value the reference uses at every size. The old
+   -0.035em was tuned for a 700 weight, where thick stems can absorb the
+   crowding; at 400 the same setting closes up the counters. */
+.display {
+  font-family: var(--font-sans);
+  font-weight: 400;
+  letter-spacing: -0.025em;
+  line-height: 1.02;
+  text-wrap: balance;
+}
+
+.display-xl {
+  font-size: clamp(2.75rem, 7.2vw, 6.25rem);
+}
+.display-lg {
+  font-size: clamp(2.25rem, 5.2vw, 4.5rem);
+}
+.display-md {
+  font-size: clamp(1.875rem, 3.6vw, 3.25rem);
+}
+
+/* The setup line. It inherits everything from `.display` — same face, same
+   weight, same size, same tracking — and differs from the payoff in colour
+   alone. Every override that used to live here (serif family, italic, a 0.78em
+   step-down, looser tracking) existed to make a second typeface sit level with
+   the first, and there is no second typeface any more. */
+.display .lead {
+  display: block;
+  color: var(--muted-foreground);
+}
+
+/* The payoff. Identical to the setup line in every respect except contrast —
+   it is the same face at the same weight, simply not muted.
+
+   `.lit` is named for the dark theme, where "lit" meant the brightest thing on
+   the page. It points at --foreground rather than a literal white so the ROLE
+   (maximum contrast) survives a ground flip; hardcoding a colour here is what
+   once rendered every emphasised headline white-on-white on a light theme. */
+.display em,
+.display .lit {
+  display: block;
+  font-style: normal;
+  color: var(--foreground);
+}
+
+/* --------------------------------------------------------------------------
+   FOOTER WORDMARK  —  the brand name as a type specimen
+
+   The last thing on the page is the name at maximum scale, running the full
+   width of the viewport and cropped by the bottom edge. It is set in the same
+   geometric face as everything else; at this size Outfit's near-circular bowls
+   stop reading as a typeface and start reading as architecture, which is the
+   whole reason it was chosen.
+
+   Two details do the work:
+
+   1. The fill is a vertical GRADIENT clipped to the glyphs, brightest where the
+      letters meet the content above and fading to nothing at the crop. The name
+      appears to sink into the void rather than sitting on it — the same
+      "light from outside the frame" logic as every other surface on the site,
+      applied to type.
+
+   2. `line-height` well below 1 crops the font's internal leading, so the caps
+      sit hard against both edges of the band instead of floating in whitespace.
+
+   Decorative: the accessible brand name is the lockup at the top of the footer,
+   so this carries aria-hidden and never reaches assistive tech twice.
+   -------------------------------------------------------------------------- */
+
+.wordmark {
+  /* The band. `overflow: hidden` crops the font's internal leading and
+     guarantees the oversized glyphs can never widen the document.
+
+     `container-type: inline-size` is what makes the fill exact: the size below
+     is expressed in `cqw`, so the name spans THIS box rather than the viewport.
+     That matters above 90rem, where `container-page` caps and centres the
+     content — a viewport-sized wordmark would run right past the column every
+     other element on the page is aligned to, and read as a mistake on a wide
+     monitor rather than a decision. */
+  container-type: inline-size;
+  overflow: hidden;
+  /* Trims the font's internal leading so the caps sit hard against the top of
+     the band. Low enough to clip the "y" descender — which is what makes the
+     name read as cropped by the page edge rather than centred in a box — but
+     not so low that it eats into the cap height and the word stops reading. */
+  line-height: 0.82;
+  pointer-events: none;
+  user-select: none;
+}
+
+.wordmark > span {
+  display: block;
+  white-space: nowrap;
+  /* Tuned by measurement: at this weight and tracking Outfit renders
+     "Dev Syndicate" at 5.74x its font-size, so 17.34cqw lands the glyph run at
+     ~99.5%% of the band — flush to the grid without the final "e" kissing the
+     edge. Measured with a Range around the text node; scrollWidth reports the
+     block's own width here and is useless for this.
+     The vw line is a fallback for engines without container query units; it is
+     deliberately first so the cqw declaration wins wherever it is understood. */
+  font-size: 14.1vw;
+  font-size: var(--wordmark-size, 15.13cqw);
+  font-weight: 600;
+  letter-spacing: -0.055em;
+  /* Pulls the glyphs flush to the left container edge: geometric caps carry a
+     little side bearing that reads as a misalignment at this scale. */
+  margin-left: -0.012em;
+
+  background: linear-gradient(
+    180deg,
+    color-mix(in oklab, var(--ref-white) 19%, transparent) 0%,
+    color-mix(in oklab, var(--ref-white) 11%, transparent) 44%,
+    color-mix(in oklab, var(--ref-white) 3%, transparent) 76%,
+    transparent 100%
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* --------------------------------------------------------------------------
+   HAIRLINE RULE  —  a divider that fades out at both ends
+
+   A full-width 1px line reads as a hard box edge. Fading the ends makes the
+   same line read as a horizon, which is the language the rest of the page is
+   speaking.
+   -------------------------------------------------------------------------- */
+
+.rule-fade {
+  height: 1px;
+  border: 0;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--border-strong) 18%,
+    var(--border-strong) 82%,
+    transparent 100%
+  );
+}
 
 /* ==========================================================================
    6. KEYFRAMES
@@ -1711,6 +2051,106 @@
   }
 }
 
+/* The bloom breathes — a very slow, very small opacity swing. Below the
+   threshold of conscious notice, but it stops the hero reading as a static
+   image and gives the light a sense of being a real source. */
+@keyframes bloom-breathe {
+  0%,
+  100% {
+    opacity: 0.62;
+  }
+  50% {
+    opacity: 0.82;
+  }
+}
+
+/* Per-character entrance for the hero's payoff line.
+
+   Each letter arrives from a line below, heavily out of focus, and resolves as
+   it lands. The blur is the whole effect: at 40px a white glyph on this canvas
+   is a soft bloom rather than a shape, so the line reads as light gathering
+   into words instead of text sliding in. It pairs with the rest of the site's
+   language, where nothing is a flat fill and everything is lit.
+
+   The characters are split and delayed on the SERVER (see the hero), so this
+   is one CSS animation per glyph and no JavaScript anywhere — the sequence
+   runs at first paint rather than waiting on hydration.
+
+   Timing is `cubic-bezier(.22,1,.36,1)`: a hard decelerate, so a glyph covers
+   most of its travel immediately and then eases the last few pixels. That is
+   what makes a 500ms move feel snappy rather than floaty. */
+@keyframes char-in {
+  from {
+    opacity: 0;
+    filter: blur(40px);
+    transform: translateY(100%);
+  }
+  to {
+    opacity: 1;
+    filter: blur(0);
+    transform: translateY(0);
+  }
+}
+
+.animate-char-in {
+  display: inline-block;
+  opacity: 0;
+  /* Restated outside the keyframes so a glyph is already blurred and displaced
+     during its delay, rather than popping into the FROM state when its turn
+     arrives. */
+  filter: blur(40px);
+  transform: translateY(100%);
+  animation: char-in 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: var(--char-delay, 0ms);
+}
+
+/* The opening: each hero element rises and resolves, staggered by a custom
+   property set inline so one keyframe serves the whole sequence. */
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(1.5rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* The arc draws itself: the horizon scales up from a flat line into its full
+   curve as the page loads, so the first thing that happens is the light
+   arriving. */
+@keyframes horizon-rise {
+  from {
+    opacity: 0;
+    transform: translateY(4rem) scaleX(0.86);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scaleX(1);
+  }
+}
+
+.animate-bloom-breathe {
+  animation: bloom-breathe 9s ease-in-out infinite;
+}
+
+/* `--rise-delay` is set per element inline.
+   Fill mode must be `both`, not `backwards`: `backwards` alone holds the
+   FROM state during the delay but drops back to the element's own style once
+   the animation ends — and that style is opacity 0, so every hero element
+   vanished the instant its entrance finished. `both` keeps the final frame. */
+.animate-rise-in {
+  opacity: 0;
+  animation: rise-in 0.9s var(--ease-out-soft) both;
+  animation-delay: var(--rise-delay, 0ms);
+}
+
+.animate-horizon-rise {
+  animation: horizon-rise 1.8s var(--ease-out-soft) both;
+  animation-delay: var(--rise-delay, 0ms);
+}
+
 /* ==========================================================================
    7. REDUCED MOTION
    --------------------------------------------------------------------------
@@ -1730,5 +2170,19 @@
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
+  }
+
+  /* The staggered entrances above start at opacity 0 and rely on their
+     animation to reveal them. Zeroing the duration is not enough on its own —
+     the `animation-delay` still applies, so an element with a 900ms stagger
+     would sit invisible for most of a second before appearing. Clear the
+     delay and pin the resting state so the content is simply *there*. */
+  .animate-rise-in,
+  .animate-horizon-rise,
+  .animate-char-in {
+    animation-delay: 0ms !important;
+    opacity: 1;
+    transform: none;
+    filter: none;
   }
 }
