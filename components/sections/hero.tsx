@@ -2,34 +2,37 @@ import { Fragment } from "react";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 
-import { hero, trust } from "@/lib/content";
-import { Chip, DotChip } from "@/components/ui/chip";
+import { hero } from "@/lib/content";
+import { Reveal } from "@/components/ui/reveal";
 import { buttonVariants } from "@/components/ui/button";
+import { SignalField } from "@/components/artwork/signal-field";
 
 /**
- * The opening: type on the void, and nothing else.
+ * The opening: type on a lattice, and a signal crossing it.
  *
- * There is no artwork behind this hero — no arc, no field, no framing marks,
- * no vignette. The page canvas is the background, and the only things in the
- * frame are the words. Everything that carries the composition is typographic:
- * the eyebrow, the two-voice headline, the supporting paragraph, the two
- * actions, and the promise row.
+ * The headline sits in the quiet centre of a dot field (see
+ * components/artwork/signal-field.tsx), and every few seconds one wavefront
+ * leaves the copy and travels out through every dot on the screen. That is the
+ * page's whole argument in one gesture — change the system at one point and the
+ * effect reaches all of it — and it is the reason the field is here rather than
+ * a texture: it is the claim, not decoration behind the claim.
  *
- * That puts the whole weight on the headline, which is set the way the
- * reference sets it: one face, regular weight, large, and tightly tracked, with
- * the setup line muted and the payoff at full contrast (see the `.display`
- * block in globals.css). Nothing here is bold — the presence comes from scale
- * and the per-character entrance below, not from mass.
+ * The type is unchanged and still carries the composition: one face, regular
+ * weight, large, tightly tracked, with the setup line muted and the payoff at
+ * full contrast (see the `.display` block in globals.css). Nothing here is
+ * bold — the presence comes from scale and the per-character entrance below,
+ * not from mass. The field is deliberately low-contrast underneath it; white
+ * type at full brightness over a 9%-white dot loses nothing.
  *
- * Server component. The entrance is CSS-only — each element carries
- * `animate-rise-in` with its own `--rise-delay`, so the stagger costs no
- * JavaScript and runs before hydration. That matters here more than anywhere
- * else on the site: this is the first paint, and the PRD's performance target
- * leaves no room for the hero to wait on a bundle.
+ * Server component, and the words do not wait on the field. The entrance is
+ * CSS-only — each element carries `animate-rise-in` with its own
+ * `--rise-delay`, so the stagger costs no JavaScript and runs before
+ * hydration. The canvas is additive: it fades in over the first 1.4s and the
+ * hero is complete and readable without it.
  */
 /* Delays for the payoff line's per-character entrance, in ms. */
-const CHAR_START = 320;
-const CHAR_STEP = 28;
+const CHAR_START = 220;
+const CHAR_STEP = 38;
 
 /**
  * Split a line into per-character spans for the `char-in` entrance.
@@ -80,105 +83,131 @@ function splitChars(line: string) {
 
 export function Hero() {
   return (
-    <section className="relative isolate">
-      <div className="container-page">
-        <div className="flex flex-col items-center pt-32 pb-16 text-center sm:pt-40 lg:pt-44">
-          <div
-            className="animate-rise-in"
-            style={{ "--rise-delay": "100ms" } as React.CSSProperties}
-          >
-            <Chip>{hero.eyebrow}</Chip>
-          </div>
+    <section className="relative isolate overflow-hidden">
+      {/* The field reads the section for its own geometry: it measures
+          `[data-hero-copy]` below to place the wave origin and the calm band,
+          and it listens for the pointer across the whole section. Both depend
+          on the canvas being a direct child here — not wrapped. */}
+      <SignalField className="signal-field" />
 
-          {/* The headline in two voices: an italic serif setup line over the
-              heavy sans payoff. See the `.display` block in globals.css.
+      <div className="relative z-10 container-page">
+        {/* The first screen is the claim and the two actions, and nothing
+            else. `min-h-svh` is what makes that true rather than approximately
+            true: it holds this block to a full viewport at every window height,
+            so the promise row below can never creep up into the opening view on
+            a tall monitor. `svh` rather than `vh` because mobile browser chrome
+            collapses on scroll, and `vh` would let the row peek out from under
+            it before settling.
 
-              The measure is 7xl, not 5xl, and that is what fixes the rag: at
-              5xl the payoff broke as "how you" / "actually work." — a pinched
-              short line between two long ones. At 7xl it holds on one line
-              down to ~640px, so the headline reads as two clean voices rather
-              than three ragged ones. Below that it wraps, and `text-wrap:
-              balance` on `.display` evens the two halves. */}
-          <h1 className="display display-xl mt-7 max-w-7xl">
-            {/* The setup line rises as one block — the same entrance every
-                other element on the page uses. Only the payoff gets the
-                per-character treatment, so the effect stays an emphasis
-                rather than a house style. */}
-            <span
-              className="lead animate-rise-in"
-              style={{ "--rise-delay": "200ms" } as React.CSSProperties}
+            The top padding is the header's own height. The copy is centred in
+            the space BELOW the nav rather than in the raw viewport, which is
+            where the eye reads the centre to be. */}
+        <div className="flex min-h-svh flex-col items-center justify-center pt-20 pb-16 text-center">
+          {/* Everything the field has to stay quiet behind, in one box. It is
+              a flex item in a centred column, so its measured width is the
+              widest line of type rather than the full container — which is
+              what keeps the calm band the shape of the headline instead of the
+              shape of the page. */}
+          <div data-hero-copy className="flex flex-col items-center">
+            {/* The headline in two voices — one face, split by contrast alone:
+                a muted setup line over a full-contrast payoff. See the
+                `.display` block in globals.css.
+
+                Three words now, so the measure is a formality: the block is a
+                flex item in a centred column and sizes to its own longest line
+                (~700px at full display size), nowhere near the cap. The cap
+                only stops an enormous viewport from setting it wider than a
+                comfortable read. Neither line can rag — there is nothing to
+                break. */}
+            <h1 className="display display-xl max-w-4xl">
+              {/* The setup line rises as one block — the same entrance every
+                  other element on the page uses. Only the payoff gets the
+                  per-character treatment, so the effect stays an emphasis
+                  rather than a house style. */}
+              <span
+                className="lead animate-rise-in"
+                style={{ "--rise-delay": "100ms" } as React.CSSProperties}
+              >
+                {hero.headline.lead}
+              </span>
+
+              <span className="lit">
+                {/* `select-none` matters as much as `sr-only` here. Without it a
+                    reader who selects the headline copies BOTH this span and the
+                    visible glyphs, and the clipboard gets the line twice. Opted
+                    out of selection, this span serves assistive tech only, and
+                    the visible characters — real text nodes with real spaces
+                    between the words — are what the clipboard picks up. */}
+                <span className="sr-only select-none">{hero.headline.lit}</span>
+                <span aria-hidden>{splitChars(hero.headline.lit)}</span>
+              </span>
+            </h1>
+
+            {/* Plain `balance` at every width now. The old copy needed a
+                `pretty`-below-`sm` exception because it ran to seven lines on a
+                phone, and Chrome only balances blocks of six or fewer — past
+                that the rule silently does nothing. This paragraph is four
+                lines at 390px, so balance applies everywhere and the exception
+                is gone with the sentence that needed it. */}
+            <p
+              className="animate-rise-in mt-7 max-w-2xl text-[1.0625rem] leading-[1.7] text-balance text-muted-foreground sm:text-lg"
+              style={{ "--rise-delay": "600ms" } as React.CSSProperties}
             >
-              {hero.headline.lead}
-            </span>
-
-            <span className="lit">
-              {/* `select-none` matters as much as `sr-only` here. Without it a
-                  reader who selects the headline copies BOTH this span and the
-                  visible glyphs, and the clipboard gets the line twice. Opted
-                  out of selection, this span serves assistive tech only, and
-                  the visible characters — real text nodes with real spaces
-                  between the words — are what the clipboard picks up. */}
-              <span className="sr-only select-none">{hero.headline.lit}</span>
-              <span aria-hidden>{splitChars(hero.headline.lit)}</span>
-            </span>
-          </h1>
-
-          {/* `pretty` below sm, `balance` at sm and up, and the split is not
-              arbitrary: Chrome only balances blocks of 6 lines or fewer. On a
-              phone this paragraph runs to 7, so `balance` silently falls back
-              to normal wrapping and leaves "firefighting." orphaned on its own
-              line. `pretty` is the rule that actually protects the last line
-              at that width; `balance` evens the whole rag once it fits. */}
-          <p
-            className="animate-rise-in mt-7 max-w-2xl text-[1.0625rem] leading-[1.7] text-pretty text-muted-foreground sm:text-lg sm:text-balance"
-            style={{ "--rise-delay": "700ms" } as React.CSSProperties}
-          >
-            {hero.supporting}
-          </p>
-
-          <div
-            className="animate-rise-in mt-10 flex flex-wrap items-center justify-center gap-3"
-            style={{ "--rise-delay": "820ms" } as React.CSSProperties}
-          >
-            <Link
-              href={hero.primaryCta.href}
-              className={buttonVariants({ size: "lg" })}
-            >
-              {hero.primaryCta.label}
-              <ArrowRight className="size-4" aria-hidden />
-            </Link>
-            <Link
-              href={hero.secondaryCta.href}
-              className={buttonVariants({ variant: "outline", size: "lg" })}
-            >
-              {hero.secondaryCta.label}
-            </Link>
-          </div>
-        </div>
-
-        {/* ── The promise row ──────────────────────────────────────────────
-            Where the reference runs a strip of client logos. We have no client
-            names to print and will not invent any, so the row carries the five
-            operational promises instead — same rhythm, all of it verifiable. */}
-        <div
-          className="animate-rise-in border-t border-border/60 py-10"
-          style={{ "--rise-delay": "940ms" } as React.CSSProperties}
-        >
-          <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between lg:gap-10">
-            <p className="max-w-xs shrink-0 text-sm leading-relaxed text-muted-foreground">
-              {hero.proof.lead}{" "}
-              <span className="text-foreground">{hero.proof.emphasis}</span>
+              {hero.supporting}
             </p>
 
-            <ul className="flex flex-wrap gap-2.5">
-              {trust.points.map((point) => (
-                <li key={point.title}>
-                  <DotChip>{point.title}</DotChip>
-                </li>
-              ))}
-            </ul>
+            <div
+              className="animate-rise-in mt-10 flex flex-wrap items-center justify-center gap-3"
+              style={{ "--rise-delay": "720ms" } as React.CSSProperties}
+            >
+              <Link
+                href={hero.primaryCta.href}
+                className={buttonVariants({ size: "lg" })}
+              >
+                {hero.primaryCta.label}
+                <ArrowRight className="size-4" aria-hidden />
+              </Link>
+              <Link
+                href={hero.secondaryCta.href}
+                className={buttonVariants({ variant: "outline", size: "lg" })}
+              >
+                {hero.secondaryCta.label}
+              </Link>
+            </div>
           </div>
         </div>
+
+        {/* ── The statement ───────────────────────────────────────────────
+            The hero's second beat: the headline above makes a claim, this
+            answers what the studio actually builds. It reveals on scroll,
+            below the fold, like every other band on the page.
+
+            An ASYMMETRIC split, and the empty gutter between the two columns is
+            the design rather than a leftover. Headline takes columns 1–5, body
+            takes 8–12, and 6–7 stay empty — roughly a sixth of the width held
+            open on a site whose whole language is void and light. A tight
+            two-column split of "big heading, paragraph beside it" is the most
+            templated band on the web; the space is what stops this being that.
+
+            The heading is `display-lg`, the same size every other section head
+            on the site uses. Setting it at hero scale would put two display
+            headlines within one screen of each other, and the second would win
+            on novelty while the first is the one that matters. */}
+        <Reveal className="border-t border-border/60 py-16 sm:py-20">
+          <div className="grid gap-8 lg:grid-cols-12 lg:gap-6">
+            <h2 className="display display-lg lg:col-span-5">
+              <span className="lead">{hero.statement.headline.lead}</span>
+              <span className="lit">{hero.statement.headline.lit}</span>
+            </h2>
+
+            {/* Nudged down a touch so its first line reads level with the
+                headline's cap rather than with the top of its line box, which
+                sits noticeably higher at display size. */}
+            <p className="max-w-[54ch] text-[1.0625rem] leading-[1.75] text-muted-foreground sm:text-lg lg:col-span-5 lg:col-start-8 lg:pt-2.5">
+              {hero.statement.body}
+            </p>
+          </div>
+        </Reveal>
       </div>
     </section>
   );

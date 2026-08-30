@@ -80,8 +80,11 @@ export function ContactForm() {
             options={[
               { value: "", label: "Not sure yet" },
               ...services.items.map((service) => ({
-                value: service.title,
-                label: service.title,
+                /* The layer name, not the full title: "Digital Products"
+                   scans in a dropdown, "Websites, Mobile Apps & Digital
+                   Experiences" does not. */
+                value: service.name,
+                label: service.name,
               })),
             ]}
             className={fieldBase}

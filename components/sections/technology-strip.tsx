@@ -3,7 +3,6 @@ import { ArrowRight } from "lucide-react";
 
 import { technology } from "@/lib/content";
 import { cn } from "@/lib/utils";
-import { Chip } from "@/components/ui/chip";
 import { Icon } from "@/components/ui/icon";
 import { Reveal } from "@/components/ui/reveal";
 import { buttonVariants } from "@/components/ui/button";
@@ -44,7 +43,6 @@ export function TechnologyStrip() {
 
       <div className="container-page">
         <Reveal className="mx-auto flex max-w-2xl flex-col items-center gap-5 text-center">
-          <Chip>{technology.strip.eyebrow}</Chip>
           <h2 id="technology-heading" className="display display-lg lit">
             {technology.strip.heading}
           </h2>

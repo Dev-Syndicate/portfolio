@@ -98,24 +98,32 @@ export const nav = [
 
 export const hero = {
   eyebrow: "Software development company",
-  /* Set on two lines in the hero, the second carrying the emphasis — the
-     reference opens with a short declarative pair rather than one long
-     sentence, and the shorter line lands harder. Same claim as before:
-     software systems, aimed at operations rather than at websites. */
-  headline: { lead: "Software that fixes", lit: "how you actually work." },
+  /* Set on two lines in the hero, the second carrying the emphasis.
+     The split falls after "for" rather than anywhere else because that is
+     where the phrase's meaning actually sits: "Technology" is the medium and
+     every studio has it, "Purpose." is the claim. Muting the setup and lighting
+     the payoff puts the contrast on the only word doing work. */
+  headline: { lead: "Technology for", lit: "Purpose." },
   /* Kept as a single string for metadata/OG, where the line break is noise. */
-  headlinePlain: "Software that fixes how you actually work.",
+  headlinePlain: "Technology for Purpose.",
   supporting:
-    "The manual work. The tools that don’t talk to each other. The process that quietly breaks the moment you grow. We build the software, AI, and automation that take those off your team’s plate — so the business moves instead of firefighting.",
+    "Engineering purposeful technology that solves meaningful problems, creates tangible value, and improves how businesses work.",
   primaryCta: { label: "Start your project", href: "/contact" },
   secondaryCta: { label: "See how we work", href: "#process" },
-  /* The strip beneath the hero. The reference runs client logos here; we have
-     none to name — and content.ts has always refused to invent them — so the
-     row carries the five operational promises instead. Same visual rhythm,
-     nothing unverifiable in it. */
-  proof: {
-    lead: "Every system we build is judged on one thing:",
-    emphasis: "does the work actually get easier?",
+  /* The hero's second beat, below the fold. This slot used to hold a row of
+     five operational promises standing in for the client-logo strip the
+     reference runs; it now states plainly what the studio builds, which is the
+     question the headline above raises and does not answer.
+
+     "DevSyndicate" is closed up here on purpose, and it is the only place in
+     visible copy that it is. `seo.alternateNames` lists that spelling, and the
+     note there is that variants have to appear in real page copy or Google
+     discounts them — so this one occurrence earns its keep. Every other mention
+     on the site, including the wordmark directly above it, stays "Dev
+     Syndicate". */
+  statement: {
+    headline: { lead: "We build", lit: "what your business needs." },
+    body: "DevSyndicate engineers software, AI, and automation that help businesses work better. From digital products and custom software to intelligent systems and connected workflows, we build technology around your needs — with purpose, precision, and permanence.",
   },
 } as const;
 
@@ -163,126 +171,172 @@ export const trust = {
 /* -------------------------------------------------------------------------- */
 
 export const services = {
-  heading: "What We Build",
-  intro:
-    "Focused engagements that turn a business goal into shipped, measurable software.",
+  heading: "What we build.",
+  intro: "Technology for every layer of your business.",
 
-  /* The home page shows `summary` only and links here for `body` plus the
-     benefits. Each summary is a condensation of the body below it, not a new
-     claim — so the two pages never print the same paragraph twice. */
+  /* The home page shows the six layers as a list and links here; this page
+     carries the audience line, the body, and what each one includes. Nothing is
+     printed twice across the two. */
   overview: {
-    eyebrow: "What we build",
-    heading: "Five ways in.",
-    /* Names the axis the items are ordered along, so the `where` labels on the
-       cards read as one scale rather than five loose captions. */
-    intro:
-      "Ordered from the surface everyone sees to the work that runs at 3am when nobody’s watching.",
+    heading: "What we build.",
+    intro: "Technology for every layer of your business.",
     cta: { label: "See what each involves", href: "/services" },
   },
 
-  /* Per-item fields beyond the copy:
+  /* THE NUMBERS ARE NOT DECORATION, AND THIS IS THE ONE THING TO PRESERVE IF
+     THIS LIST IS EVER EDITED.
 
-     `slug`  — the fragment id of this service's card on /services. It is a
-               public URL (`/services#web-applications`), so treat it as
-               permanent: changing one breaks every inbound link and the
-               footer/home deep links that resolve through it.
-     `short` — the nav-length name, for the footer's "What we build" column.
-               Lives here so that column is generated from the real service
-               list and can never drift out of step with it again.
-     `where` — the place in the customer's world the engagement occupies, i.e.
-               how close it sits to the people who use it. The home-page
-               overview orders the items along that axis (most visible →
-               least) and prints the label on each card, so the ordering
-               carries information a visitor can use to find themselves rather
-               than being decoration. Keep the array in that order; the labels
-               stop being a scale if it is shuffled. */
+     A numbered list is only honest when the order carries information, and here
+     it does: the six run from the OUTSIDE IN. 01 is the surface anyone can see
+     without asking permission; 02 is what people log in to; 03 is the
+     operational core the business actually runs on; 04 is the connective tissue
+     between systems; 05 is intelligence sitting on top of all of it; 06 is the
+     work that happens with nobody watching. That is a depth ordering, which is
+     exactly what the supporting line means by "every layer of your business" —
+     so the numbers index strata, not menu items.
+
+     Shuffle this array and the numbering stops meaning anything.
+
+     Per-item fields:
+       `slug`     — the fragment id of this service on /services. Public URL
+                    (`/services#digital-products`), linked from the footer and
+                    the home list: treat as permanent.
+       `short`    — nav-length name, for the footer column.
+       `name`     — the layer, e.g. "Digital Products".
+       `title`    — what it actually consists of, in the client’s words.
+       `audience` — who this layer is for. The fastest way for a visitor to
+                    find themselves in a list of six.
+       `body`     — one paragraph, no list.
+       `includes` — the concrete scope. This is the part prospects actually
+                    read, so it stays specific and unglamorous. */
   items: [
     {
-      /* PRD-COPY */
-      icon: "globe",
-      slug: "website-development",
-      short: "Websites",
-      where: "Public surface",
-      title: "Website Development",
-      summary:
-        "A site that looks like you mean it — and loads like it too.",
-      body: "We design and develop websites that balance aesthetics with performance. Every project is crafted to represent your brand while delivering measurable business value.",
-      benefits: [
-        "Strong first impressions",
-        "Better customer engagement",
-        "Higher conversion potential",
-        "Long-term scalability",
-        "Faster loading times",
+      n: "01",
+      slug: "digital-products",
+      short: "Digital products",
+      name: "Digital Products",
+      title: "Websites, Mobile Apps & Digital Experiences",
+      audience:
+        "For businesses that need to be seen, understood, and connected.",
+      body: "We build high-performance websites, landing pages, corporate sites, and mobile applications that represent your business, engage your audience, and turn digital interactions into meaningful outcomes.",
+      includes: [
+        "Landing pages",
+        "Corporate & business websites",
+        "Product / service websites",
+        "Mobile applications",
+        "SEO optimisation",
+        "Forms & lead capture",
+        "Email integrations",
+        "Analytics & tracking",
+        "CMS integration",
+        "Performance & accessibility",
       ],
-      featured: true,
     },
     {
-      /* DRAFT-COPY */
-      icon: "app-window",
-      slug: "web-applications",
-      short: "Web apps",
-      where: "Behind the login",
-      title: "Web Applications",
-      summary:
-        "Dashboards, portals and internal tools your team will actually live in.",
-      body: "Dashboards, portals, and internal tools built on the same foundations as our marketing work — typed, tested, and designed to be lived in every day.",
-      benefits: [
-        "Workflows tailored to your team",
-        "Role-aware access control",
-        "Reporting you can act on",
+      n: "02",
+      slug: "business-applications",
+      short: "Business applications",
+      name: "Business Applications",
+      title: "Platforms & Web Applications",
+      audience:
+        "For businesses that need people to log in, work, manage, or interact.",
+      body: "We build custom web platforms that turn business processes into software — from dashboards and customer portals to internal tools and workflow-based applications.",
+      includes: [
+        "Customer portals",
+        "Admin dashboards",
+        "Employee portals",
+        "Booking / management systems",
+        "Role-based access",
+        "Authentication",
+        "Data management",
+        "Backend systems",
+        "Business workflows",
       ],
-      featured: false,
     },
     {
-      /* DRAFT-COPY */
-      icon: "tablet-smartphone",
-      slug: "mobile-applications",
-      short: "Mobile apps",
-      where: "In the pocket",
-      title: "Mobile Applications",
-      summary:
-        "One Flutter codebase. Both app stores. Half the bill.",
-      body: "Cross-platform apps built in Flutter, so iOS and Android come from a single codebase rather than two separate builds — and stay in step with each other as the product changes.",
-      benefits: [
-        "One codebase, both platforms",
-        "Native performance and feel",
-        "Offline use and push notifications",
-        "Store submission handled for you",
+      n: "03",
+      slug: "business-systems",
+      short: "Business systems",
+      name: "Business Systems",
+      title: "ERP, CRM & Operational Systems",
+      audience:
+        "For businesses that need their operations connected in one place.",
+      body: "We engineer systems that bring customers, teams, data, processes, and day-to-day operations together — replacing disconnected tools and manual workflows with one coordinated system.",
+      includes: [
+        "ERP systems",
+        "CRM systems",
+        "Customer management",
+        "Employee / team management",
+        "Inventory & operations",
+        "Workflow management",
+        "Reporting & dashboards",
+        "Role & permission systems",
+        "Custom business logic",
       ],
-      featured: false,
     },
     {
-      /* DRAFT-COPY */
-      icon: "plug",
-      slug: "api-integrations",
-      short: "APIs & integrations",
-      where: "Between systems",
-      title: "APIs & Integrations",
-      summary:
-        "Make the tools you already pay for finally talk to each other.",
-      body: "We connect the systems you already pay for — CRMs, payment providers, ERPs — so data moves without anyone copying it between tabs.",
-      benefits: [
-        "Fewer manual handoffs",
-        "One reliable source of truth",
-        "Documented, versioned contracts",
+      n: "04",
+      slug: "integrations-apis",
+      short: "Integrations & APIs",
+      name: "Integrations & APIs",
+      title: "Connected Systems",
+      audience: "For businesses whose tools need to work together.",
+      body: "We connect the software you already use so information moves between systems automatically, reliably, and without repetitive manual work.",
+      includes: [
+        "API development",
+        "Third-party API integrations",
+        "Payment gateways",
+        "Email & communication services",
+        "CRM / ERP integrations",
+        "Google services",
+        "Webhooks",
+        "Data synchronisation",
+        "Custom integrations",
       ],
-      featured: false,
     },
     {
-      /* DRAFT-COPY */
-      icon: "sparkles",
-      slug: "ai-automation",
-      short: "AI & automation",
-      where: "Runs unattended",
-      title: "AI & Automation",
-      summary: "Point automation at the work that’s quietly eating your week.",
-      body: "Practical automation applied where it pays back: support triage, content pipelines, and the repetitive work quietly consuming your team’s week.",
-      benefits: [
-        "Faster response times",
-        "Lower operational cost",
-        "Humans kept in the loop",
+      n: "05",
+      slug: "ai-systems",
+      short: "AI systems",
+      name: "AI Systems",
+      title: "AI & Intelligent Systems",
+      audience:
+        "For businesses looking to put AI to work — not just add an AI feature.",
+      body: "We integrate AI into existing products and build standalone intelligent systems that can understand information, assist teams, automate decisions, and interact with customers.",
+      includes: [
+        "AI features in existing applications",
+        "AI chatbots",
+        "Customer support assistants",
+        "Internal AI assistants",
+        "Document / knowledge systems",
+        "AI-powered search",
+        "Recommendation systems",
+        "LLM integrations",
+        "Intelligent workflows",
+        "Custom AI applications",
       ],
-      featured: false,
+    },
+    {
+      n: "06",
+      slug: "automation",
+      short: "Automation",
+      name: "Automation",
+      title: "Automation & Workflow Engineering",
+      audience:
+        "For businesses spending time on work software should be doing.",
+      body: "We automate repetitive processes, connect business workflows, and create systems that move work forward with less manual intervention.",
+      includes: [
+        "Workflow automation",
+        "Process automation",
+        "Notifications & alerts",
+        "Automated reporting",
+        "Lead routing",
+        "Data processing",
+        "Scheduled workflows",
+        "Approval workflows",
+        "AI-powered automation",
+        "Cross-platform automation",
+      ],
     },
   ],
 } as const;
@@ -303,7 +357,7 @@ export const technology = {
     eyebrow: "The stack",
     heading: "Six areas. One standard.",
     intro:
-      "We pick the tool per problem rather than bending every problem to one stack. Here's the ground we cover.",
+      "We choose technology around the problem — guided by what the solution actually requires. Our engineering covers the core layers needed to build, connect, and scale modern digital systems.",
     cta: { label: "How we choose", href: "/services" },
   },
 
@@ -387,20 +441,41 @@ export const process = {
      full description of each. */
   strip: {
     eyebrow: "The process",
-    heading: "Five stages. No surprises.",
+    /* Split into setup and payoff, the same shape as `hero.statement.headline`
+       — the display type sets the lead muted and the lit half at full
+       contrast.
+
+       This is a single short sentence, which the `whyUs` note below says
+       should normally be set whole. It earns the split anyway because the
+       break is not arbitrary: the muted half IS the problem and the lit half
+       IS the purpose, so the colour carries the same move the words do. Split
+       a short heading only when it does that much work. */
+    heading: { lead: "From problem", lit: "to purpose." },
     intro:
-      "Each one answers a question you shouldn’t have to guess the answer to — and you'll know where we are at every point.",
+      "A clear process for turning what your business needs into technology that works.",
+    /* Read once, at the head of the pipeline, before the traverse starts — it
+       states the shape of the whole process so the five stages arrive as parts
+       of something rather than as a list. It fades out as the pipeline moves,
+       so it never competes with the stages for attention. */
+    lead: "We start by understanding the problem, define what the solution needs to achieve, then design, build, and verify it against those goals. Every stage has a purpose, a clear outcome, and a point of validation — so you always know what we’re building and why.",
     cta: { label: "What happens at each stage", href: "/services" },
-    /* The right-hand panel of the process block. Concrete commitments rather
-       than another paragraph — the reference sets a checklist here and the
-       specificity is what makes it land. Every line is already promised
-       elsewhere on the site; none of it is new. */
-    promises: [
-      "A live preview URL from week one",
-      "Lighthouse targets agreed before we build",
-      "Typed, reviewed code at every merge",
-      "Support that doesn't stop at launch",
-    ],
+    /* Closes the process block: what holds true at every stage, rather than
+       another paragraph. It sits under the pipeline as a single quiet row, so
+       each line has to survive being read in isolation and at a glance — which
+       is why they are four short noun phrases and not four sentences.
+
+       The heading lives here with the list rather than in the component: it
+       names this list specifically, so the two have to be edited together or
+       they drift apart. */
+    promises: {
+      heading: "What you get, every time",
+      items: [
+        "Clear visibility from day one",
+        "Defined standards before we build",
+        "Reviewed, maintainable code",
+        "Support beyond launch",
+      ],
+    },
   },
 
   steps: [
@@ -438,32 +513,120 @@ export const process = {
 } as const;
 
 /* -------------------------------------------------------------------------- */
+/* About — the studio's own position                                          */
+/* -------------------------------------------------------------------------- */
+
+export const about = {
+  /* THE SPLIT IS INVERTED HERE, AND DELIBERATELY.
+     Everywhere else on the site the display type runs muted setup → lit payoff,
+     a crescendo. This headline is a statement of precedence — X before Y — so
+     the word that comes first is also the word that matters most, and setting
+     "product" as the bright half would argue the opposite of what the sentence
+     says. `lit` is therefore the FIRST half here. See components/sections/
+     about-hero.tsx, which is why About does not use the shared PageHeader. */
+  hero: {
+    eyebrow: "About",
+    lit: "Purpose",
+    lead: "before product.",
+    intro:
+      "We start with what a business actually needs, then decide what to build — and whether it needs building at all.",
+  },
+
+  /* Vision is the distant state, mission is the present act. The section
+     renders them as a pair and encodes that difference in the light: the
+     vision panel is lit from the far top corner, the mission panel from close
+     underneath. Same device, opposite ends of the same idea. */
+  vision: {
+    label: "Our Vision",
+    statement: "A world where technology is built with purpose.",
+    body: [
+      "We envision a future where technology is created because it is needed — not simply because it can be built.",
+      "Where businesses use technology to solve meaningful problems, create lasting value, and improve the way people work, while avoiding unnecessary complexity and digital waste.",
+    ],
+  },
+
+  mission: {
+    label: "Our Mission",
+    statement: "Build better technology that matters.",
+    body: [
+      "Our mission is to engineer purposeful software, AI, and automation that solve meaningful business problems and create lasting value.",
+    ],
+  },
+
+  /* THESE ARE CONSTRAINTS, NOT STEPS. You do not do 01 and then 02 — all five
+     are held at once on every project, which is what "don’t compromise on"
+     means. The numbers are therefore an index and a count, not a sequence, and
+     the section is built to read as one held set rather than five separate
+     items. See components/sections/principles.tsx.
+
+     01 is deliberately the same claim as the page’s own headline. The hero
+     asserts "Purpose before product"; this is where it is actually defined, so
+     the first row carries the lead treatment rather than being one of five
+     equals. */
+  principles: {
+    heading: { lead: "Five decisions", lit: "we don’t compromise on." },
+    intro:
+      "The principles that guide what we build and how we build it.",
+    items: [
+      {
+        title: "Purpose before product",
+        body: "We start with the problem, not the technology. If something doesn’t solve a meaningful need or create enough value to justify itself, it doesn’t need to be built.",
+      },
+      {
+        title: "The right technology",
+        body: "We choose technology based on what the problem requires — balancing capability, complexity, cost, performance, and long-term maintainability rather than following trends for their own sake.",
+      },
+      {
+        title: "Simplicity where it matters",
+        body: "More features and more complexity don’t automatically create better solutions. We favour clear architectures, focused functionality, and systems that are easier to understand, use, and maintain.",
+      },
+      {
+        title: "Built for longevity",
+        body: "Technology shouldn’t become a liability the moment it launches. We build systems that can be maintained, adapted, and extended as the business and its needs evolve.",
+      },
+      {
+        title: "Responsible by design",
+        body: "We consider the broader cost of what we build — from infrastructure and digital resources to the use of AI. Technology should create meaningful value without unnecessary complexity or waste.",
+      },
+    ],
+  },
+} as const;
+
+/* -------------------------------------------------------------------------- */
 /* Why Choose Us — derived from the trust points and PRD standards            */
 /* -------------------------------------------------------------------------- */
 
 export const whyUs = {
-  /* Set as a two-line display headline in the values section, mirroring the
-     reference's left column. `lit` is the half that steps up to full white. */
-  heading: { lead: "The deliberate", lit: "choice." },
-  headingPlain: "The deliberate choice",
-  eyebrow: "Our values",
+  /* One voice at full contrast rather than the two-part {lead, lit} split the
+     hero and the statement band use. That split earns its keep on a long
+     headline, where a muted setup can carry half a sentence and the payoff
+     lands on the other half; on three words it would only cut the phrase in an
+     arbitrary place. Section heads that are already short are set whole. */
+  heading: "Deliberate by principle.",
   intro:
-    "Four commitments we hold on every project — and every one of them is something you can check rather than take our word for.",
+    "Four values guide how we think, build, and deliver — keeping every decision purposeful, practical, and built to last.",
+  /* Order is load-bearing: the section renders these into a 2×2 whose cards are
+     each lit from the corner facing the middle, so index 0 is top-left and
+     index 3 is bottom-right. Reordering these reorders the grid, not the
+     lighting — see FACING_CENTRE in components/sections/values.tsx. */
   reasons: [
     {
       icon: "gauge",
       title: "Outcomes first",
-      body: "We talk about what technology does for you, not what it’s called. Every decision traces back to a result you asked for.",
+      body: "We start with what needs to change, not what needs to be built. Every technical decision is driven by the outcome your business needs.",
+    },
+    {
+      /* Resilience rather than security. `layers` would read closer to
+         "maintainable" but Yours to keep already holds it, and two cards in one
+         grid should never share a glyph. */
+      icon: "shield",
+      title: "Built to last",
+      body: "Simple, maintainable systems designed to stay useful beyond launch — easy to understand, adapt, and evolve as your business grows.",
     },
     {
       icon: "search",
       title: "Measured, not claimed",
       body: "Performance, accessibility, SEO and best practice audited with Lighthouse before launch — against numbers you can re-run yourself.",
-    },
-    {
-      icon: "shield",
-      title: "Accessible by default",
-      body: "Keyboard paths, visible focus, semantic HTML and WCAG AA contrast are in the build from day one. Never a phase-two promise.",
     },
     {
       icon: "layers",

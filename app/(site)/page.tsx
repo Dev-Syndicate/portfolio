@@ -3,7 +3,6 @@ import { Values } from "@/components/sections/values";
 import { ServicesOverview } from "@/components/sections/services-overview";
 import { TechnologyStrip } from "@/components/sections/technology-strip";
 import { ProcessStrip } from "@/components/sections/process-strip";
-import { Faq } from "@/components/sections/faq";
 import { ContactCta } from "@/components/sections/contact-cta";
 
 /* ---------------------------------------------------------------------------
@@ -14,9 +13,14 @@ import { ContactCta } from "@/components/sections/contact-cta";
      Values          asymmetric split, cross-lit  — why us
      Services        centred head + bento grid    — what we build
      Technology      centred, constellation field — what we build it with
-     Process         centred head + two panels    — how it runs
-     FAQ             centred, separated rows      — objections
+     Process         pinned horizontal pipeline   — how it runs
      Close           one lit panel                — the ask
+
+   The FAQ used to sit between Process and Close, answering objections. It was
+   removed rather than moved: Process now pins and takes the scroll for a full
+   screen, so an accordion of six collapsed rows immediately afterwards asked
+   the reader to work through a second interactive block before they were
+   allowed to reach the ask.
 
    No two adjacent sections share a shape. That alternation is what stops a
    long dark page reading as one undifferentiated scroll, and it is the thing
@@ -34,7 +38,6 @@ export default function Home() {
       <ServicesOverview />
       <TechnologyStrip />
       <ProcessStrip />
-      <Faq />
       <ContactCta />
     </>
   );

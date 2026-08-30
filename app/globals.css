@@ -1595,6 +1595,59 @@
     0 18px 50px -18px rgb(0 0 0 / 0.85);
 }
 
+/* The capsule as a full-width BAR, and as a stacked SHEET — the site header
+   and the menu it drops beneath itself.
+
+   Both are declared here rather than as Tailwind utilities on the element for a
+   specificity reason worth knowing: `.capsule` is unlayered CSS, and unlayered
+   CSS beats everything in `@layer utilities`. A `rounded-3xl` on the sheet
+   would silently lose to the base `border-radius: 9999px` and the menu would
+   render as a giant lozenge. Anything that has to override the primitive has to
+   live beside the primitive.
+
+   `overflow: visible` matters just as much: the base capsule clips to its own
+   radius, and a clipped capsule eats the focus ring of every link inside it —
+   keyboard users would tab through the nav seeing nothing at all. The ::before
+   highlight takes the inherited radius instead, so it still stays in the pill.
+
+   `gap: 0` because both lay their own children out with flex utilities. */
+.capsule-bar,
+.capsule-sheet {
+  display: flex;
+  width: 100%;
+  gap: 0;
+  overflow: visible;
+}
+
+.capsule-bar::before,
+.capsule-sheet::before {
+  border-radius: inherit;
+}
+
+/* The sheet is a rounded rectangle, not a pill: it holds stacked rows, and a
+   9999px radius on a tall block bows the first and last rows inward.
+
+   `align-items: stretch` undoes the base capsule's `center`, which is right for
+   a row of controls and wrong the moment the axis turns: as a column it centres
+   every row on its own text width, so the menu renders as a ragged stack of
+   shrink-wrapped pills instead of full-width rows. */
+.capsule-sheet {
+  flex-direction: column;
+  align-items: stretch;
+  border-radius: 1.75rem;
+}
+
+/* Once the page has scrolled the glass sits over CONTENT rather than over the
+   hero's field, so it thickens: more fill, a firmer rim, a deeper shadow. At
+   the top it stays thin and lets the signal show through. */
+.capsule-bar.is-dense {
+  background: color-mix(in oklab, var(--ref-deep) 84%, transparent);
+  border-color: var(--hairline-strong);
+  box-shadow:
+    inset 0 1px 0 color-mix(in oklab, var(--ref-white) 22%, transparent),
+    0 24px 60px -20px rgb(0 0 0 / 0.95);
+}
+
 /* The caught highlight. Deliberately off-centre and soft-edged — a specular
    smear, not a gradient sweep. */
 .capsule::before {
@@ -1634,6 +1687,25 @@
   color: var(--muted-foreground);
   backdrop-filter: blur(8px);
   white-space: nowrap;
+}
+
+/* Sentence-case variant, for chips carrying a PHRASE rather than a label.
+   Ten uppercase letterspaced scope items are a wall; the same ten in sentence
+   case are a list you can actually read.
+
+   AFTER `.chip`, not before, and that is the whole trick. Both are single-class
+   selectors, so specificity is a tie and SOURCE ORDER decides — declared above
+   `.chip` this rule loses every property it is trying to override, silently.
+
+   It also has to live here rather than as `normal-case tracking-normal` on the
+   element: `.chip` is unlayered CSS and beats anything in `@layer utilities`,
+   so those utilities never apply. (`DotChip` in components/ui/chip.tsx has
+   carried exactly that dead override since it was written, which is how this
+   was noticed.) */
+.chip-plain {
+  font-size: 0.8125rem;
+  letter-spacing: normal;
+  text-transform: none;
 }
 
 /* --------------------------------------------------------------------------
@@ -1697,6 +1769,203 @@
   opacity: 0.035;
   mix-blend-mode: overlay;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* --------------------------------------------------------------------------
+   VALUE ART  —  the diagram panel at the head of a value card
+
+   The reference lets its card artwork run to the panel edges and dissolve
+   before the title, rather than sitting in a bordered box above it. That crop
+   is what makes the drawing read as a window into something larger instead of
+   a picture pasted in — so the SVG is full-bleed to the top and sides, and a
+   linear mask retires it into the card before the type begins.
+
+   A `mask-image` is the right tool HERE, unlike on the hero's canvas where it
+   cost half the frame rate: this element is painted once and never animates,
+   so the mask is composited once too. The rule is about masking surfaces that
+   repaint every frame, not about masks.
+   -------------------------------------------------------------------------- */
+
+.value-art {
+  /* Pulls the fade down over the top of the text block, so there is no seam
+     between the two — the drawing ends where the reading starts. */
+  margin-bottom: -1.25rem;
+  pointer-events: none;
+  --mask: linear-gradient(to bottom, #000 0%, #000 58%, transparent 94%);
+  -webkit-mask-image: var(--mask);
+  mask-image: var(--mask);
+}
+
+/* --------------------------------------------------------------------------
+   VALUE DIAGRAM MOTION
+
+   Each of the four value drawings performs its own claim rather than merely
+   decorating it — see the per-card notes in components/artwork/value-diagrams.
+   The rules that keep four looping animations from becoming a light show:
+
+   0. MOTION THAT ADDS OR REMOVES BELONGS ONLY ON CARDS ABOUT CHANGE. Two of
+      these values — Built to last, Yours to keep — are claims about PERMANENCE,
+      and the first version of this file looped a slab blinking into a slot and
+      a code line erasing and rewriting itself. Both animations argued against
+      their own captions: a flickering box reads as instability, a self-erasing
+      line reads as churn. They now get motion that neither adds nor removes
+      anything — load travelling down a standing frame, a caret stepping down a
+      file that stays whole. Only the two cards that ARE about change (a
+      direction of reasoning, a measurement re-run) loop something in and out.
+   1. AT MOST TWO MOVING PARTS PER CARD, and in three of the four, one.
+   2. NO TWO CARDS SHARE A PERIOD. 1.15s / 7s / 8.4s / 6.2s never come back into
+      phase, so the grid never pulses in unison — which is the thing that makes
+      a set of looping cards read as a screensaver.
+   3. THE RESTING STATE IS THE FINISHED DRAWING. Every animation is written so
+      that with `animation-duration` collapsed to nothing — which is exactly
+      what the reduced-motion block at the foot of this file does — the element
+      lands on the completed artwork, not on an empty first frame. The one
+      exception is the ghost slab, whose honest static state IS absent: an empty
+      slot is what the drawing means when nothing is arriving.
+
+   These are CSS animations on server-rendered SVG, so the whole set costs zero
+   JavaScript and no hydration. The trade is that they cannot be gated on
+   visibility the way the hero's canvas is; four small stroke animations are
+   cheap enough that a rAF loop and an observer would cost more than they save.
+   -------------------------------------------------------------------------- */
+
+/* Marching dashes — flow along a path, direction included. */
+@keyframes vd-flow {
+  to {
+    stroke-dashoffset: -9;
+  }
+}
+
+.vd-flow {
+  animation: vd-flow 1.15s linear infinite;
+}
+
+/* A slow breath on the one lit element, so the eye is told where to look
+   without anything actually moving. */
+@keyframes vd-pulse {
+  0%,
+  100% {
+    opacity: var(--o, 0.72);
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.07);
+  }
+}
+
+.vd-pulse {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: vd-pulse 4.6s var(--ease-out-soft) infinite;
+}
+
+/* Load travelling down a frame and into its base. One short segment slides the
+   length of the upright and is gone; the structure it slides along never moves.
+   The base rule is `opacity: 0`, so with the duration collapsed under reduced
+   motion this leaves no stray mark on the drawing — it simply is not there. */
+@keyframes vd-load {
+  0% {
+    stroke-dashoffset: 0;
+    opacity: var(--o, 0.7);
+  }
+  100% {
+    stroke-dashoffset: -136;
+    opacity: var(--o, 0.7);
+  }
+}
+
+.vd-load {
+  opacity: 0;
+  stroke-dasharray: 16 120;
+  animation: vd-load 3.2s linear infinite;
+}
+
+/* A caret stepping down a gutter. Each tick runs the same keyframes on its own
+   phase, which is what an `animation-delay` on an infinite loop actually buys
+   you — a sequence that repeats forever with nothing to resynchronise. */
+@keyframes vd-caret {
+  0%,
+  100% {
+    opacity: 0.28;
+  }
+  4% {
+    opacity: 1;
+  }
+  16% {
+    opacity: 0.28;
+  }
+}
+
+.vd-caret {
+  animation: vd-caret 3.6s linear infinite;
+  animation-delay: var(--at, 0s);
+}
+
+/* A line drawing itself. `--len` is the path length. Deliberately split from
+   the fade below rather than doing both in one keyframe set: an element can
+   only carry one `animation`, and the drawn line and the marks that belong with
+   it have to clear together. So the GROUP owns the fade and the PATH owns the
+   draw, on the same `--dur`. The dashoffset snaps back at 100%, which is
+   invisible because the group is at zero opacity across that boundary. */
+@keyframes vd-trace {
+  0% {
+    stroke-dashoffset: var(--len);
+  }
+  46%,
+  100% {
+    stroke-dashoffset: 0;
+  }
+}
+
+.vd-trace {
+  stroke-dasharray: var(--len);
+  animation: vd-trace var(--dur, 8s) var(--ease-out-soft) infinite;
+}
+
+/* The run: appear, hold long enough to be read, clear, repeat. On the group,
+   so everything the run consists of leaves together. */
+@keyframes vd-cycle {
+  0% {
+    opacity: 0;
+  }
+  8%,
+  88% {
+    opacity: 1;
+  }
+  97%,
+  100% {
+    opacity: 0;
+  }
+}
+
+.vd-cycle {
+  animation: vd-cycle var(--dur, 8s) var(--ease-out-soft) infinite;
+}
+
+/* --------------------------------------------------------------------------
+   SIGNAL FIELD  —  the canvas the hero's dot lattice is drawn on
+
+   POSITIONING ONLY. Every pixel of the field, including the fade at the foot of
+   the section, comes from the canvas itself.
+
+   That division of labour is deliberate and was measured. The foot fade started
+   life here as a `mask-image`, which looked identical and cost half the frame
+   rate: a mask forces the browser to re-composite the whole layer through it on
+   every paint, and at 2x on a 1920-wide viewport that layer is ~6.9 million
+   pixels. The draw loop itself runs in under a millisecond; the mask was the
+   entire budget. Baked into the per-dot alpha at build time it costs nothing.
+
+   The lesson generalises — do not put `mask-image`, `filter`, or `backdrop-
+   filter` on a full-bleed canvas that repaints every frame.
+   See components/artwork/signal-field.tsx.
+   -------------------------------------------------------------------------- */
+
+.signal-field {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
 }
 
 /* --------------------------------------------------------------------------
@@ -1777,21 +2046,27 @@
    FOOTER WORDMARK  —  the brand name as a type specimen
 
    The last thing on the page is the name at maximum scale, running the full
-   width of the viewport and cropped by the bottom edge. It is set in the same
-   geometric face as everything else; at this size Outfit's near-circular bowls
-   stop reading as a typeface and start reading as architecture, which is the
-   whole reason it was chosen.
+   width of the column. At this size the letterforms stop reading as a typeface
+   and start reading as architecture, which is the whole point of setting it
+   this big.
 
    Two details do the work:
 
    1. The fill is a vertical GRADIENT clipped to the glyphs, brightest where the
-      letters meet the content above and fading to nothing at the crop. The name
-      appears to sink into the void rather than sitting on it — the same
+      letters meet the content above and fading out toward the baseline. The
+      name appears to sink into the void rather than sitting on it — the same
       "light from outside the frame" logic as every other surface on the site,
       applied to type.
 
-   2. `line-height` well below 1 crops the font's internal leading, so the caps
-      sit hard against both edges of the band instead of floating in whitespace.
+   2. The band trims the font's internal leading so the caps sit hard against
+      its top edge, WITHOUT slicing the bottom of the glyphs. This used to be
+      one `line-height: 0.82`, which cropped the descender of the "y" — and a
+      crop that lands exactly on the baseline does not read as a deliberate
+      bleed, it reads as a missing tail. The fade is what makes the name sink;
+      it does not need a hard edge helping. So the line box is now tall enough
+      to hold cap-height through descender, and a negative top margin pulls the
+      caps back up to the band's edge. Same silhouette at the top, whole
+      letterforms at the bottom.
 
    Decorative: the accessible brand name is the lockup at the top of the footer,
    so this carries aria-hidden and never reaches assistive tech twice.
@@ -1808,12 +2083,13 @@
      other element on the page is aligned to, and read as a mistake on a wide
      monitor rather than a decision. */
   container-type: inline-size;
+  /* Still hidden, but now only as a guard against the oversized glyphs ever
+     widening the document — not as the thing that crops the type. */
   overflow: hidden;
-  /* Trims the font's internal leading so the caps sit hard against the top of
-     the band. Low enough to clip the "y" descender — which is what makes the
-     name read as cropped by the page edge rather than centred in a box — but
-     not so low that it eats into the cap height and the word stops reading. */
-  line-height: 0.82;
+  /* Tall enough to contain the full glyph box, descender included. Paired with
+     the negative margin on the span below, which takes the resulting space off
+     the top so the caps stay flush to the band. */
+  line-height: 1.34;
   pointer-events: none;
   user-select: none;
 }
@@ -1821,31 +2097,122 @@
 .wordmark > span {
   display: block;
   white-space: nowrap;
-  /* Tuned by measurement: at this weight and tracking Outfit renders
-     "Dev Syndicate" at 5.74x its font-size, so 17.34cqw lands the glyph run at
-     ~99.5%% of the band — flush to the grid without the final "e" kissing the
-     edge. Measured with a Range around the text node; scrollWidth reports the
-     block's own width here and is useless for this.
+  /* The old note here was measured against Outfit, which this site has not
+     used since it moved to a single typeface — and it quoted a value the code
+     did not even carry. Both are gone.
+
+     15.5cqw is derived from the 15.13cqw that fitted "Dev Syndicate" in
+     Instrument Sans: removing the word space drops roughly one 0.29em advance
+     less one unit of the -0.055em tracking, so the string narrows by about
+     3.7% and the size has to come up to match.
+
+     BIASED DELIBERATELY LOW. An estimate that runs long gets the final "e"
+     sliced off by the overflow guard; one that runs short leaves a few pixels
+     of gap at the right margin that nobody will ever notice. Only one of those
+     is a bug, so the arithmetic is rounded toward the harmless side.
+
      The vw line is a fallback for engines without container query units; it is
      deliberately first so the cqw declaration wins wherever it is understood. */
-  font-size: 14.1vw;
-  font-size: var(--wordmark-size, 15.13cqw);
+  font-size: 14.4vw;
+  font-size: var(--wordmark-size, 15.5cqw);
   font-weight: 600;
   letter-spacing: -0.055em;
   /* Pulls the glyphs flush to the left container edge: geometric caps carry a
      little side bearing that reads as a misalignment at this scale. */
   margin-left: -0.012em;
+  /* Takes the leading added above back off the top, so the caps sit against
+     the band's top edge exactly as before while the descender keeps its room
+     at the bottom. */
+  margin-top: -0.3em;
 
+  /* Reaches further down than it used to, and does not land on nothing. The
+     band is taller now, so the old stops finished the fade above the baseline
+     and left the descender invisible — which would have been the same bug by
+     another route. Ending at 4% keeps the "y" faint but legibly complete. */
   background: linear-gradient(
     180deg,
-    color-mix(in oklab, var(--ref-white) 19%, transparent) 0%,
-    color-mix(in oklab, var(--ref-white) 11%, transparent) 44%,
-    color-mix(in oklab, var(--ref-white) 3%, transparent) 76%,
-    transparent 100%
+    color-mix(in oklab, var(--ref-white) 24%, transparent) 0%,
+    color-mix(in oklab, var(--ref-white) 16%, transparent) 45%,
+    color-mix(in oklab, var(--ref-white) 8%, transparent) 78%,
+    color-mix(in oklab, var(--ref-white) 4%, transparent) 100%
   );
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
+}
+
+/* ── The watermark variant ────────────────────────────────────────────────
+   The same specimen, demoted from "last thing on the page" to "the surface the
+   footer is printed on". Two changes, and both are forced by that move.
+
+   FAR DIMMER. The band version ran 24% white at its top edge, which is fine for
+   type sitting on its own in the dark and ruinous behind a 14px link. At 8%
+   falling to 2% the letterforms read as an emboss in the ground rather than as
+   something competing with the words on top of them — visible enough to be
+   deliberate, quiet enough that the footer stays the thing you read.
+
+   BLEEDING PAST THE BOTTOM. Anchored flush to the footer's lower edge a
+   watermark reads as a caption that has slipped; pushed down so the baseline
+   runs off the frame, it reads as a surface the page is sitting on. The
+   footer's own `overflow: hidden` does the cropping.
+
+   AFTER `.wordmark > span`, not before. Both are one-class-plus-child selectors
+   of equal specificity, so source order decides — declared above it, every
+   property here would lose silently. Same trap as `.chip-plain`. */
+.wordmark-watermark {
+  /* Sized to reach BOTH edges, now that the band is full-bleed rather than
+     inside the content column.
+
+     `.wordmark`'s own 15.5cqw was tuned to sit deliberately short — its note
+     explains the arithmetic was rounded toward the harmless side, because
+     overshooting gets the final "e" sliced off by the overflow guard while
+     undershooting only leaves a gap "nobody will ever notice". Measured, that
+     gap was 9% of the width, which at full bleed is very noticeable indeed: the
+     mark started at the left edge and stopped well short of the right.
+
+     16.9cqw closes it. The value is measured rather than derived — see the fill
+     percentages in the note on `--wordmark-size` below — and still lands a
+     whisker under 100%, keeping the overflow guard un-triggered. */
+  --wordmark-size: 16.9cqw;
+  transform: translateY(16%);
+}
+
+.wordmark-watermark > span {
+  background: linear-gradient(
+    180deg,
+    color-mix(in oklab, var(--ref-white) 8%, transparent) 0%,
+    color-mix(in oklab, var(--ref-white) 5%, transparent) 52%,
+    color-mix(in oklab, var(--ref-white) 2%, transparent) 100%
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+}
+
+/* Narrow screens. The name is sized to span the container, so on a phone it is
+   ~54px of type behind a footer over a thousand pixels tall — proportionally a
+   twentieth of what it is on a desktop, which reads as a stray line at the
+   bottom rather than as a surface.
+
+   The fix is NOT to make it wider than the container. Bleeding it off the sides
+   would crop the name mid-word and throw away the left-edge alignment with the
+   lockup and the columns, which is the best thing about this element. Instead
+   the bleed comes off and the fill comes up: the whole mark is visible, and a
+   little more present to compensate for being small. */
+@media (max-width: 40rem) {
+  .wordmark-watermark {
+    transform: translateY(2%);
+  }
+
+  .wordmark-watermark > span {
+    background: linear-gradient(
+      180deg,
+      color-mix(in oklab, var(--ref-white) 11%, transparent) 0%,
+      color-mix(in oklab, var(--ref-white) 7%, transparent) 52%,
+      color-mix(in oklab, var(--ref-white) 3%, transparent) 100%
+    );
+    -webkit-background-clip: text;
+    background-clip: text;
+  }
 }
 
 /* --------------------------------------------------------------------------
@@ -2184,5 +2551,753 @@
     opacity: 1;
     transform: none;
     filter: none;
+  }
+}
+
+/* ==========================================================================
+   THE PIPELINE  —  the five stages as one continuous line
+   --------------------------------------------------------------------------
+   Companion to components/sections/process-strip.tsx, which carries the design
+   rationale. This block owns the geometry: how wide the rail is, how tall, how
+   a card hangs off its node, and how the detail opens.
+
+   TWO LAYOUTS, NOT ONE RESPONSIVE COMPROMISE.
+
+     < lg   a plain horizontal row of cards you swipe, every detail already
+            open, no trace and no hover. The curve needs width to exist — at
+            375px the amplitude collapses, the alternation stops being legible,
+            and expanding cards have nowhere to expand into. Forcing it on is
+            worse than not having it, so the small layout is its own finished
+            thing rather than a squeezed copy of the large one.
+
+     >= lg  the trace, the nodes sitting on it, and cards alternating above and
+            below, each opening on hover.
+
+   Everything here is token-driven; there is no literal colour in the block.
+   ========================================================================== */
+
+/* ── The pin ─────────────────────────────────────────────────────────────
+   The runway is pure scroll budget: one viewport tall (what the pinned rail
+   occupies) plus the horizontal distance the track has to cover. The page
+   therefore grows by exactly the scrolling the traverse spends, and the
+   section below arrives on the frame Support does — no dead space at either
+   end, and the pipeline cannot be scrolled past half-finished.
+
+   THE HEIGHT IS COMPUTED IN CSS, NOT MEASURED IN JS, and that is load-bearing.
+   The travel distance is `track width - viewport width`, and the track width
+   is a CSS expression — so the same arithmetic is available here, which means
+   the runway is the right height in the very first frame the server HTML
+   paints. Setting it from a measurement in an effect instead would have grown
+   the section by most of a viewport on hydration, which is a ~1000px jump for
+   anyone who reloads or deep-links below this point.
+
+   (JS still measures the travel, because the transform needs it as a number.
+   The two agree to within the scrollbar's width — `100vw` counts it and
+   `clientWidth` does not — and that residue just lands as a few extra pixels
+   of stillness at the end of the run.)
+
+   PINNING TAKES THE SCROLLBAR AWAY, so the run has to be short enough not to
+   feel like a trap. At 1.6x the travel distance that is roughly one viewport
+   of scrolling, and the pipeline's own left-to-right movement is what tells
+   the reader how much is left — Support arriving at the right edge IS the
+   progress indicator. Lengthen the pace much beyond this and the section will
+   need an explicit one. */
+
+.pipe-runway {
+  margin-top: 4rem;
+}
+
+@media (width >= 40rem) {
+  .pipe-runway {
+    margin-top: 5rem;
+  }
+}
+
+@media (width >= 64rem) {
+  .pipe-runway {
+    height: calc(100svh + (max(122rem, 150vw) - 100vw) * 1.3);
+    /* No margin once pinned: the pin's own 5.5rem of header clearance already
+       separates the rail from the heading, and stacking a margin on top of it
+       just pushed the first stage further down an already-tall empty box. The
+       margin comes back in the unpinned blocks below, where nothing else is
+       providing it. */
+    margin-top: 0;
+  }
+
+  .pipe-pin {
+    position: sticky;
+    top: 0;
+    height: 100svh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: clamp(1.5rem, 3vh, 2.75rem);
+    /* The site header is `fixed` at the top of the viewport, so a pinned box
+       that centres across the full 100svh runs the topmost card under the nav
+       pill on any screen below about 800px tall. Centring in the space BELOW
+       the header costs nothing on a tall screen and is the difference between
+       legible and hidden on a laptop. 5.5rem is the same clearance the
+       section's own `scroll-margin-top` uses. */
+    padding-top: 5.5rem;
+    /* Clips the rail rather than letting it push the pinned box past the
+       viewport, which would stop `sticky` sticking and drop the effect. */
+    overflow: hidden;
+  }
+}
+
+.pipe-viewport {
+  scrollbar-width: none;
+  /* Snap only matters while this is a real scroller (below lg, or reduced
+     motion). It is inert once the track is transform-driven. */
+  scroll-snap-type: x mandatory;
+  scroll-padding-inline: 1.25rem;
+}
+
+.pipe-viewport::-webkit-scrollbar {
+  display: none;
+}
+
+/* The focus ring belongs on the region, not on a 0x0 anchor inside it. Inset
+   so the section's own overflow cannot clip it. */
+.pipe-viewport:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: -2px;
+  border-radius: var(--radius);
+}
+
+/* ── Small screens: a swipeable row ──────────────────────────────────────── */
+
+.pipe-track {
+  display: flex;
+  gap: 1rem;
+  padding-inline: 1.25rem;
+  list-style: none;
+  /* `max-content` so the row is as wide as its cards rather than as wide as
+     the viewport, which is what makes it scroll at all. */
+  width: max-content;
+}
+
+.pipe-track > .pipe-stage {
+  position: relative;
+  width: 17rem;
+  flex: none;
+  scroll-snap-align: center;
+}
+
+/* The trace is a large-screen device only, and the node dot only means
+   something once it is sitting on a line — below lg the index in the card head
+   carries the sequence instead. */
+.pipe-track > svg,
+.pipe-track > .pipe-stage > .pipe-node {
+  display: none;
+}
+
+@media (width >= 40rem) {
+  .pipe-track {
+    padding-inline: 2rem;
+    gap: 1.25rem;
+  }
+}
+
+/* ── Large screens: the curve ────────────────────────────────────────────── */
+
+@media (width >= 64rem) {
+  /* Clipped, not scrolled: while pinned the track is moved by a transform, so
+     a second scroll mechanism on the same axis would fight it. Stated here
+     rather than as a conditional class in the component, so it is already true
+     in the server HTML. */
+  .pipe-viewport {
+    overflow-x: clip;
+    scroll-snap-type: none;
+  }
+
+  .pipe-track {
+    display: block;
+    position: relative;
+    padding-inline: 0;
+    /* Wider than any viewport it will meet, which is the point — the traverse
+       is real horizontal distance, not a parallax trick on content that had
+       already fitted. At 1440px this is ~1900px, so about a quarter of the
+       pipeline is off-screen at any moment.
+
+       THE 122rem FLOOR IS NOT A ROUND NUMBER, IT IS A CLEARANCE. Discover
+       sits at 30% of the track and its card is centred on it, so the card's
+       left edge lands at 30% of the width minus 12rem. That edge has to clear
+       the opening paragraph (`.pipe-lead`) plus a gutter, or the two overlap
+       at the moment the section pins — which is exactly when both are meant to
+       be readable. 122rem is the width at which they clear at 1024px, the
+       narrowest viewport this layout runs at. */
+    width: max(122rem, 150vw);
+    /* Reserved so the deepest node plus a FULLY OPEN card fits on either side
+       of the centreline — the rail never grows, which is what makes hovering
+       across the five stages cause no reflow at all.
+
+       Derived, not chosen: the highest node sits at 32.7% of the height, the
+       stem is 1.5rem, and the tallest open card runs about 195px at 24rem
+       wide. (195 + 24) / 0.327 ≈ 670px, hence the 42rem floor. Change the card
+       width or the body copy and this floor has to be recomputed. */
+    height: clamp(42rem, 46vw, 46rem);
+  }
+
+  .pipe-track > svg,
+  .pipe-track > .pipe-stage > .pipe-node {
+    display: block;
+  }
+
+  /* Zero-size anchor pinned to the node's coordinates. The dot and the card
+     both position against this one point, which is how they stay welded to
+     the trace at every width without measuring anything. */
+  .pipe-track > .pipe-stage {
+    position: absolute;
+    width: 0;
+    height: 0;
+    flex: initial;
+    /* MUST be dropped along with the width. A zero-width box is still a valid
+       snap target, so leaving this on hands `mandatory` five points it can
+       never satisfy — which a scroll-driven rail never notices (it is clipped,
+       not scrolled) but a reduced-motion desktop reader does, because for them
+       the rail is still a real scroller and it fights every drag. */
+    scroll-snap-align: none;
+  }
+}
+
+/* ── The opening statement ───────────────────────────────────────────────
+   Below lg it is simply the first thing in the section: a paragraph above the
+   rail, in the flow, that never moves. There is no pin at those widths and no
+   lead-in for it to sit in.
+
+   At lg it moves into the pinned box as an overlay occupying the track's
+   lead-in, vertically centred against the trace. `pointer-events: none`
+   because it is read, not used — once it has faded out it must not sit
+   invisibly on top of Discover's card swallowing the hover. */
+
+.pipe-lead {
+  padding-inline: 1.25rem;
+  margin-bottom: 2.5rem;
+  max-width: 42rem;
+}
+
+.pipe-lead > p {
+  font-size: 1rem;
+  line-height: 1.7;
+  color: var(--muted-foreground);
+  text-wrap: pretty;
+}
+
+@media (width >= 40rem) {
+  .pipe-lead {
+    padding-inline: 2rem;
+  }
+}
+
+@media (width >= 64rem) {
+  .pipe-lead {
+    position: absolute;
+    top: 50%;
+    /* Not `container-page`: that centres inside a 90rem max-width, which on a
+       wide screen walks the paragraph inward until it meets Discover's card.
+       This holds it against the actual left edge at every width, which is the
+       one place the lead-in is guaranteed to be empty. */
+    left: clamp(1.25rem, 4vw, 3.5rem);
+    /* Narrow enough to clear the first card at 1024px, wide enough to hold a
+       readable measure at 1920. The vw term is 22 rather than 24 because the
+       track width bottoms out at its 122rem floor below ~1300px while the
+       paragraph kept growing with the viewport — so the gutter to Discover's
+       card was at its tightest (35px) exactly where the paragraph was widest
+       relative to the space. Trading 2vw for a higher ceiling widens the
+       measure where there is room and loosens the squeeze where there is not. */
+    width: clamp(18rem, 22vw, 27rem);
+    max-width: none;
+    margin-bottom: 0;
+    padding-inline: 0;
+    /* Above the trace, below nothing — it is the first thing read. */
+    z-index: 5;
+    pointer-events: none;
+    /* Motion drives `x`; the vertical half-step is the element's own. */
+    translate: 0 -50%;
+  }
+
+  /* THE TYPE SCALES WITH ITS BOX, which is the only way this stays readable.
+     The paragraph's width is fluid and pinned between 18rem and 27rem, so a
+     flat font size means the measure swings from 35 characters a line to 55 —
+     the same text reading as a newspaper column on one screen and a loose
+     banner on another. Tying the size to the same viewport term holds the
+     measure at roughly 34–45 characters everywhere.
+
+     Ceiling of 1.25rem: it sits under the 1.375rem stage titles, so the
+     opening statement is the largest body text in the section without
+     competing with the headings the pipeline is actually made of. */
+  .pipe-lead > p {
+    font-size: clamp(1.0625rem, 1.35vw, 1.25rem);
+    line-height: 1.65;
+  }
+
+  /* Set once the fade has finished. `visibility` rather than `display` so the
+     motion value driving opacity has something to animate right up to the
+     last frame, and so nothing reflows on the way out. */
+  .pipe-lead[data-gone] {
+    visibility: hidden;
+  }
+}
+
+/* ── The line ────────────────────────────────────────────────────────────── */
+
+.pipe-line {
+  fill: none;
+  stroke: var(--hairline-strong);
+  stroke-width: 1.25;
+  stroke-linecap: round;
+}
+
+/* The lit fill. `pathLength="1"` hands arc-length normalisation to the browser,
+   so the dash offset the component sets is a plain 0–1 fraction and no
+   getTotalLength() call is needed.
+
+   NO TRANSITION ON `stroke-dashoffset`. There was one, back when the fill was
+   driven by which card you were hovering and had to ease between two resting
+   values. It is now written every frame from scroll position, and a 500ms ease
+   on a per-frame value does not smooth it — it puts the light half a second
+   behind the scroll and smears the tip. Scroll-linked values are already as
+   smooth as the scroll is; anything they animate has to be driven, not eased. */
+.pipe-line-lit {
+  fill: none;
+  stroke: var(--primary);
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-dasharray: 1;
+  opacity: 0.9;
+}
+
+/* ── The node ────────────────────────────────────────────────────────────── */
+
+.pipe-node {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 0.6875rem;
+  height: 0.6875rem;
+  transform: translate(-50%, -50%);
+  border-radius: 999px;
+  background: var(--background);
+  box-shadow: 0 0 0 1px var(--hairline-strong);
+  transition:
+    background-color var(--duration-base) var(--ease-out-soft),
+    box-shadow var(--duration-base) var(--ease-out-soft);
+}
+
+@media (width >= 64rem) {
+  /* TWO STATES, TWO SOURCES. `data-reached` is set by the scroll position —
+     the light has arrived at this stage — and simply fills the dot, so the
+     nodes light one after another as the trace draws through them and stay
+     lit behind it. `data-active` is the pointer, and adds the halo. Keeping
+     them separate is what stops the section having two competing ideas of
+     which stage is "current". */
+  .pipe-stage[data-reached] .pipe-node {
+    background: var(--primary);
+    box-shadow: 0 0 0 1px var(--primary);
+  }
+
+  .pipe-stage[data-active] .pipe-node {
+    background: var(--primary);
+    /* The halo lands exactly where the travelling light stops, so arrival and
+       emphasis are one event rather than two effects that agree. */
+    box-shadow:
+      0 0 0 1px var(--primary),
+      0 0 0 6px color-mix(in oklab, var(--primary) 12%, transparent),
+      0 0 22px 2px color-mix(in oklab, var(--primary) 26%, transparent);
+  }
+}
+
+/* ── The card ────────────────────────────────────────────────────────────── */
+
+.pipe-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+@media (width >= 64rem) {
+  .pipe-card {
+    position: absolute;
+    left: 0;
+    /* 24rem, not the 19rem this started at. Narrower cards ran the stage body
+       to six lines, which pushed the reserved rail height past 49rem and left
+       a wall of empty void above and below the trace at rest. Widening the
+       measure to ~54 characters buys back two lines per card and takes 7rem
+       off the height of the whole section. */
+    width: 24rem;
+    transform: translateX(-50%);
+  }
+
+  /* Each card opens AWAY from the trace, so the line is never covered and the
+     rail never reflows: above-cards are anchored by their bottom edge and grow
+     upward, below-cards by their top edge and grow downward. */
+  .pipe-stage[data-side="above"] .pipe-card {
+    bottom: 1.5rem;
+    justify-content: flex-end;
+  }
+
+  .pipe-stage[data-side="below"] .pipe-card {
+    top: 1.5rem;
+  }
+
+  /* A stem from the node to its card. The one piece of purely connective
+     tissue in the section — without it a card floating 24px off the line reads
+     as unattached at the wider node spacings. */
+  .pipe-stage::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    width: 1px;
+    height: 1.5rem;
+    transition: background var(--duration-base) var(--ease-out-soft);
+  }
+
+  .pipe-stage[data-side="above"]::before {
+    bottom: 0;
+    background: linear-gradient(
+      to top,
+      var(--hairline-strong),
+      var(--bloom-none)
+    );
+  }
+
+  .pipe-stage[data-side="below"]::before {
+    top: 0;
+    background: linear-gradient(
+      to bottom,
+      var(--hairline-strong),
+      var(--bloom-none)
+    );
+  }
+
+  .pipe-stage[data-side="above"][data-reached]::before,
+  .pipe-stage[data-side="above"][data-active]::before {
+    background: linear-gradient(
+      to top,
+      color-mix(in oklab, var(--primary) 55%, transparent),
+      var(--bloom-none)
+    );
+  }
+
+  .pipe-stage[data-side="below"][data-reached]::before,
+  .pipe-stage[data-side="below"][data-active]::before {
+    background: linear-gradient(
+      to bottom,
+      color-mix(in oklab, var(--primary) 55%, transparent),
+      var(--bloom-none)
+    );
+  }
+}
+
+.pipe-card-head {
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
+}
+
+/* Mono, caption-scale, and deliberately NOT the oversized ghost numeral this
+   kind of section usually gets. The trace is the loud element; the index is a
+   label on a node and is sized like one.
+
+   Also deliberately NOT brightened with the rest of the hover state. Opening a
+   stage already moves four things — the node fills and haloes, the stem
+   lights, the title comes up to full contrast, the detail unfolds. Lifting the
+   numeral too was a fifth change saying what the other four had said. */
+.pipe-index {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.14em;
+  font-variant-numeric: tabular-nums;
+  color: var(--muted-foreground);
+}
+
+.pipe-title {
+  font-size: 1.375rem;
+  font-weight: 500;
+  letter-spacing: -0.025em;
+  color: color-mix(in oklab, var(--foreground) 78%, var(--ref-blue));
+  transition: color var(--duration-base) var(--ease-out-soft);
+}
+
+/* The title comes up to full contrast when the light reaches it, and stays
+   there. Reading the section by scrolling therefore brightens each stage in
+   turn, which is the same information the trace is carrying, said in type. */
+.pipe-stage[data-reached] .pipe-title,
+.pipe-stage[data-active] .pipe-title {
+  color: var(--foreground);
+}
+
+.pipe-question {
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  color: var(--muted-foreground);
+  text-wrap: pretty;
+}
+
+/* ── The detail ──────────────────────────────────────────────────────────── */
+
+/* 0fr → 1fr on a grid row animates to the content's OWN height. The usual
+   max-height trick needs a guessed ceiling, which either clips the longest
+   stage or makes every shorter one ease through empty space before it lands. */
+.pipe-detail {
+  display: grid;
+  grid-template-rows: 1fr;
+  min-height: 0;
+}
+
+.pipe-detail > p {
+  overflow: hidden;
+  font-size: 0.875rem;
+  line-height: 1.65;
+  color: color-mix(in oklab, var(--muted-foreground) 82%, var(--background));
+  text-wrap: pretty;
+}
+
+@media (width >= 64rem) {
+  /* Collapsed at rest only where there is a pointer to open it with. On a
+     touch screen there is no hover, so every detail simply stays open. */
+  @media (hover: hover) {
+    .pipe-detail {
+      grid-template-rows: 0fr;
+      opacity: 0;
+      transition:
+        grid-template-rows var(--duration-base) var(--ease-out-soft),
+        opacity var(--duration-base) var(--ease-out-soft);
+    }
+
+    /* DISCOVER IS OPEN BEFORE ANYONE SCROLLS. Its card is bottom-anchored
+       above the rail's highest node, so the rail reserves ~195px above it for
+       it to grow into — and while it sat collapsed at 74px, 122px of that was
+       simply a hole between the section heading and the first thing you could
+       read. Opening it costs no layout at all (the space is reserved either
+       way) and it is the better resting composition: stage one is where you
+       are, so it should be legible before the traverse starts.
+
+       Only the CARD, deliberately — the node and the trace stay unlit until
+       the light actually reaches them, which is what `data-reached` is for. */
+    .pipe-stage:first-of-type .pipe-detail,
+
+    /* Three ways in, in order of importance: the light reaches the stage while
+       you scroll, you point at it, or you tab to the region — which opens all
+       five, so a keyboard reader gets the section whole rather than being
+       asked to simulate a cursor. */
+    .pipe-stage[data-reached] .pipe-detail,
+    .pipe-stage:hover .pipe-detail,
+    .pipe-viewport:focus-visible .pipe-detail {
+      grid-template-rows: 1fr;
+      opacity: 1;
+    }
+
+    /* Padding rather than margin: margin on a 0fr grid row is still painted
+       and leaves a gap under the question while the row is closed. */
+    .pipe-detail > p {
+      padding-top: 0.5rem;
+    }
+  }
+}
+
+/* SHORT VIEWPORTS.
+
+   The rail's height is reserved for a fully open card either side of the
+   centreline, and that reservation assumes the card's PIXEL height while the
+   node offsets are PERCENTAGES of the rail. Shrink the rail and the nodes come
+   toward the middle while the cards stay the same size — so the cards run out
+   of the top and bottom of a pinned box before anything looks obviously wrong.
+
+   Three steps, each taking over where the last runs out:
+
+   1. Cap the rail to what the pinned box can actually show. 8.5rem covers the
+      header clearance plus a little air. `min()` so this only ever takes
+      height away — on a tall screen the clamp still wins. */
+@media (width >= 64rem) {
+  .pipe-track {
+    height: min(clamp(42rem, 46vw, 46rem), calc(100svh - 8.5rem));
+  }
+}
+
+/* 2. Below ~768px tall the capped rail is too short for full-size cards, so
+      the type comes down with it. Shrinking both keeps the proportion rather
+      than clipping the copy. */
+@media (width >= 64rem) and (height < 48rem) {
+  .pipe-card {
+    width: 21rem;
+  }
+
+  .pipe-title {
+    font-size: 1.125rem;
+  }
+
+  .pipe-question,
+  .pipe-detail > p {
+    font-size: 0.8125rem;
+  }
+}
+
+/* 3. Below 40rem tall there is no honest way to fit a five-stage pipeline into
+      a pinned viewport, so stop trying: unpin, and hand the traverse back as
+      an ordinary scrollable rail. Better a plain thing that works than a
+      signature that clips its own copy. */
+@media (height < 40rem) {
+  .pipe-runway {
+    height: auto;
+    margin-top: 5rem;
+  }
+
+  .pipe-pin {
+    position: static;
+    display: block;
+    height: auto;
+    padding-top: 0;
+    overflow: visible;
+  }
+
+  .pipe-viewport {
+    overflow-x: auto;
+  }
+
+  /* Back into the flow: with no pin there is no lead-in to sit in. */
+  .pipe-lead {
+    position: static;
+    width: auto;
+    max-width: 42rem;
+    margin-bottom: 2.5rem;
+    padding-inline: 2.5rem;
+    translate: none;
+    pointer-events: auto;
+  }
+}
+
+/* Motion is the only thing removed, never the content. Under reduced motion
+   the trace still fills and the details still open — instantly.
+
+   THIS BLOCK IS LAST IN THE FILE ON PURPOSE. Every rule it overrides is set at
+   the same specificity inside a `width >= 64rem` query, so source order is the
+   only thing deciding the winner. Move it above those and reduced motion
+   silently stops working at exactly the widths where it matters most. */
+@media (prefers-reduced-motion: reduce) {
+  /* Unpin completely: no runway, no sticky, and the rail goes back to being a
+     plain scrollable region the reader drives at their own pace. A scroll-
+     linked pin is precisely the kind of motion this setting is asking us not
+     to do. The content is identical either way — only who controls the
+     traverse changes. */
+  .pipe-runway {
+    height: auto;
+    margin-top: 5rem;
+  }
+
+  .pipe-pin {
+    position: static;
+    display: block;
+    height: auto;
+    overflow: visible;
+  }
+
+  .pipe-viewport {
+    overflow-x: auto;
+  }
+
+  /* Back into the flow: with no pin there is no lead-in to sit in. */
+  .pipe-lead {
+    position: static;
+    width: auto;
+    max-width: 42rem;
+    margin-bottom: 2.5rem;
+    padding-inline: 2.5rem;
+    translate: none;
+    pointer-events: auto;
+  }
+
+  .pipe-node,
+  .pipe-index,
+  .pipe-title,
+  .pipe-stage::before,
+  .pipe-detail {
+    transition-duration: 1ms;
+  }
+}
+
+/* ==========================================================================
+   PRINCIPLE ROWS  —  a lit row instead of a card
+   --------------------------------------------------------------------------
+   Companion to components/sections/principles.tsx. Three of the five
+   principles argue against unnecessary complexity, so the section refuses card
+   chrome: no border, no radius, no elevation, nothing at rest but type on the
+   void and a hairline between one decision and the next.
+
+   The card's job — "this is one object, and it responds when you approach it"
+   — is done by light instead, which is what every other surface on this site
+   uses anyway. The difference is that it is applied to a ROW: the wash enters
+   from the left edge and falls off across the width, so a decision lights up
+   without lifting off the page.
+   ========================================================================== */
+
+.principle-row {
+  position: relative;
+  /* The wash is painted at -1 so it sits under the text without needing a
+     stacking context on every child. `isolation` keeps that z-index local, so
+     the row can never paint underneath the section around it. */
+  isolation: isolate;
+}
+
+.principle-row::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset-block: 0;
+  /* Bleeds past the row's own box so the wash has no visible left edge — it
+     reads as light arriving from off-frame, the same as every bloom. */
+  inset-inline: -1.5rem;
+  border-radius: 0.75rem;
+  background: linear-gradient(
+    90deg,
+    var(--bloom-mid) 0%,
+    var(--bloom-edge) 32%,
+    var(--bloom-none) 68%
+  );
+  opacity: 0;
+  transition: opacity var(--duration-base) var(--ease-out-soft);
+}
+
+.principle-row:hover::before,
+.principle-row:focus-within::before {
+  opacity: 1;
+}
+
+/* The hairline between decisions, on every row but the first. Fades at both
+   ends for the same reason `rule-fade` does: a full-width 1px line reads as a
+   box edge, and the point of this section is that there are no boxes. */
+li + li .principle-row::after {
+  content: "";
+  position: absolute;
+  inset-inline: 0;
+  top: 0;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--border-strong) 8%,
+    var(--border-strong) 92%,
+    transparent
+  );
+}
+
+/* Both come up to full contrast together, so the row reads as one thing
+   responding rather than two elements animating. */
+.principle-index,
+.principle-title {
+  transition: color var(--duration-base) var(--ease-out-soft);
+}
+
+.principle-row:hover .principle-index,
+.principle-row:focus-within .principle-index {
+  color: var(--primary);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .principle-row::before,
+  .principle-index,
+  .principle-title {
+    transition-duration: 1ms;
   }
 }

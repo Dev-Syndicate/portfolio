@@ -13,7 +13,7 @@ import { Process } from "@/components/sections/process";
 import { ContactCta } from "@/components/sections/contact-cta";
 
 const description =
-  "Website development, web applications, mobile apps, API integrations, and automation — engineered around the business outcome, not the tech stack.";
+  "Digital products, business applications, ERP and CRM systems, integrations and APIs, AI systems, and automation — engineered around the business outcome, not the tech stack.";
 
 export const metadata = pageMetadata({
   title: "Services",
@@ -23,7 +23,10 @@ export const metadata = pageMetadata({
     "website development",
     "web application development",
     "mobile app development",
+    "ERP development",
+    "CRM development",
     "API integration services",
+    "AI systems development",
     "workflow automation",
   ],
 });
@@ -54,10 +57,13 @@ export default function ServicesPage() {
           servicesSchema(services.items),
         ]}
       />
+      {/* The page header names the ordering rather than repeating the home
+          page's line, so a visitor arriving here cold knows why the six are in
+          this order before they start reading them. */}
       <PageHeader
         eyebrow="Services"
-        title={{ lead: "Engineering scoped to", lit: "the outcome you need." }}
-        intro="Every engagement starts with the business result and works backward to the technology. That’s why our proposals talk about conversion, load times, and maintenance cost long before they mention a framework."
+        title={{ lead: "Six layers,", lit: "one business." }}
+        intro="Ordered from the surface your customers see to the work that runs with nobody watching. Most engagements touch two or three of them — this is how we talk about all six."
       />
 
       <Services />
