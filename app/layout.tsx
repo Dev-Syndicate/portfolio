@@ -1,11 +1,25 @@
 import type { Metadata, Viewport } from "next";
-import { Geist, Geist_Mono, Caveat, Newsreader } from "next/font/google";
+import { Instrument_Sans, Geist_Mono } from "next/font/google";
 
 import { seo, site } from "@/lib/content";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+// One voice for the whole site.
+//
+// Instrument Sans is a neo-grotesque with a tall x-height and open apertures,
+// which is what lets it hold at 15px in a form label AND at display size in a
+// headline without needing a second face to carry the big sizes.
+//
+// It is loaded as a VARIABLE font: one file covers the full 400–700 range, so
+// `font-medium` and `font-semibold` cost nothing extra over `font-normal`. The
+// old pairing shipped five static Poppins cuts plus a Playfair italic.
+//
+// The counter-voice is deliberately gone. Headlines used to set an italic
+// serif lead over a heavy sans payoff; now both halves are this face at weight
+// 400, and the contrast is carried by colour alone — muted for the setup,
+// full-contrast for the payoff. See the `.display` block in globals.css.
+const instrumentSans = Instrument_Sans({
+  variable: "--font-instrument-sans",
   subsets: ["latin"],
   display: "swap",
 });
@@ -13,26 +27,6 @@ const geistSans = Geist({
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
-  display: "swap",
-});
-
-// Reading serif for long-form article body. Newsreader is a warm, screen-tuned
-// text serif with a genuine italic — it makes a post read like a publication
-// rather than a UI. Used only in the article body (prose-blog); the rest of the
-// site stays in Geist. Optical-size + italic pulled in for pull-quotes/emphasis.
-const newsreader = Newsreader({
-  variable: "--font-reading",
-  subsets: ["latin"],
-  weight: ["400", "500", "600"],
-  style: ["normal", "italic"],
-  display: "swap",
-});
-
-// Handwriting face for the polaroid-wall scrawl notes on the blog.
-const caveat = Caveat({
-  variable: "--font-caveat",
-  subsets: ["latin"],
-  weight: ["500", "700"],
   display: "swap",
 });
 
@@ -99,7 +93,7 @@ export const viewport: Viewport = {
   // literal — the meta tag is emitted before any stylesheet loads, so it
   // cannot read `--ref-deep`. Keep this in sync with that variable in
   // app/globals.css; it is the one colour that has to be duplicated.
-  themeColor: "#0a0a0c",
+  themeColor: "#050505",
 };
 
 export default function RootLayout({
@@ -115,7 +109,7 @@ export default function RootLayout({
       // animates the scroll to top instead of jumping.
       // See node_modules/next/dist/docs/01-app/02-guides/upgrading/version-16.md
       data-scroll-behavior="smooth"
-      className={`${geistSans.variable} ${geistMono.variable} ${newsreader.variable} ${caveat.variable} h-full`}
+      className={`${instrumentSans.variable} ${geistMono.variable} h-full`}
     >
       {/* Root layout is just the document shell. The public site chrome lives
           in app/(site)/layout.tsx and the admin area in app/admin/layout.tsx,

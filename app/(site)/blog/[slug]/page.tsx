@@ -19,7 +19,8 @@ import { CoverArt } from "@/components/blog/cover-art";
 import { ReadingProgress } from "@/components/blog/reading-progress";
 import { ArticleToc, type TocItem } from "@/components/blog/article-toc";
 import { Button } from "@/components/ui/button";
-import { InstrumentLabel } from "@/components/ui/instrument";
+import { Chip } from "@/components/ui/chip";
+import { Bloom } from "@/components/ui/bloom";
 import { Reveal } from "@/components/ui/reveal";
 
 export const revalidate = 60;
@@ -132,11 +133,11 @@ export default async function ArticlePage({
 
       {/* ── Full-bleed atmospheric header ─────────────────────────────── */}
       <header className="relative isolate overflow-hidden pt-28 pb-12 sm:pt-32">
+        {/* The same dome that opens every interior page — light arriving from
+            above the frame rather than the home page's horizon below it. */}
         <div aria-hidden className="pointer-events-none absolute inset-0 -z-10">
-          <div
-            className="absolute -top-1/3 left-[35%] h-[42rem] w-[42rem] -translate-x-1/2 rounded-full blur-[130px]"
-            style={{ background: "var(--glow-a)" }}
-          />
+          <div className="animate-bloom-breathe absolute -top-[26rem] left-1/2 h-[44rem] w-[80rem] max-w-[160vw] -translate-x-1/2 rounded-[50%] bg-[radial-gradient(closest-side,var(--bloom-core),var(--bloom-mid)_38%,var(--bloom-none)_70%)] opacity-50 blur-2xl" />
+          <div className="absolute inset-0 bg-[radial-gradient(120%_90%_at_50%_0%,transparent_30%,var(--background)_82%)]" />
         </div>
 
         <div className="container-page">
@@ -149,12 +150,14 @@ export default async function ArticlePage({
               All articles
             </Link>
 
-            <InstrumentLabel>{post.category || "Blog"}</InstrumentLabel>
+            <Chip>{post.category || "Blog"}</Chip>
 
             {/* `text-pretty` (not balance) lets each line fill the available
                 width — so the title runs wide instead of stacking into a narrow
                 balanced block while space sits empty to the right. */}
-            <h1 className="text-[clamp(2.2rem,4.8vw,3.75rem)] leading-[1.06] font-semibold tracking-[-0.035em] text-pretty">
+            {/* Article titles stay in the reading serif — the same face the
+                body is set in, and the one the index previews. */}
+            <h1 className="font-reading text-[clamp(2.2rem,4.8vw,3.75rem)] leading-[1.08] font-medium tracking-[-0.02em] text-pretty">
               {post.title}
             </h1>
 
@@ -226,7 +229,7 @@ export default async function ArticlePage({
 
             {/* End CTA — shares the article's left edge and measure. */}
             <div className="mt-16 flex max-w-[68ch] flex-col items-start gap-4 border-t border-border pt-10">
-              <h2 className="text-xl font-semibold">
+              <h2 className="text-2xl font-medium tracking-tight">
                 Want this thinking applied to your project?
               </h2>
               <p className="text-muted-foreground">
@@ -245,7 +248,7 @@ export default async function ArticlePage({
             <div className="sticky top-28 flex flex-col gap-8">
               <ArticleToc items={toc} />
 
-              <div className="flex flex-col gap-3 border-t border-border pt-6">
+              <Bloom from="tl" className="flex flex-col gap-3 p-5">
                 <span className="font-mono text-[0.625rem] tracking-[0.14em] text-muted-foreground uppercase">
                   Article
                 </span>
@@ -267,11 +270,11 @@ export default async function ArticlePage({
                     </dd>
                   </div>
                 </dl>
-              </div>
+              </Bloom>
 
               <Link
                 href="/contact"
-                className="rounded-xl border border-border bg-card p-4 text-sm transition-colors hover:border-border-strong"
+                className="rounded-2xl border border-border bg-card p-5 text-sm transition-colors hover:border-border-strong"
               >
                 <span className="font-medium">Have a project?</span>
                 <span className="mt-1 flex items-center gap-1.5 text-primary">
@@ -326,9 +329,9 @@ function MoreCard({ post, index }: { post: Post; index: number }) {
     <Reveal delay={index * 0.06}>
       <Link
         href={`/blog/${post.slug}`}
-        className="group flex h-full flex-col overflow-hidden rounded-xl border border-border bg-card transition-[border-color,transform] duration-[var(--duration-base)] ease-out-soft hover:-translate-y-1 hover:border-border-strong"
+        className="bloom bloom-soft group flex h-full flex-col transition-transform duration-[var(--duration-base)] ease-out-soft hover:-translate-y-1 motion-reduce:hover:translate-y-0"
       >
-        <div className="relative aspect-[16/10] overflow-hidden">
+        <div className="relative z-10 aspect-[16/10] overflow-hidden">
           {post.coverUrl ? (
             <Image
               src={post.coverUrl}
@@ -341,11 +344,11 @@ function MoreCard({ post, index }: { post: Post; index: number }) {
             <CoverArt slug={post.slug} title={post.title} className="h-full w-full" />
           )}
         </div>
-        <div className="flex flex-1 flex-col gap-2 p-5">
+        <div className="relative z-10 flex flex-1 flex-col gap-2 p-5">
           <span className="font-mono text-[0.625rem] tracking-[0.12em] text-muted-foreground uppercase">
             {post.readingMinutes} min read
           </span>
-          <h3 className="leading-snug font-semibold tracking-[-0.01em]">
+          <h3 className="font-reading leading-snug font-medium tracking-[-0.01em]">
             {post.title}
           </h3>
         </div>

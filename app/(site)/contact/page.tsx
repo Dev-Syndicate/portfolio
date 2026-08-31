@@ -4,12 +4,11 @@ import { seo, site } from "@/lib/content";
 import { pageMetadata, webPageSchema, breadcrumbSchema } from "@/lib/seo";
 import { JsonLd } from "@/components/seo/json-ld";
 import { PageHeader } from "@/components/ui/page-header";
+import { Bloom } from "@/components/ui/bloom";
 import { Reveal } from "@/components/ui/reveal";
-import { Conversation } from "@/components/artwork/conversation";
 import { ContactForm } from "./contact-form";
 
-/** Instagram glyph — lucide-react dropped its brand icons, so it's inline.
- *  Accepts the same props the render passes to lucide icons. */
+/** Instagram glyph — lucide-react dropped its brand icons, so it's inline. */
 function InstagramIcon(props: React.SVGProps<SVGSVGElement>) {
   return (
     <svg
@@ -64,7 +63,7 @@ const details = [
   {
     icon: ShieldCheck,
     title: "What you get back",
-    body: "An honest view of scope and approach, including when the answer is that you don't need us for it.",
+    body: "An honest read on scope and approach — including when the answer is that you don't need us for this.",
   },
 ];
 
@@ -73,7 +72,11 @@ export default function ContactPage() {
     <>
       <JsonLd
         data={[
-          webPageSchema({ path: "/contact", name: "Contact — Dev Syndicate", description }),
+          webPageSchema({
+            path: "/contact",
+            name: "Contact — Dev Syndicate",
+            description,
+          }),
           breadcrumbSchema([
             { name: "Home", path: "/" },
             { name: "Contact", path: "/contact" },
@@ -82,42 +85,48 @@ export default function ContactPage() {
       />
       <PageHeader
         eyebrow="Contact"
-        title="Tell us what you're building."
-        intro="Share the goal and the constraints. We'll come back with an honest view of scope, timeline, and cost — including when the answer is that you don't need us."
-        visual={<Conversation />}
+        title={{ lead: "Tell us where", lit: "the work gets stuck." }}
+        intro="Share the goal and the constraints. You'll get an honest view of scope, timeline, and cost — including when the answer is that you don't need us."
       />
 
-      {/* The form area — the cards carry the structure; the ground stays the
-          same liquid as the rest of the site. */}
-      <div className="tone-light relative isolate pt-16 pb-20">
-        <div className="relative container-page grid gap-12 pt-4 lg:grid-cols-[1fr_20rem] lg:gap-16">
-          <Reveal className="surface-card p-7 sm:p-9">
-            <ContactForm />
+      <div className="section-y-sm pb-24">
+        <div className="container-page grid items-start gap-4 lg:grid-cols-[minmax(0,1fr)_22rem] lg:gap-6">
+          {/* The form sits in the brightest panel on the page — this is the one
+              thing the page is for, so it gets the light. */}
+          <Reveal>
+            <Bloom from="tl" soft={false} className="p-7 sm:p-10">
+              <ContactForm />
+            </Bloom>
           </Reveal>
 
-          <Reveal delay={0.1} className="flex flex-col gap-8">
+          <Reveal delay={0.08} className="flex flex-col gap-3 lg:sticky lg:top-28">
             {details.map(({ icon: Icon, title, body, href }) => (
-              <div key={title} className="flex flex-col gap-2">
-                <span className="inline-flex size-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
-                  <Icon className="size-5" strokeWidth={1.75} aria-hidden />
+              <Bloom key={title} from="tr" className="p-6">
+                <span
+                  aria-hidden
+                  className="mb-4 grid size-10 shrink-0 place-items-center rounded-full border border-hairline bg-wash text-foreground"
+                >
+                  <Icon className="size-[1.125rem]" strokeWidth={1.6} />
                 </span>
-                <h2 className="font-semibold">{title}</h2>
+
+                <h2 className="font-medium tracking-tight">{title}</h2>
+
                 {href ? (
                   <a
                     href={href}
                     {...(href.startsWith("http")
                       ? { target: "_blank", rel: "noopener noreferrer" }
                       : {})}
-                    className="text-[0.9375rem] text-muted-foreground underline-offset-4 transition-colors hover:text-foreground hover:underline"
+                    className="mt-1.5 text-[0.9375rem] text-primary underline-offset-4 transition-colors hover:text-foreground hover:underline"
                   >
                     {body}
                   </a>
                 ) : (
-                  <p className="text-[0.9375rem] leading-relaxed text-muted-foreground">
+                  <p className="mt-1.5 text-[0.9375rem] leading-[1.7] text-muted-foreground">
                     {body}
                   </p>
                 )}
-              </div>
+              </Bloom>
             ))}
           </Reveal>
         </div>

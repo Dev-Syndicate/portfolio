@@ -1,124 +1,125 @@
+import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 
 import { technology } from "@/lib/content";
-import { Section, SectionHeader } from "@/components/ui/section";
-import { IconTile, type IconName } from "@/components/ui/icon";
-import { lineArt, type LineArtName } from "@/components/artwork/line-art";
-import { Reveal } from "@/components/ui/reveal";
-import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { Icon } from "@/components/ui/icon";
+import { Reveal } from "@/components/ui/reveal";
+import { buttonVariants } from "@/components/ui/button";
 
 /**
- * Home-page version of Technology: the six areas as quiet, type-led cards —
- * an icon tile, the area name, and a one-line business outcome (not framework
- * names). A single line-art drawing sits faint in the top-right corner of each
- * card as texture, never a centrepiece. The stack lists and full write-ups live
- * on /services, so the site never prints the same framework list twice.
+ * Technology — the constellation module.
+ *
+ * The reference scatters rounded tiles at varying heights across a wide
+ * elliptical glow, so the row reads as a field of connected things rather than
+ * a logo strip. The arc is the whole effect: tiles near the middle sit high,
+ * tiles at the ends sit low, and the light behind them peaks in the centre.
+ *
+ * Each tile is one of the six technology areas. Hovering a tile lifts it and
+ * reveals what that area is *for* — the outcome line, never the stack list,
+ * because the promise this section makes is that technology gets explained as
+ * business impact.
  */
 
-/* Each group gets its own faint corner drawing so no two cards repeat. Keyed by
-   the group's icon name (stable in content.ts); the position fallback below
-   guarantees six distinct illustrations even if an icon key ever drifts. */
-const artByIcon: Record<string, LineArtName> = {
-  monitor: "layers", // frontend / rendered layers
-  "tablet-smartphone": "globe", // mobile / reaches every device
-  server: "coil", // backend / scalable core
-  database: "nodes", // data / connected records
-  cloud: "orbit", // cloud delivery / always-on
-  bot: "wave", // automation / signal
-};
-
-/* Position fallback — a distinct name per slot, so index i always resolves to
-   its own drawing regardless of icon coverage. */
-const artByIndex: LineArtName[] = [
-  "layers",
-  "globe",
-  "coil",
-  "nodes",
-  "orbit",
-  "wave",
-];
+/* Vertical lift per tile, in rem, forming a shallow dome.
+   The row is `items-end`, so every tile hangs from a shared baseline and a
+   BOTTOM margin raises it. The centre pair therefore needs the LARGEST values
+   to sit highest — the outer tiles get none. (Reversed once already: giving the
+   outer tiles the big numbers produced a valley, not a dome.)
+   Applied only from `sm` up; below that the tiles wrap to a grid and an offset
+   would just read as broken alignment. */
+const ARC = [0, 1.25, 2.5, 2.5, 1.25, 0];
 
 export function TechnologyStrip() {
   return (
-    <Section id="technology" aria-labelledby="technology-strip-heading">
-      <SectionHeader
-        id="technology-strip-heading"
-        eyebrow="Technology"
-        heading={technology.strip.heading}
-        intro={technology.strip.intro}
-      />
+    <section
+      aria-labelledby="technology-heading"
+      className="section-y relative isolate overflow-hidden"
+    >
+      {/* The wide elliptical bloom the tiles sit in front of. */}
+      <div aria-hidden className="pointer-events-none absolute inset-0 -z-10">
+        <div className="absolute top-1/2 left-1/2 h-[34rem] w-[76rem] max-w-[150vw] -translate-x-1/2 -translate-y-[42%] rounded-[50%] bg-[radial-gradient(closest-side,var(--bloom-core),var(--bloom-mid)_42%,var(--bloom-none)_74%)] opacity-40 blur-2xl" />
+      </div>
 
-      {/* Quiet cards, three-up on desktop, collapsing cleanly to one column on a
-          phone. Icon + name + outcome, with a faint corner drawing for texture. */}
-      <ul className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {technology.groups.map((group, i) => {
-          // First card is "lit" — the anchor the eye lands on first.
-          const lit = i === 0;
-          const Art =
-            lineArt[artByIcon[group.icon] ?? artByIndex[i] ?? "chip"];
+      <div className="container-page">
+        <Reveal className="mx-auto flex max-w-2xl flex-col items-center gap-5 text-center">
+          <h2 id="technology-heading" className="display display-lg lit">
+            {technology.strip.heading}
+          </h2>
+          <p className="text-[1.0625rem] leading-[1.7] text-muted-foreground text-pretty sm:text-lg">
+            {technology.strip.intro}
+          </p>
+        </Reveal>
 
-          return (
-            <Reveal key={group.id} as="li" delay={0.04 + i * 0.05} className="flex">
-              <article
-                className={cn(
-                  "group relative flex w-full flex-col gap-4 overflow-hidden rounded-2xl border p-7 transition-[border-color,transform] duration-[var(--duration-base)] ease-out-soft hover:-translate-y-1",
-                  lit
-                    ? "ring-glow border-primary/30 bg-card shadow-[var(--elevation-2)]"
-                    : "border-border bg-card hover:border-border-strong",
-                )}
-              >
-                {lit ? (
-                  <div
-                    aria-hidden
-                    className="pointer-events-none absolute -top-16 -right-16 size-40 rounded-full blur-[80px]"
-                    style={{ background: "var(--glow-a)" }}
-                  />
-                ) : null}
+        {/* ── The field ───────────────────────────────────────────────────
+            Two layouts, one markup.
 
-                {/* Faint corner drawing — texture, not a centrepiece. */}
+            Mobile: a plain two-column grid. `items-stretch` (grid's default)
+            plus `h-full` on each tile makes both cells in a row share the
+            taller one's height, so a two-line title never leaves its neighbour
+            short — that ragged, uneven look was fixed-width tiles sizing to
+            their own content. No arc down here: it only reads as a dome once
+            the six sit on one line.
+
+            sm and up: back to the arc. `sm:flex` restores the single wrapping
+            row, `items-end` hangs every tile from a shared baseline, and the
+            per-tile ARC bottom-margin lifts the centre pair into the dome. */}
+        <ul className="mt-16 grid grid-cols-2 items-stretch gap-3 sm:flex sm:flex-wrap sm:items-end sm:justify-center sm:gap-4">
+          {technology.groups.map((group, i) => (
+            <li
+              key={group.id}
+              style={{ "--arc": `${ARC[i]}rem` } as React.CSSProperties}
+              className="flex sm:mb-[var(--arc)]"
+            >
+              <Reveal delay={i * 0.07} className="flex w-full">
                 <div
-                  aria-hidden
                   className={cn(
-                    "pointer-events-none absolute -top-4 -right-4 h-24 w-32 transition-colors duration-[var(--duration-slow)]",
-                    lit
-                      ? "text-primary/25"
-                      : "text-muted-foreground/20 group-hover:text-muted-foreground/35",
+                    "group relative flex h-full w-full flex-col items-center gap-3 rounded-2xl p-5 text-center sm:w-[10.5rem] sm:p-6",
+                    // A shared floor on every tile so all six read as one set,
+                    // not six content-sized boxes. Mobile gets its own (shorter,
+                    // since two columns give the text more width and fewer wraps);
+                    // sm+ keeps the taller floor the dome needs to stay a clean
+                    // curve.
+                    "min-h-[12.5rem] sm:min-h-[14.5rem]",
+                    "border border-hairline bg-wash backdrop-blur-sm",
+                    "transition-[transform,border-color,background-color] duration-[var(--duration-base)] ease-out-soft",
+                    "hover:-translate-y-1.5 hover:border-hairline-strong hover:bg-wash-strong",
+                    "motion-reduce:hover:translate-y-0",
                   )}
                 >
-                  <Art />
-                </div>
+                  {/* The lit disc — the reference's icon treatment. */}
+                  <Icon
+                    name={group.icon}
+                    className={cn(
+                      "size-12 rounded-full p-3 text-foreground",
+                      "bg-[radial-gradient(70%_70%_at_30%_22%,color-mix(in_oklab,var(--ref-white)_38%,transparent),color-mix(in_oklab,var(--ref-navy)_88%,transparent))]",
+                      "shadow-[inset_0_1px_0_var(--highlight-strong),0_6px_20px_-8px_var(--bloom-mid)]",
+                    )}
+                  />
 
-                <IconTile
-                  name={group.icon as IconName}
-                  className={cn(
-                    "size-12 rounded-xl",
-                    lit && "border-primary/30 text-primary",
-                  )}
-                />
-
-                <div className="flex flex-col gap-1.5">
-                  <h3 className="text-lg font-semibold tracking-[-0.01em]">
+                  <span className="text-sm leading-snug font-medium">
                     {group.title}
-                  </h3>
-                  <p className="text-[0.9375rem] leading-[1.6] text-brand-100/90">
-                    {group.outcome}
-                  </p>
-                </div>
-              </article>
-            </Reveal>
-          );
-        })}
-      </ul>
+                  </span>
 
-      <Reveal delay={0.2}>
-        <div className="mt-10">
-          <Button href={technology.strip.cta.href} variant="outline" size="lg">
+                  <span className="text-xs leading-[1.5] text-muted-foreground">
+                    {group.outcome}
+                  </span>
+                </div>
+              </Reveal>
+            </li>
+          ))}
+        </ul>
+
+        <Reveal className="mt-14 flex justify-center">
+          <Link
+            href={technology.strip.cta.href}
+            className={buttonVariants({ variant: "outline", size: "lg" })}
+          >
             {technology.strip.cta.label}
             <ArrowRight className="size-4" aria-hidden />
-          </Button>
-        </div>
-      </Reveal>
-    </Section>
+          </Link>
+        </Reveal>
+      </div>
+    </section>
   );
 }
