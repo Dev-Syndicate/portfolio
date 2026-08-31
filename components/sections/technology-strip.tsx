@@ -52,23 +52,35 @@ export function TechnologyStrip() {
         </Reveal>
 
         {/* ── The field ───────────────────────────────────────────────────
-            `items-end` plus the per-tile bottom margin in ARC is what produces
-            the dome: every tile hangs from the same baseline, and the centre
-            pair is lifted off it. */}
-        <ul className="mt-16 flex flex-wrap items-end justify-center gap-3 sm:gap-4">
+            Two layouts, one markup.
+
+            Mobile: a plain two-column grid. `items-stretch` (grid's default)
+            plus `h-full` on each tile makes both cells in a row share the
+            taller one's height, so a two-line title never leaves its neighbour
+            short — that ragged, uneven look was fixed-width tiles sizing to
+            their own content. No arc down here: it only reads as a dome once
+            the six sit on one line.
+
+            sm and up: back to the arc. `sm:flex` restores the single wrapping
+            row, `items-end` hangs every tile from a shared baseline, and the
+            per-tile ARC bottom-margin lifts the centre pair into the dome. */}
+        <ul className="mt-16 grid grid-cols-2 items-stretch gap-3 sm:flex sm:flex-wrap sm:items-end sm:justify-center sm:gap-4">
           {technology.groups.map((group, i) => (
             <li
               key={group.id}
               style={{ "--arc": `${ARC[i]}rem` } as React.CSSProperties}
-              className="sm:mb-[var(--arc)]"
+              className="flex sm:mb-[var(--arc)]"
             >
-              <Reveal delay={i * 0.07}>
+              <Reveal delay={i * 0.07} className="flex w-full">
                 <div
                   className={cn(
-                    "group relative flex h-full w-[9.5rem] flex-col items-center gap-3 rounded-2xl p-5 text-center sm:w-[10.5rem] sm:p-6",
-                    // Equal heights keep the dome a clean curve; without it the
-                    // longer outcome lines make neighbouring tiles ragged.
-                    "sm:min-h-[14.5rem]",
+                    "group relative flex h-full w-full flex-col items-center gap-3 rounded-2xl p-5 text-center sm:w-[10.5rem] sm:p-6",
+                    // A shared floor on every tile so all six read as one set,
+                    // not six content-sized boxes. Mobile gets its own (shorter,
+                    // since two columns give the text more width and fewer wraps);
+                    // sm+ keeps the taller floor the dome needs to stay a clean
+                    // curve.
+                    "min-h-[12.5rem] sm:min-h-[14.5rem]",
                     "border border-hairline bg-wash backdrop-blur-sm",
                     "transition-[transform,border-color,background-color] duration-[var(--duration-base)] ease-out-soft",
                     "hover:-translate-y-1.5 hover:border-hairline-strong hover:bg-wash-strong",

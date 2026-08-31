@@ -2613,6 +2613,52 @@
   }
 }
 
+/* ── The mobile carousel pin ──────────────────────────────────────────────
+   Below lg, on a viewport tall enough to be worth pinning, the section pins the
+   same way the curve does and vertical scroll drives a one-card-at-a-time
+   horizontal slide (Discover → Support). MUST MATCH the `carousel` query in
+   process-strip.tsx.
+
+   The runway reserves `one viewport (the pin) + the horizontal travel × pace`,
+   the same shape as the curve's calc. Travel is `track width − 100vw`; the
+   track is five cards of `min(100vw - 2.5rem, 30rem)` plus gaps and inline
+   padding — the same `min()` the card width uses, so the reserved height stays
+   honest on narrow phones (card = 100vw − 2.5rem) and large phones alike. The
+   measured `travel` in JS still drives the actual transform, so any residue
+   here only nudges the pace. Pace 0.85: the five stages pass in a little under
+   one screen of scroll each. */
+@media (width < 64rem) and (height >= 32rem) {
+  .pipe-runway {
+    --pipe-card: min(100vw - 2.5rem, 30rem);
+    --pipe-track-w: calc(5 * var(--pipe-card) + 4 * 1rem + 2 * 1.25rem);
+    height: calc(100svh + max(0px, var(--pipe-track-w) - 100vw) * 0.85);
+    margin-top: 0;
+  }
+
+  .pipe-pin {
+    position: sticky;
+    top: 0;
+    height: 100svh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: clamp(1rem, 2.5vh, 2rem);
+    /* Same header clearance the curve uses so the first card never tucks under
+       the fixed nav pill. Centring happens in the space BELOW that clearance. */
+    padding-top: 5.5rem;
+    padding-bottom: 1.5rem;
+    overflow: hidden;
+  }
+}
+
+/* At 40rem the track's gaps and padding widen (see the small-screen block),
+   so the reserved travel has to use those larger values too. */
+@media (width >= 40rem) and (width < 64rem) and (height >= 32rem) {
+  .pipe-runway {
+    --pipe-track-w: calc(5 * var(--pipe-card) + 4 * 1.25rem + 2 * 2rem);
+  }
+}
+
 @media (width >= 64rem) {
   .pipe-runway {
     height: calc(100svh + (max(122rem, 150vw) - 100vw) * 1.3);
@@ -2647,10 +2693,21 @@
 
 .pipe-viewport {
   scrollbar-width: none;
-  /* Snap only matters while this is a real scroller (below lg, or reduced
-     motion). It is inert once the track is transform-driven. */
+  /* Snap only matters while this is a real native scroller — i.e. only in the
+     unpinned fallback (a viewport too short to pin, or reduced motion). Once the
+     track is transform-driven (mobile carousel or desktop curve) the viewport
+     is clipped, not scrolled, and snap is inert. */
   scroll-snap-type: x mandatory;
   scroll-padding-inline: 1.25rem;
+}
+
+/* Driven carousel: clip, don't scroll, so the transform owns the x-axis — the
+   same move the curve makes at lg. */
+@media (width < 64rem) and (height >= 32rem) {
+  .pipe-viewport {
+    overflow-x: clip;
+    scroll-snap-type: none;
+  }
 }
 
 .pipe-viewport::-webkit-scrollbar {
@@ -2665,7 +2722,15 @@
   border-radius: var(--radius);
 }
 
-/* ── Small screens: a swipeable row ──────────────────────────────────────── */
+/* ── Small screens: the row ───────────────────────────────────────────────────
+   A horizontal row of stage cards. Two ways it is driven:
+     • the carousel (tall enough to pin) — the track is transform-driven by
+       vertical scroll, one card filling the screen at a time; see the pin block
+       above and the width override below.
+     • the unpinned fallback (short viewport, or reduced motion) — a plain
+       native swipe scroller, where the narrower peek-card width is the right
+       affordance because it shows there is more to swipe.
+   Both share this base; only the card width and the overflow differ. */
 
 .pipe-track {
   display: flex;
@@ -2673,15 +2738,33 @@
   padding-inline: 1.25rem;
   list-style: none;
   /* `max-content` so the row is as wide as its cards rather than as wide as
-     the viewport, which is what makes it scroll at all. */
+     the viewport, which is what lets the transform (or a swipe) traverse it. */
   width: max-content;
 }
 
 .pipe-track > .pipe-stage {
   position: relative;
+  /* Fallback peek-card width. The carousel overrides this to a full screen
+     width below, so one stage fills the view and the next slides in. */
   width: 17rem;
   flex: none;
   scroll-snap-align: center;
+  /* A surface, so a single card filling the screen reads as a deliberate panel
+     rather than loose text — the `.bloom` card language used elsewhere. */
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  background: var(--card);
+  padding: 1.5rem;
+}
+
+/* Carousel: one card per screen. `100vw - 2.5rem` leaves a gutter each side;
+   capped at 30rem so it never runs to an unreadable measure on a large phone
+   before the curve takes over at lg. */
+@media (width < 64rem) and (height >= 32rem) {
+  .pipe-track > .pipe-stage {
+    width: min(100vw - 2.5rem, 30rem);
+    padding: 1.75rem;
+  }
 }
 
 /* The trace is a large-screen device only, and the node dot only means
@@ -2752,6 +2835,13 @@
     width: 0;
     height: 0;
     flex: initial;
+    /* The small-screen row dresses each stage as a card (border, fill,
+       padding). Up here the stage is a zero-size anchor and the CARD is a
+       separate absolutely-positioned child, so those come back off or they
+       paint a stray filled dot on the trace. */
+    border: 0;
+    background: none;
+    padding: 0;
     /* MUST be dropped along with the width. A zero-width box is still a valid
        snap target, so leaving this on hands `mandatory` five points it can
        never satisfy — which a scroll-driven rail never notices (it is clipped,

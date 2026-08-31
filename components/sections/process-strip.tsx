@@ -283,17 +283,29 @@ export function ProcessStrip() {
   const [travel, setTravel] = useState(0);
 
   const reduceMotion = useReducedMotion();
-  /* Same 64rem breakpoint the layout uses. Below it the rail is a native
-     scroller and the transform has to stay off, or the two fight for the same
-     axis. */
-  /* MUST MATCH THE CSS EXACTLY. The stylesheet unpins on short viewports as
-     well as narrow ones (see the `height < 40rem` block), and this flag only
-     tested the width — so on a short desktop window the section was unpinned
-     while JS carried on applying scroll-driven transforms to a rail that was
-     no longer stuck to anything. Two sources of truth for one layout decision;
-     they have to be written as one condition. */
+  /* TWO PINNED LAYOUTS, ONE TRANSFORM. Vertical scroll drives a horizontal
+     traverse in both:
+       • `wide`     — the large-screen curve: the trace, the nodes, the cards
+                      fanned above and below, the opening paragraph in the
+                      lead-in. Wants a tall, wide viewport to breathe.
+       • `carousel` — the small-screen version: one card fills the screen and
+                      each scroll-step slides the next stage in (Discover →
+                      Support), the section pinned until all five have passed.
+
+     BOTH pin, so BOTH drive the transform; the mechanism (measure `travel`,
+     translate the track across the runway) is identical and geometry-agnostic.
+     The only thing that differs is the CSS geometry, gated on the same two
+     queries.
+
+     MUST MATCH THE CSS EXACTLY. Each query also carries a min-height so we
+     never pin a sliver of a landscape strip where a full-height pin would trap
+     the scroll — the curve wants 40rem, the carousel is fine on a phone held
+     upright at 32rem. */
   const wide = useMediaQuery("(min-width: 64rem) and (min-height: 40rem)");
-  const driven = wide && !reduceMotion;
+  const carousel = useMediaQuery(
+    "(max-width: 63.999rem) and (min-height: 32rem)",
+  );
+  const driven = (wide || carousel) && !reduceMotion;
 
   /* Measure the overflow rather than deriving it from the CSS width, so the
      traverse is exact whatever the container padding and scrollbar do. */
@@ -434,15 +446,17 @@ export function ProcessStrip() {
           adds nothing. */}
       <div ref={runwayRef} className="pipe-runway">
         <div className="pipe-pin">
-          {/* The opening statement. It occupies the track's lead-in — the
-              first 30%, before Discover — so at rest it sits beside a pipeline
-              that has not started yet, and it is carried off to the left as
-              the traverse begins. Below lg (and under reduced motion) it is an
-              ordinary paragraph above the rail that never moves. */}
+          {/* The opening statement. On the large-screen curve it occupies the
+              track's lead-in — the first 30%, before Discover — so at rest it
+              sits beside a pipeline that has not started yet, and is carried off
+              to the left as the traverse begins. That overlay slide is a
+              `wide`-only device: on the mobile carousel (and under reduced
+              motion) it is an ordinary paragraph above the rail that never
+              moves, so the motion is gated on `wide`, not `driven`. */}
           <motion.div
             className="pipe-lead"
-            data-gone={(driven && leadGone) || undefined}
-            style={driven ? { opacity: leadOpacity, x: leadX } : undefined}
+            data-gone={(wide && leadGone) || undefined}
+            style={wide ? { opacity: leadOpacity, x: leadX } : undefined}
           >
             <p>{process.strip.lead}</p>
           </motion.div>

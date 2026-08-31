@@ -244,8 +244,20 @@ export function SiteFooter() {
               width — the gaps read as 341px and 302px against each other.
               Equal tracks and one gap value line them up by construction. */}
           <div className="grid grid-cols-2 gap-x-8 gap-y-10 sm:grid-cols-3">
-            {columns.map((column, i) => (
-              <div key={column.id} className="flex flex-col items-start gap-8">
+            {columns.map((column, i) => {
+              /* The reach column is the tall one on a phone: four rows of
+                 icon-plus-address (the email runs the full width of the cell).
+                 Below sm it collapses to a single row of icon-only tap targets
+                 — the glyphs already say Instagram / LinkedIn / GitHub / email,
+                 so the text labels are redundant there and only cost height.
+                 The labels stay in the DOM as `sr-only`, so the accessible name
+                 is unchanged; from sm up they render as before. */
+              const reach = column.id === "reach";
+              return (
+              <div
+                key={column.id}
+                className={`flex flex-col items-start gap-8${reach ? " col-span-2 sm:col-span-1" : ""}`}
+              >
                 <nav
                   aria-labelledby={`footer-${column.id}`}
                   className="flex flex-col gap-4"
@@ -254,7 +266,13 @@ export function SiteFooter() {
                     {column.label}
                   </ColumnLabel>
 
-                  <ul className="flex flex-col gap-3">
+                  <ul
+                    className={
+                      reach
+                        ? "flex flex-row flex-wrap gap-2 sm:flex-col sm:gap-3"
+                        : "flex flex-col gap-3"
+                    }
+                  >
                   {column.links.map((link) => {
                     // mailto: and off-site URLs both need a plain anchor;
                     // only in-app routes go through <Link>.
@@ -263,7 +281,23 @@ export function SiteFooter() {
                     const { Icon } = link;
                     const cls =
                       "group/link inline-flex items-center gap-2.5 text-sm text-muted-foreground transition-colors hover:text-foreground";
-                    const inner = (
+                    /* On the reach column below sm, each link is an icon-only
+                       tile: a bordered square big enough to tap, with the label
+                       carried as sr-only. From sm up it reverts to the inline
+                       icon-and-text row every other link uses. */
+                    const reachCls = reach
+                      ? "group/link grid size-11 place-items-center rounded-xl border border-hairline bg-wash text-muted-foreground transition-colors hover:border-hairline-strong hover:text-foreground sm:inline-flex sm:size-auto sm:rounded-none sm:border-0 sm:bg-transparent sm:gap-2.5 sm:text-sm"
+                      : cls;
+                    const inner = reach ? (
+                      <>
+                        {Icon ? (
+                          <Icon className="size-[1.15rem] shrink-0 opacity-80 transition-opacity group-hover/link:opacity-100 sm:size-3.5 sm:opacity-70" />
+                        ) : null}
+                        <span className="sr-only sm:not-sr-only">
+                          {link.label}
+                        </span>
+                      </>
+                    ) : (
                       <>
                         {Icon ? (
                           <Icon className="size-3.5 shrink-0 opacity-70 transition-opacity group-hover/link:opacity-100" />
@@ -277,7 +311,7 @@ export function SiteFooter() {
                         {offSite || isMail ? (
                           <a
                             href={link.href}
-                            className={cls}
+                            className={reachCls}
                             {...(offSite
                               ? { target: "_blank", rel: "noopener noreferrer" }
                               : {})}
@@ -285,7 +319,7 @@ export function SiteFooter() {
                             {inner}
                           </a>
                         ) : (
-                          <Link href={link.href} className={cls}>
+                          <Link href={link.href} className={reachCls}>
                             {inner}
                           </Link>
                         )}
@@ -316,7 +350,8 @@ export function SiteFooter() {
                   </Link>
                 ) : null}
               </div>
-            ))}
+              );
+            })}
           </div>
         </div>
 
