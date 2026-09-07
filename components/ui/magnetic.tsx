@@ -20,11 +20,18 @@ import { cn } from "@/lib/utils";
 export function Magnetic({
   children,
   strength = 0.35,
+  radius,
   className,
 }: {
   children: React.ReactNode;
   /** Fraction of the cursor offset the element follows. */
   strength?: number;
+  /**
+   * Cap on how far, in px, the element may drift from its resting position.
+   * Unbounded by default; set it where the element sits inside a fixed frame
+   * (e.g. the header capsule) so magnetic drift can't carry it out of bounds.
+   */
+  radius?: number;
   className?: string;
 }) {
   const ref = useRef<HTMLSpanElement>(null);
@@ -42,8 +49,23 @@ export function Magnetic({
     if (!el) return;
 
     const rect = el.getBoundingClientRect();
-    x.set((event.clientX - (rect.left + rect.width / 2)) * strength);
-    y.set((event.clientY - (rect.top + rect.height / 2)) * strength);
+    let dx = (event.clientX - (rect.left + rect.width / 2)) * strength;
+    let dy = (event.clientY - (rect.top + rect.height / 2)) * strength;
+
+    // Clamp the drift to `radius` so the element can nudge toward the cursor
+    // without ever leaving the frame it sits in. Scale both axes by the same
+    // factor so the pull still points at the cursor.
+    if (radius !== undefined) {
+      const distance = Math.hypot(dx, dy);
+      if (distance > radius) {
+        const scale = radius / distance;
+        dx *= scale;
+        dy *= scale;
+      }
+    }
+
+    x.set(dx);
+    y.set(dy);
   }
 
   function reset() {

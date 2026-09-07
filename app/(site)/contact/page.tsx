@@ -104,7 +104,7 @@ export default function ContactPage() {
               <Bloom key={title} from="tr" className="p-6">
                 <span
                   aria-hidden
-                  className="mb-4 grid size-10 w-fit place-items-center rounded-full border border-hairline bg-wash text-foreground"
+                  className="mb-4 grid size-10 shrink-0 place-items-center rounded-full border border-hairline bg-wash text-foreground"
                 >
                   <Icon className="size-[1.125rem]" strokeWidth={1.6} />
                 </span>

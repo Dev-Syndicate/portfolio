@@ -171,7 +171,11 @@ export function SiteHeader() {
           </ul>
 
           <div className="hidden shrink-0 md:block">
-            <Magnetic strength={0.25}>
+            {/* The capsule sets `overflow: visible` (so it never clips a focus
+                ring), which means an unclamped magnetic drift would carry this
+                button clear out of the bar. `radius` caps the nudge to a few px
+                — enough to feel alive, never enough to escape the glass. */}
+            <Magnetic strength={0.25} radius={6}>
               <Button href="/contact" size="sm" className="h-10 px-5">
                 Start your project
               </Button>
