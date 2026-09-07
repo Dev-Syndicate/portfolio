@@ -1,43 +1,50 @@
-"use client";
-
-import { motion, useReducedMotion } from "motion/react";
-import type { ReactNode } from "react";
+import type { CSSProperties, ReactNode } from "react";
 
 type Direction = "up" | "down" | "left" | "right" | "none";
 
-const offsets: Record<Direction, { x: number; y: number }> = {
-  up: { x: 0, y: 24 },
-  down: { x: 0, y: -24 },
-  left: { x: 24, y: 0 },
-  right: { x: -24, y: 0 },
-  none: { x: 0, y: 0 },
+/** Where the block travels FROM, as x/y offsets fed to the CSS transform. */
+const offsets: Record<Direction, { x: string; y: string }> = {
+  up: { x: "0", y: "1.5rem" },
+  down: { x: "0", y: "-1.5rem" },
+  left: { x: "1.5rem", y: "0" },
+  right: { x: "-1.5rem", y: "0" },
+  none: { x: "0", y: "0" },
 };
 
-type Tag = "div" | "section" | "li" | "span" | "p";
+type Tag =
+  | "div"
+  | "section"
+  | "li"
+  | "span"
+  | "p"
+  | "article"
+  | "ul"
+  | "h1"
+  | "h2"
+  | "h3"
+  | "h4";
 
 /**
- * Fade + slide a block into view once, the first time it is scrolled to.
+ * Fade + travel a block into view the first time it is scrolled to.
  *
- * `viewport.once` matters for perf: without it the observer keeps firing on
- * every scroll pass.
+ * NO LONGER A CLIENT COMPONENT, and that is the point of the rewrite. This used
+ * to be a `motion` element with its own `whileInView` observer, which meant
+ * every heading that wanted an entrance pulled its whole page into the client
+ * bundle and added another IntersectionObserver to the document. It now emits
+ * `data-reveal` and two custom properties; one observer for the entire site
+ * (components/ui/reveal-observer.tsx) adds `.is-revealed`, and a CSS transition
+ * does the work. Same API, same look, none of the per-element cost.
  *
- * REDUCED MOTION IS HANDLED IN THE TRANSITION, NOT IN THE MARKUP, and that
- * distinction is load-bearing. This component used to branch on
- * `useReducedMotion()` at render time and return a plain element instead of a
- * motion one. `useReducedMotion` cannot know the user's setting on the server,
- * so it returned false there and true in the browser: the server sent
- * `style="opacity:0;transform:translateY(24px)"` and the client rendered no
- * style at all. React reported the mismatch and — as it warns — did not patch
- * it up, so the server's `opacity:0` stayed on the element, and nothing was
- * left to animate it away. Every section wrapped in a Reveal was PERMANENTLY
- * INVISIBLE to anyone browsing with reduced motion on: Values, Services, FAQ,
- * the closing panel.
- *
- * Branching only the `transition` fixes it because a transition is never
- * serialised into HTML. Server and client now emit identical markup, and a
- * reduced-motion user gets the same reveal with a zero-length duration — the
- * content simply appears when scrolled to, which is what "no animation" should
- * mean rather than "no content".
+ * REDUCED MOTION AND NO-JS ARE HANDLED IN CSS, NOT HERE, and that distinction
+ * is load-bearing — it is the bug this component used to have, in a new form.
+ * The old version branched its markup on `useReducedMotion()`, which the server
+ * cannot know, so the server sent `opacity: 0` and the client rendered
+ * something else; React refused to patch the mismatch and the text stayed
+ * invisible for anyone browsing with reduced motion on. Nothing here varies
+ * between server and client at all: the hidden state lives entirely in a
+ * stylesheet, inside a `prefers-reduced-motion: no-preference` query and behind
+ * a `.reveal-ready` class that only appears once IntersectionObserver is
+ * confirmed. Whatever fails, the text is visible.
  */
 export function Reveal({
   children,
@@ -45,32 +52,45 @@ export function Reveal({
   delay = 0,
   className,
   as = "div",
+  style,
+  id,
+  "aria-labelledby": ariaLabelledBy,
 }: {
   children: ReactNode;
   direction?: Direction;
+  /** Seconds, matching the old motion API so existing call sites are unchanged. */
   delay?: number;
   className?: string;
   as?: Tag;
+  style?: CSSProperties;
+  /** Headings passed through `as` still need to be referenceable by aria. */
+  id?: string;
+  "aria-labelledby"?: string;
 }) {
-  const reduceMotion = useReducedMotion();
+  const Tag = as;
   const offset = offsets[direction];
-  const Animated = motion[as];
 
   return (
-    <Animated
-      // Constant across server and client — anything that varies here lands in
-      // the HTML and reintroduces the mismatch described above.
-      initial={{ opacity: 0, x: offset.x, y: offset.y }}
-      whileInView={{ opacity: 1, x: 0, y: 0 }}
-      viewport={{ once: true, margin: "0px 0px -12% 0px" }}
-      transition={
-        reduceMotion
-          ? { duration: 0 }
-          : { duration: 0.7, delay, ease: [0.16, 1, 0.3, 1] }
+    <Tag
+      id={id}
+      aria-labelledby={ariaLabelledBy}
+      data-reveal=""
+      // Only set when authored. Its presence is also the signal the observer
+      // reads to leave this element out of its parent's automatic stagger —
+      // a call site that numbered its own children has already decided the
+      // order, and a second one layered on top would fight it.
+      {...(delay > 0 ? { "data-reveal-delay": "" } : {})}
+      style={
+        {
+          "--reveal-x": offset.x,
+          "--reveal-y": offset.y,
+          ...(delay > 0 ? { "--reveal-delay": `${Math.round(delay * 1000)}ms` } : {}),
+          ...style,
+        } as CSSProperties
       }
       className={className}
     >
       {children}
-    </Animated>
+    </Tag>
   );
 }

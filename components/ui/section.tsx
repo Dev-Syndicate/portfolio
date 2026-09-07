@@ -92,16 +92,30 @@ export function SectionHeader({
   const split = typeof heading === "string" ? null : heading;
 
   return (
-    <Reveal
+    <div
       className={cn(
         "flex max-w-2xl flex-col gap-5",
         align === "center" ? "mx-auto items-center text-center" : "items-start",
         className,
       )}
     >
-      {eyebrow ? <Chip>{eyebrow}</Chip> : null}
+      {/* Each part reveals on its own rather than the three riding in on one
+          wrapper. The wrapper version was a single block sliding up, which at
+          this size reads as a panel moving; taken separately they arrive in
+          reading order — label, then claim, then the sentence that explains it
+          — which is the order someone reads them in anyway.
 
-      <h2 id={id} className="display display-md">
+          None of them carries an explicit delay: they are siblings, so the
+          observer numbers them 0/1/2 automatically and the stagger comes out
+          of their position in the markup. Renaming or reordering them cannot
+          leave a hand-written delay behind pointing at the wrong one. */}
+      {eyebrow ? (
+        <Reveal>
+          <Chip>{eyebrow}</Chip>
+        </Reveal>
+      ) : null}
+
+      <Reveal as="h2" id={id} className="display display-md">
         {split ? (
           <>
             <span className="lead">{split.lead}</span>
@@ -110,13 +124,16 @@ export function SectionHeader({
         ) : (
           <span className="lit">{heading as string}</span>
         )}
-      </h2>
+      </Reveal>
 
       {intro ? (
-        <p className="text-[1.0625rem] leading-[1.7] text-muted-foreground text-pretty sm:text-lg">
+        <Reveal
+          as="p"
+          className="text-[1.0625rem] leading-[1.7] text-muted-foreground text-pretty sm:text-lg"
+        >
           {intro}
-        </p>
+        </Reveal>
       ) : null}
-    </Reveal>
+    </div>
   );
 }

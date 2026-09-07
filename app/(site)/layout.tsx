@@ -2,6 +2,7 @@ import { organizationSchema, websiteSchema } from "@/lib/seo";
 import { JsonLd } from "@/components/seo/json-ld";
 import { SiteHeader } from "@/components/layout/site-header";
 import { SiteFooter } from "@/components/layout/site-footer";
+import { RevealObserver } from "@/components/ui/reveal-observer";
 
 /**
  * Public site shell — header, footer, and the site-wide Organization/WebSite
@@ -24,6 +25,11 @@ export default function SiteLayout({
       >
         Skip to content
       </a>
+
+      {/* Drives every `[data-reveal]` on the public site from one observer.
+          Mounted here rather than in the root layout so the admin area — a
+          tool, not a page you read — never animates its text on scroll. */}
+      <RevealObserver />
 
       <SiteHeader />
       <main id="main" className="flex-1">

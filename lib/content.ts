@@ -341,6 +341,28 @@ export const services = {
   ],
 } as const;
 
+/* The six services, paired down to the three groupings the footer lists.
+ *
+ * NOT a slice of `services.items`, and not derivable from one: the footer names
+ * "Business applications & systems" and "AI systems & Automation", each of
+ * which covers two of the six. A footer that printed all six would be a
+ * six-item column next to a three-item one and a two-item one, which is the
+ * link matrix this footer was built to replace.
+ *
+ * `satisfies` is doing real work on the slug. Each group deep-links to the
+ * first service it covers, and a slug that no longer exists would compile
+ * happily and ship an anchor that scrolls nowhere — so the type is pinned to
+ * the actual slugs above, and renaming or removing a service breaks the build
+ * here instead of breaking the link silently.
+ */
+type ServiceSlug = (typeof services.items)[number]["slug"];
+
+export const footerServices = [
+  { label: "Digital products", slug: "digital-products" },
+  { label: "Business Apps & systems", slug: "business-applications" },
+  { label: "AI systems & Automation", slug: "ai-systems" },
+] as const satisfies readonly { label: string; slug: ServiceSlug }[];
+
 /* -------------------------------------------------------------------------- */
 /* Technology — PRD-COPY                                                      */
 /* -------------------------------------------------------------------------- */

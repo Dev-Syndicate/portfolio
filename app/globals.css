@@ -2215,6 +2215,272 @@
   }
 }
 
+/* ── The solid variant ────────────────────────────────────────────────────
+   The same specimen promoted the other way: from "surface the footer is
+   printed on" to the last OBJECT on the page. This is the one bold move in
+   the footer, and everything around it is quiet to pay for it.
+
+   Three changes from the base, each forced by that promotion.
+
+   SOLID FILL. The gradient that made the base version sink into the void is
+   the wrong instrument here — a mark that fades toward its own baseline reads
+   as receding, and this one has to read as arriving. Flat `--ref-white`, no
+   clip, no gradient.
+
+   HEAVIER. 700 rather than 600. At full contrast the 600 stems look
+   underweight against the empty field above them; the extra weight is what
+   turns the letterforms into mass rather than outline.
+
+   RE-MEASURED, AND MEASURED PROPERLY. The heavier cut and the caps below are
+   both wider, so the base's 15.5cqw overflows badly — it renders at 105.5% of
+   the column, which silently eats the final "E".
+
+   The value here is measured with a Range over the text node, NOT with the
+   span's own bounding box. The span is `display: block`, so its rect is the
+   container width at every font-size and reports a flat ~100% however far the
+   glyphs actually overrun — which is exactly how a 5.5% overflow can look
+   correct to a check that never questions it.
+
+   MEASURED AGAINST THE SPLIT MARKUP, which is not the same string. The letters
+   are wrapped one per inline-block for the entrance animation (see
+   components/ui/wordmark-reveal.tsx), and inline-blocks kern against nothing —
+   VS, AT and TE all sit at their default advance instead of tightening. Set as
+   one run this string fitted at 14.05cqw; split, the same value renders at
+   103.1% and eats the final E.
+
+   Swept against the split markup at 1440px: 13.2cqw → 96.8%, 13.4 → 98.3,
+   13.6 → 99.8, 13.8 → 101.2. 13.55cqw lands at ~99.4% — the same bias-low rule
+   the base version follows, for the same reason: an overshoot loses a letter to
+   the overflow guard, an undershoot loses a few pixels nobody sees.
+
+   Anything that changes the MARKUP of the mark — re-joining the letters,
+   another weight, a rename — invalidates this number and needs a fresh sweep.
+
+   AFTER `.wordmark-watermark > span`, not before. Equal specificity, so
+   source order decides — the same trap the two rules above document. */
+.wordmark-solid {
+  --wordmark-size: 13.55cqw;
+}
+
+.wordmark-solid > span {
+  font-weight: 700;
+  /* CAPS. Two reasons, and neither is stylistic preference.
+
+     The base variant sets the name in its mixed-case form, which is right for
+     a watermark — it reads as the brand signature it is. At full contrast that
+     form brings a "y" descender, and the band's `overflow: hidden` crops it:
+     the mark rendered with the tail of the "y" sliced off, which at this scale
+     is not a subtlety. Caps have no descender, so the baseline is the bottom
+     of the glyph box and the band can sit flush to the rule below it.
+
+     It is also what the letterforms want here. Below ~600 the mixed-case
+     version reads as a wordmark; set solid at 700 across the full column it
+     reads as architecture, and architecture is set in caps. */
+  text-transform: uppercase;
+  /* Overrides the base's clipped gradient outright. `background: none` has to
+     come with it: `background-clip: text` on a transparent-coloured span with
+     no background paints nothing at all. */
+  background: none;
+  -webkit-background-clip: border-box;
+  background-clip: border-box;
+  color: var(--ref-white);
+  /* Caps only, so the glyph box is cap-height and the leading above and below
+     it is dead space. Both margins pull it off, which is what sits the mark
+     flush between the pills above and the rail below.
+
+     THE TOP VALUE IS A CLIPPING EDGE, NOT A SPACING PREFERENCE. `.wordmark`
+     is `overflow: hidden`, so whatever this margin pulls past the band's top
+     edge is not merely tight — it is cut off the letterforms, cleanly and in a
+     dead straight line across all twelve, which reads as a rendering fault
+     rather than as tight spacing.
+
+     Measured at 184px: the line box starts 0.293em above the cap line (half of
+     the 1.34 leading, plus the gap between the font's ascent and its cap
+     height). -0.3em therefore overshot the caps by 0.007em — 1.3px — and
+     sliced the top off every flat-topped capital, plus the apex of the A.
+
+     -0.24em leaves ~10px of clearance at the desktop size and ~1.7px at the
+     smallest, which covers the antialiased edge that sits outside the measured
+     ink box. The ratio is not quite scale-invariant — at 47px the font rounds
+     and hints differently, and -0.26em measured only 0.7px of clearance there
+     against 6px on desktop — so the value is set by the WORST case, not the
+     common one. Do not round it back toward -0.3em to close a gap on a big
+     screen; the gap is the safety margin, and the phone is what needs it. */
+  margin-top: -0.24em;
+  margin-bottom: -0.26em;
+}
+
+/* ── The per-letter mask ──────────────────────────────────────────────────
+   One box per letter, each clipping its own glyph, so the letters can rise
+   into place out of nothing instead of the whole block sliding.
+
+   `overflow: hidden` is the mask. It also changes how the box sits on the
+   line: an inline-block with a non-visible overflow aligns its BOTTOM MARGIN
+   EDGE to the baseline rather than its own internal baseline, which would lift
+   every glyph by the descender space and quietly break the flush baseline the
+   solid variant is built on. `vertical-align: bottom` takes that decision back
+   and states it explicitly.
+
+   The line-height inherited from `.wordmark` is 1.34em, comfortably taller
+   than the cap-height glyph inside it, so a letter translated fully down
+   clears its own mask with room to spare. */
+.wordmark-letter {
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: bottom;
+}
+
+.wordmark-letter > span {
+  display: inline-block;
+  /* `will-change` on twelve elements is cheap here and worth it: these are the
+     largest painted glyphs on the page, and promoting them for the duration of
+     one entrance keeps the stagger from tearing on a weaker GPU. */
+  will-change: transform;
+}
+
+/* --------------------------------------------------------------------------
+   FOOTER  —  the closing panel
+
+   Composition rather than a sitemap: a tall empty field, one sign-off, two
+   pills, three links, and the name. The emptiness above the mark is doing as
+   much work as anything printed in it, which is why the min-height is set in
+   `svh` and not left to the content.
+   -------------------------------------------------------------------------- */
+
+.footer-statement {
+  font-family: var(--font-sans);
+  font-weight: 400;
+  font-size: clamp(2.5rem, 6.1vw, 5.25rem);
+  line-height: 1.02;
+  letter-spacing: -0.03em;
+  color: var(--foreground);
+}
+
+/* Hard line breaks, not `text-wrap: balance`. The sign-off is two written
+   lines and the break between them is authored — balancing would re-flow it
+   at some widths and turn a deliberate couplet into an accident. */
+.footer-statement > span {
+  display: block;
+}
+
+/* The pill. Flat: a hairline stroke on nothing, which is the reference's whole
+   button language. Deliberately NOT `buttonVariants({variant:"outline"})` —
+   that one carries a conic sweep, a glass fill and a lift-on-hover, all of
+   which are the opposite of what this composition needs. */
+.footer-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.75rem;
+  border: 1px solid var(--hairline-strong);
+  border-radius: 9999px;
+  padding: 0.9375rem 1.5rem;
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: var(--muted-foreground);
+  transition:
+    color var(--duration-base) var(--ease-out-soft),
+    border-color var(--duration-base) var(--ease-out-soft);
+}
+
+.footer-pill:hover {
+  color: var(--foreground);
+  border-color: var(--foreground);
+}
+
+/* The glyph rides the hover rather than animating on its own — one movement
+   per interaction, not two. */
+.footer-pill svg {
+  transition: transform var(--duration-base) var(--ease-out-soft);
+}
+
+.footer-pill:hover svg {
+  transform: translateX(0.1875rem);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .footer-pill:hover svg {
+    transform: none;
+  }
+}
+
+/* Narrow screens. The pair is one gesture — one route in, one address — and it
+   reads as that side by side and as two unrelated buttons stacked. The 1.75rem
+   internal gap is what pushes them over a 390px column, so it comes in; it is
+   the cheapest thing here to give up, since at this width there is no long
+   sweep of empty pill for it to be measuring out. */
+@media (max-width: 26rem) {
+  .footer-pill {
+    gap: 1rem;
+    padding-inline: 1.125rem;
+  }
+}
+
+/* Social links: words, no glyphs. The icons the old footer set beside each of
+   these were doing the job the word already does, and at this size they turned
+   a clean right-hand stack into a ragged one. */
+.footer-social a {
+  display: block;
+  font-size: clamp(1.25rem, 1.6vw, 1.5rem);
+  line-height: 1.32;
+  letter-spacing: -0.015em;
+  color: var(--muted-foreground);
+  transition: color var(--duration-base) var(--ease-out-soft);
+}
+
+.footer-social a:hover {
+  color: var(--foreground);
+}
+
+/* The one action among the links. Underlined rather than recoloured or
+   emboldened: the columns are deliberately one flat voice, and spending a
+   second colour here would make the reader wonder what the other seven links
+   are missing. Higher specificity than `.footer-social a`, so it wins the
+   underline regardless of source order.
+
+   The offset is the whole craft of it — an underline sitting on the baseline
+   cuts the descender of the "p" and "j" in "Start a project". 0.22em clears
+   both. */
+.footer-social a.footer-action {
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.22em;
+  text-decoration-color: color-mix(in oklab, currentColor 45%, transparent);
+  transition:
+    color var(--duration-base) var(--ease-out-soft),
+    text-decoration-color var(--duration-base) var(--ease-out-soft);
+}
+
+.footer-social a.footer-action:hover {
+  text-decoration-color: currentColor;
+}
+
+/* Optical alignment with the statement beside it.
+   `align-items: start` makes the two blocks share a measured top edge, which
+   is not the same as looking level. Both texts sit lower in their line box
+   than their cap-height suggests, but by amounts that scale with their very
+   different sizes — 84px against 24px — so flush line boxes leave the links'
+   caps floating ABOVE the statement's.
+
+   Measured, not guessed: comparing true ink tops (each element's baseline
+   minus the canvas `actualBoundingBoxAscent` for its own font and string) puts
+   the links 6.5px high, and that figure holds at 1280, 1440 and 1920 because
+   both sides scale together. 0.25rem pushes them back down onto the same cap
+   line. Do not "simplify" this to zero — the alignment it is correcting is
+   invisible in the box model and obvious on screen.
+
+   Scoped to `xl` because that is the only breakpoint where the two are side by
+   side — stacked, there is nothing to align to and the nudge would just widen
+   the gap above. */
+@media (width >= 80rem) {
+  .footer-links {
+    margin-top: 0.25rem;
+  }
+}
+
 /* --------------------------------------------------------------------------
    HAIRLINE RULE  —  a divider that fades out at both ends
 
@@ -2516,6 +2782,72 @@
 .animate-horizon-rise {
   animation: horizon-rise 1.8s var(--ease-out-soft) both;
   animation-delay: var(--rise-delay, 0ms);
+}
+
+/* --------------------------------------------------------------------------
+   SCROLL REVEAL  —  text rising into place as it is reached
+
+   The scroll-triggered sibling of `rise-in` above, and deliberately built from
+   the same three values: 1.5rem of travel, `--ease-out-soft`, and a duration in
+   the same register. A page's above-the-fold header animates on load and
+   everything below it animates on scroll, and the two have to look like one
+   behaviour rather than two systems that happen to share a page.
+
+   WHY CSS AND ONE OBSERVER, NOT A MOTION COMPONENT PER ELEMENT. This runs on
+   effectively every text block on the public site — several hundred elements.
+   The previous approach wrapped each one in a `motion` component, which meant a
+   client-component boundary, a motion instance and an IntersectionObserver
+   EACH. Here the state is two class names, the animation is a plain CSS
+   transition, and one observer in the whole document watches every target (see
+   components/ui/reveal-observer.tsx). `Reveal` goes back to being a server
+   component, so wrapping a heading no longer drags its page into the client
+   bundle.
+
+   THE `data-reveal-ready` GATE IS A SAFETY INTERLOCK, NOT A STYLING HOOK. The
+   hidden state exists ONLY when that attribute is on <html>, and only the
+   inline script in app/layout.tsx adds it — after confirming
+   IntersectionObserver exists.
+
+   It is an ATTRIBUTE rather than a class for a hydration reason, not a
+   stylistic one: <html> already carries a React-rendered `className` (the font
+   variables), so a script adding a class to it before hydration makes the
+   client's className differ from the server's and React reports a mismatch on
+   every page. React never renders this attribute, so there is nothing for it
+   to disagree with. So if the script never runs, or the browser is too old, or JS is off
+   entirely, no element is ever `opacity: 0` and the page renders as plain
+   static content. Hiding text by default and relying on script to bring it back
+   is how a site ships a blank page to the one visitor whose bundle failed.
+
+   The whole block sits inside `prefers-reduced-motion: no-preference`, which is
+   the same reasoning one level up: with reduced motion the rules do not exist
+   at all, so there is no hidden state to fail to undo. "No animation" means the
+   text is simply there.
+   -------------------------------------------------------------------------- */
+
+@media (prefers-reduced-motion: no-preference) {
+  [data-reveal-ready] [data-reveal] {
+    opacity: 0;
+    /* `translate3d` rather than `translateY` so the compositor keeps these off
+       the main thread — with this many targets, a paint-driven transform is the
+       difference between a smooth scroll and a stuttering one. */
+    transform: translate3d(var(--reveal-x, 0), var(--reveal-y, 1.5rem), 0);
+    transition:
+      opacity 0.9s var(--ease-out-soft),
+      transform 0.9s var(--ease-out-soft);
+    /* Two delays added, and they are fed from different places on purpose.
+       `--reveal-delay` is authored — a component that knows its own order sets
+       it explicitly. `--reveal-i` is assigned by the observer to elements that
+       did NOT author one, from their position among their siblings, so a group
+       staggers without anything having to hand-number it. */
+    transition-delay: calc(
+      var(--reveal-delay, 0ms) + var(--reveal-i, 0) * var(--reveal-step, 70ms)
+    );
+  }
+
+  [data-reveal-ready] [data-reveal].is-revealed {
+    opacity: 1;
+    transform: none;
+  }
 }
 
 /* ==========================================================================

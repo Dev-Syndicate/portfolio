@@ -105,11 +105,45 @@ export default function RootLayout({
       // See node_modules/next/dist/docs/01-app/02-guides/upgrading/version-16.md
       data-scroll-behavior="smooth"
       className={`${instrumentSans.variable} ${geistMono.variable} h-full`}
+      // The scroll-reveal gate (the inline script at the top of <body>) sets
+      // `data-reveal-ready` on this element BEFORE React hydrates, which is the
+      // whole point — the gate has to be in place ahead of first paint or the
+      // text flashes in and then hides itself. React sees an attribute it did
+      // not render and reports a mismatch for it, so the check is suppressed
+      // here. It applies to THIS ELEMENT'S ATTRIBUTES ONLY, one level deep, so
+      // it cannot hide a real mismatch anywhere in the tree below.
+      suppressHydrationWarning
     >
       {/* Root layout is just the document shell. The public site chrome lives
           in app/(site)/layout.tsx and the admin area in app/admin/layout.tsx,
           so /admin never inherits the public header/footer. */}
-      <body className="flex min-h-full flex-col">{children}</body>
+      <body className="flex min-h-full flex-col">
+        {/* Arms the scroll-reveal styles, and nothing else.
+
+            The `[data-reveal]` hidden state in globals.css is scoped to
+            `[data-reveal-ready]`, so until this line runs no text on the site is
+            hidden — which is exactly what should happen if the browser has no
+            IntersectionObserver, or JS is off, or this script never arrives.
+            The alternative (hide by default, un-hide with script) ships a blank
+            page to anyone whose bundle fails.
+
+            FIRST CHILD OF <body>, not a child of <html>. A bare <script>
+            between </head> and <body> is invalid nesting — React refuses to
+            order it and reports a hydration error. Here it is valid, and it
+            still runs synchronously before any markup below it is parsed, so
+            the gate lands ahead of first paint and no text flashes in before
+            being hidden.
+
+            It sets an ATTRIBUTE rather than a class because <html> already has
+            a React-rendered className — adding to it here would differ from the
+            server's and trip a hydration mismatch on every page. */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `if(typeof IntersectionObserver!=="undefined")document.documentElement.setAttribute("data-reveal-ready","")`,
+          }}
+        />
+        {children}
+      </body>
     </html>
   );
 }

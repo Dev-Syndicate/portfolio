@@ -1,8 +1,9 @@
 import Link from "next/link";
-import { ArrowUpRight } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 
-import { nav, seo, services, site } from "@/lib/content";
-import { MarkLockup } from "@/components/ui/mark";
+import { footerServices, hero, nav, seo, site } from "@/lib/content";
+import { Reveal } from "@/components/ui/reveal";
+import { WordmarkReveal } from "@/components/ui/wordmark-reveal";
 
 const instagramUrl =
   seo.sameAs.find((u) => u.includes("instagram.com")) ??
@@ -12,316 +13,288 @@ const linkedinUrl =
   seo.sameAs.find((u) => u.includes("linkedin.com")) ??
   "https://www.linkedin.com/in/devsyndicate/";
 
-const githubUrl =
-  seo.sameAs.find((u) => u.includes("github.com")) ??
-  "https://github.com/Dev-Syndicate";
+/* Resolved from `seo.sameAs` rather than typed out, so the schema graph and the
+   footer can never claim different profiles. Set as WORDS, not icons — see the
+   note on `.footer-social` in globals.css.
 
-/** Instagram glyph — lucide-react dropped its brand icons, so it's inline. */
-function InstagramIcon(props: React.SVGProps<SVGSVGElement>) {
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={1.75}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden
-      {...props}
-    >
-      <rect x="2" y="2" width="20" height="20" rx="5" />
-      <circle cx="12" cy="12" r="4" />
-      <circle cx="17.5" cy="6.5" r="0.75" fill="currentColor" stroke="none" />
-    </svg>
-  );
-}
-
-/** LinkedIn glyph — inline for the same reason as Instagram. */
-function LinkedInIcon(props: React.SVGProps<SVGSVGElement>) {
-  return (
-    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden {...props}>
-      <path d="M20.45 20.45h-3.56v-5.57c0-1.33-.02-3.04-1.85-3.04-1.85 0-2.14 1.45-2.14 2.94v5.67H9.35V9h3.42v1.56h.05c.48-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.46v6.28zM5.34 7.43a2.07 2.07 0 1 1 0-4.14 2.07 2.07 0 0 1 0 4.14zM7.12 20.45H3.55V9h3.57v11.45zM22.22 0H1.77C.79 0 0 .77 0 1.73v20.54C0 23.23.79 24 1.77 24h20.45c.98 0 1.78-.77 1.78-1.73V1.73C24 .77 23.2 0 22.22 0z" />
-    </svg>
-  );
-}
-
-/** GitHub glyph — inline, same reason. */
-function GitHubIcon(props: React.SVGProps<SVGSVGElement>) {
-  return (
-    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden {...props}>
-      <path d="M12 .5a11.5 11.5 0 0 0-3.64 22.41c.58.11.79-.25.79-.56v-2c-3.2.7-3.88-1.37-3.88-1.37-.53-1.34-1.29-1.7-1.29-1.7-1.05-.72.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.77 2.71 1.26 3.37.96.1-.75.4-1.26.73-1.55-2.56-.29-5.25-1.28-5.25-5.7 0-1.26.45-2.29 1.19-3.1-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.18 1.18a11 11 0 0 1 5.79 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.12 3.05.74.81 1.18 1.84 1.18 3.1 0 4.43-2.69 5.4-5.26 5.69.41.36.78 1.06.78 2.14v3.17c0 .31.21.68.8.56A11.5 11.5 0 0 0 12 .5z" />
-    </svg>
-  );
-}
-
-/** Envelope glyph, drawn to match the weight of the brand marks above. */
-function MailIcon(props: React.SVGProps<SVGSVGElement>) {
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={1.75}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden
-      {...props}
-    >
-      <rect x="2" y="4" width="20" height="16" rx="3" />
-      <path d="m3 7 8.2 5.5a1.5 1.5 0 0 0 1.6 0L21 7" />
-    </svg>
-  );
-}
-
-/* The "What we build" column is generated from `services.items` rather than
-   hand-listed, so it is always the real service list and each entry lands on
-   that service's own card. */
-const build = services.items.map((service) => ({
-  label: service.short,
-  href: `/services#${service.slug}`,
-}));
-
-
-/** A link in the footer matrix. Off-site rows carry a glyph; in-site ones don't. */
-type FooterLink = {
-  label: string;
-  href: string;
-  Icon?: (props: React.SVGProps<SVGSVGElement>) => React.ReactElement;
-};
-
-/* Three link columns, described as data so the markup below stays one loop and
-   the hairline dividers can be placed by index rather than by hand. */
-const columns: { id: string; label: string; links: readonly FooterLink[] }[] = [
-  { id: "site", label: "Site", links: nav.map((n) => ({ ...n })) },
-  { id: "build", label: "What we build", links: build },
-  {
-    id: "reach",
-    /* Socials as text rather than a second "Start a project" — that CTA already
-       has its own underlined link in the masthead immediately to the left, and
-       printing it twice in one footer reads as a mistake. Four rows here also
-       stops the third column looking starved beside two columns of five. */
-    label: "Connect with us",
-    links: [
-      { label: "Instagram", href: instagramUrl, Icon: InstagramIcon },
-      { label: "LinkedIn", href: linkedinUrl, Icon: LinkedInIcon },
-      { label: "GitHub", href: githubUrl, Icon: GitHubIcon },
-      { label: site.email, href: `mailto:${site.email}`, Icon: MailIcon },
-    ],
-  },
+   GitHub is deliberately absent from this list but still present in
+   `seo.sameAs`, and the split is intentional: `sameAs` is the machine-readable
+   claim that these profiles are all the same organisation, which is what ties
+   the brand entity together for search, and dropping the account from there to
+   tidy a footer column would weaken that for nothing. It is only the visible
+   row that goes. */
+const socials = [
+  { label: "LinkedIn", href: linkedinUrl },
+  { label: "Instagram", href: instagramUrl },
 ];
 
-/** Mono column heading — the site's technical register, used for labels that
- *  name a set rather than make a claim. */
-function ColumnLabel({ id, children }: { id: string; children: React.ReactNode }) {
-  return (
-    <h2
-      id={id}
-      className="font-mono text-[0.625rem] tracking-[0.16em] text-muted-foreground uppercase"
-    >
-      {children}
-    </h2>
+/* Home and Contact are pulled from the footer's route list on purpose, and
+   neither becomes unreachable by it: the header lockup is the link home on
+   every page, and Contact has the "Start a project" pill directly above this
+   column plus the address in the rail below it. Printing them here as well
+   would be a third and fourth route to the same two places inside one footer.
+
+   Filtered rather than hand-listed, so a route added to `nav` still appears. */
+const pages = nav.filter(
+  (item) => item.href !== "/" && item.href !== "/contact",
+);
+
+/**
+ * The flat hairline pill. Two of them, and the pair is the whole call to
+ * action — one route in, one address.
+ */
+function Pill({
+  href,
+  external,
+  children,
+  glyph,
+}: {
+  href: string;
+  external?: boolean;
+  children: React.ReactNode;
+  glyph: React.ReactNode;
+}) {
+  const inner = (
+    <>
+      <span>{children}</span>
+      {glyph}
+    </>
+  );
+
+  return external ? (
+    <a href={href} className="footer-pill">
+      {inner}
+    </a>
+  ) : (
+    <Link href={href} className="footer-pill">
+      {inner}
+    </Link>
   );
 }
 
 /**
- * Footer — the colophon.
+ * Footer — the closing panel.
  *
- * A specimen sheet rather than a sitemap. The functional matrix is compressed
- * into a tight, mono-labelled grid with hairline gutters, and the space that
- * buys is spent on the one thing worth ending on: the name at full viewport
- * width, cropped by the bottom edge and fading into the void.
+ * A composition, not a sitemap. A tall empty field, the site's claim set at
+ * display size with two pills under it, three short link columns opposite, and
+ * the name set solid at container width, rising letter by letter as you reach
+ * it. The emptiness above the mark is doing as much work as anything printed
+ * in it.
  *
- * The link content is unchanged — every route and every service still has its
- * own entry, generated from `nav` and `services.items` so neither column can
- * drift out of step with the site.
+ * WHAT CHANGED AND WHY. This used to be a three-column link matrix under
+ * tracked-out mono labels, printed over the name at 8% opacity. Every element
+ * in it was quiet, so nothing was the ending — you finished a grid of nineteen
+ * links and the page simply stopped. Here the name is promoted from watermark
+ * to object and takes the whole bottom of the frame, and the link count comes
+ * down to eight to pay for the space.
+ *
+ * WHAT IS DELIBERATELY NOT HERE. Home and Contact (both reachable twice over
+ * from this same footer — see the note on `pages`), the three services the
+ * groupings do not name, and the GitHub row (kept in `seo.sameAs`, where it
+ * still does its work — see the note on `socials`). Everything that remains is
+ * generated from content.ts rather than hand-listed, so a route or a service
+ * cannot quietly fall out of step with the rest of the site.
+ *
+ * No bloom, no glow, no gradient ground. Flat black is what lets the mark
+ * land; a wash under this composition would put it back in competition with
+ * the thing it is supposed to be the backdrop for.
  */
 export function SiteFooter() {
   const year = new Date().getFullYear();
 
   return (
-    <footer className="relative isolate mt-28 overflow-hidden">
-      {/* The wash. Two wide, low ellipses at the outer corners — the light the
-          wordmark's gradient is nominally catching. */}
-      <div aria-hidden className="pointer-events-none absolute inset-0 -z-10">
-        <div className="absolute -bottom-32 -left-40 h-[32rem] w-[52rem] rounded-[50%] bg-[radial-gradient(closest-side,var(--bloom-core),var(--bloom-mid)_44%,var(--bloom-none)_74%)] opacity-70 blur-2xl" />
-        <div className="absolute -right-40 -bottom-40 h-[30rem] w-[48rem] rounded-[50%] bg-[radial-gradient(closest-side,var(--bloom-core),var(--bloom-mid)_44%,var(--bloom-none)_74%)] opacity-50 blur-2xl" />
-      </div>
+    <footer className="relative isolate mt-24 overflow-hidden">
+      {/* ── The empty field ────────────────────────────────────────────────
+          `justify-end` against an svh floor: the content sits at the bottom of
+          a tall box and the space above it is the composition, not a padding
+          value that happens to be large. */}
+      <div className="container-page flex min-h-[64svh] flex-col justify-end pt-32 sm:min-h-[72svh]">
+        {/* `xl`, not `sm`. The link group is three columns wide now, one of
+            them carrying a 31-character label — beside a display statement at
+            up to 84px there is not room for both on one line until the
+            container is genuinely wide. Below that they stack, which is the
+            same arrangement the phone gets. */}
+        <div className="flex flex-col gap-y-14 xl:flex-row xl:items-start xl:justify-between xl:gap-x-12">
+          <div className="flex flex-col items-start">
+            <Reveal>
+              {/* One <h2> carrying both authored lines. Split across two
+                  headings it would announce as two separate sections to a
+                  screen reader; split with a <br> it would lose the line box
+                  the type needs.
 
-      <div className="rule-fade" />
-      {/* ── The watermark ────────────────────────────────────────────────
-          The name at maximum scale, BEHIND the footer rather than beneath it.
+                  This is `hero.headline` — literally the same object the home
+                  page opens on, not a copy of its words. The site's claim now
+                  bookends every page: it is the first thing you read and the
+                  last. Reusing the object rather than retyping the string is
+                  what stops the two drifting apart, which is the whole reason
+                  the phrase lives in content.ts. */}
+              <h2 className="footer-statement text-pretty">
+                <span>{hero.headline.lead}</span>
+                <span>{hero.headline.lit}</span>
+              </h2>
+            </Reveal>
 
-          It used to be a band in the flow below the baseline readout, which
-          made it a second thing the page ended with — you finished the footer,
-          then met a slab with the name on it. As a watermark it stops being an
-          event and becomes the surface the footer is printed on, which is what
-          a brand mark at this scale is actually for.
-
-          Bottom-anchored and bleeding off the edge, cropped by the footer's own
-          `overflow-hidden`. FULL-BLEED rather than inside `container-page`: the
-          mark now runs the true width of the viewport, edge to edge, so it
-          reads as the surface the page is printed on rather than as a graphic
-          sitting inside the same column as the links. It no longer shares the
-          content grid, which is the deliberate trade — a watermark that lines
-          up with the columns is still a layout element; one that ignores them
-          is a ground.
-
-          Decorative: the accessible brand name is the lockup at the top of the
-          footer, so this never reaches assistive tech twice. */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-x-0 bottom-0 -z-10"
-      >
-        <div className="wordmark wordmark-watermark">
-          {/* Set solid, with no word space. At this scale the gap between
-              "Dev" and "Syndicate" opens into a hole wide enough to read as
-              two words rather than one mark. Derived from `site.name` rather
-              than typed out, so a rename still flows through — and
-              "DevSyndicate" is already a declared brand variant (see
-              `seo.alternateNames`), not something invented here. */}
-          <span>{site.name.replace(/\s+/g, "")}</span>
-        </div>
-      </div>
-
-
-      <div className="container-page">
-        {/* ── Masthead ─────────────────────────────────────────────────────
-            The promise gets set at real size here rather than as the 13px grey
-            aside it used to be — the foot of the page is the last place it can
-            land, so it lands properly.
-
-            Two parts, and the split is the point: the line names what the
-            studio is FOR, the paragraph says what it actually does. Contrast
-            carries the hierarchy the same way the display type does elsewhere
-            on the site — full-contrast claim, muted support — rather than a
-            size jump doing all the work. */}
-        <div className="grid gap-x-10 gap-y-12 pt-16 pb-32 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)] lg:pt-20">
-          <div className="flex max-w-md flex-col items-start gap-6">
-            <Link href="/" aria-label={`${site.name} — home`} className="group">
-              <MarkLockup
-                name={site.name}
-                size={36}
-                nameClassName="text-[1.0625rem] tracking-tight"
-              />
-            </Link>
-
-            <div className="flex flex-col gap-3">
-              <p className="text-[1.1875rem] leading-[1.4] font-semibold tracking-tight text-balance text-foreground">
-                Technology for Purpose.
-              </p>
-              <p className="text-[0.9375rem] leading-[1.65] text-pretty text-muted-foreground">
-                We engineer software, AI, and automation that solve business
-                problems, improve how teams work, and create lasting value.
-              </p>
-            </div>
-
-            {/* ── Baseline readout ─────────────────────────────────────
-                Moved up under the paragraph it belongs to. It used to be a
-                full-width strip across the foot of the footer, which gave the
-                page two endings — the columns finished, then a lone line of
-                facts ran underneath them. Sat here it closes the masthead
-                block, and the watermark gets the bottom of the frame to
-                itself. Deliberately just the three facts. */}
-            <div className="flex flex-wrap items-center gap-x-3 gap-y-2 font-mono text-[0.6875rem] tracking-[0.08em] text-muted-foreground uppercase">
-              <span className="tabular-nums">© {year} {site.name}</span>
-              <span aria-hidden className="text-muted-foreground/45">/</span>
-              <span>Worldwide</span>
-              <span aria-hidden className="text-muted-foreground/45">/</span>
-              <a
-                href={site.url}
-                className="normal-case transition-colors hover:text-foreground"
-              >
-                {site.url.replace("https://", "")}
-              </a>
-            </div>
+            <Reveal delay={0.08}>
+              <div className="mt-9 flex flex-wrap gap-3">
+                <Pill
+                  href="/contact"
+                  glyph={<ArrowRight className="size-4" aria-hidden />}
+                >
+                  Start a project
+                </Pill>
+                {/* The @ is the glyph, the way the reference sets it — it
+                    names the medium without spelling out the address, which
+                    the rail below already carries in full. */}
+                <Pill
+                  href={`mailto:${site.email}`}
+                  external
+                  glyph={
+                    <span aria-hidden className="text-base leading-none">
+                      @
+                    </span>
+                  }
+                >
+                  Email us
+                </Pill>
+              </div>
+            </Reveal>
           </div>
 
-          {/* ── The matrix ─────────────────────────────────────────────────
-              Three equal columns on one plain gutter. The hairline rules that
-              used to separate them are gone: they were doing the job spacing
-              already does, and because only columns 2 and 3 carried a rule
-              plus its `pl-8`, the three columns were not actually the same
-              width — the gaps read as 341px and 302px against each other.
-              Equal tracks and one gap value line them up by construction. */}
-          <div className="grid grid-cols-2 gap-x-8 gap-y-10 sm:grid-cols-3">
-            {columns.map((column, i) => (
-              <div key={column.id} className="flex flex-col items-start gap-8">
-                <nav
-                  aria-labelledby={`footer-${column.id}`}
-                  className="flex flex-col gap-4"
-                >
-                  <ColumnLabel id={`footer-${column.id}`}>
-                    {column.label}
-                  </ColumnLabel>
+          {/* ── The three link columns ───────────────────────────────────
+              Pages, then what we build, then where else to find us. Set
+              identically, and ordered so the middle column expands the
+              "Services" link immediately to its left.
 
-                  <ul className="flex flex-col gap-3">
-                  {column.links.map((link) => {
-                    // mailto: and off-site URLs both need a plain anchor;
-                    // only in-app routes go through <Link>.
-                    const offSite = link.href.startsWith("http");
-                    const isMail = link.href.startsWith("mailto:");
-                    const { Icon } = link;
-                    const cls =
-                      "group/link inline-flex items-center gap-2.5 text-sm text-muted-foreground transition-colors hover:text-foreground";
-                    const inner = (
-                      <>
-                        {Icon ? (
-                          <Icon className="size-3.5 shrink-0 opacity-70 transition-opacity group-hover/link:opacity-100" />
-                        ) : null}
-                        {link.label}
-                      </>
-                    );
+              They sit level with the STATEMENT, not with the pills below it.
+              Bottom-aligned to the pills the group read as a footnote to the
+              buttons — it sat in the lowest band of the field with the whole
+              headline empty to its left. Level with the first line of
+              "Technology for Purpose." the two halves of the row start
+              together, and the empty space collects underneath them where it
+              belongs, between the content and the mark.
 
-                    return (
-                      <li key={link.href}>
-                        {offSite || isMail ? (
-                          <a
-                            href={link.href}
-                            className={cls}
-                            {...(offSite
-                              ? { target: "_blank", rel: "noopener noreferrer" }
-                              : {})}
-                          >
-                            {inner}
-                          </a>
-                        ) : (
-                          <Link href={link.href} className={cls}>
-                            {inner}
-                          </Link>
-                        )}
+              The columns are three, three and three items, so they also share
+              a bottom edge for free; `items-start` is what fixes the top, and
+              the optical nudge below is what makes "About" and "Technology"
+              actually look level rather than merely measure level.
+
+              No column headings. Three stacks reading "About / Services /
+              Blog", "Digital products / …" and "LinkedIn / Instagram" are
+              legible as what they are, and a label over each would be the only
+              chrome in a composition that has otherwise earned its quiet. The
+              names screen readers need are on the <nav> elements instead, where
+              they cost the design nothing.
+
+              RIGHT-ALIGNED, and only from `xl`. The middle column carries a
+              31-character label; at `sm` three columns of this size and the
+              statement cannot share a line without one crushing the other, so
+              below `xl` the whole group drops beneath the statement and sets
+              flush left, where there is nothing to align against anyway.
+              `flex-wrap` is the backstop for the widths in between. */}
+          <Reveal delay={0.16}>
+            <div className="footer-links flex flex-wrap items-start gap-x-10 gap-y-8 sm:gap-x-14">
+              <nav aria-label="Site">
+                <ul className="footer-social flex flex-col gap-1 xl:text-right">
+                  {pages.map((item) => (
+                    <li key={item.href}>
+                      <Link href={item.href}>{item.label}</Link>
+                    </li>
+                  ))}
+                </ul>
+              </nav>
+
+              <nav aria-label="What we build">
+                <ul className="footer-social flex flex-col gap-1 xl:text-right">
+                  {footerServices.map((service) => (
+                    <li key={service.slug}>
+                      <Link href={`/services#${service.slug}`}>
+                        {service.label}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </nav>
+
+              {/* The platforms, then the ask. `.footer-social` moves to the
+                  wrapper so both are set in the column's one voice, and the
+                  <nav> keeps only what is actually navigation — "Start a
+                  project" is an action, not a profile, so it sits outside the
+                  landmark rather than being announced as a third platform.
+
+                  The underline is the only thing separating them, and that is
+                  the point: it is the web's oldest signal for "this does
+                  something", so it marks the action without needing a colour,
+                  a weight or a glyph the other two columns do not have. */}
+              <div className="footer-social flex flex-col gap-1 xl:text-right">
+                <nav aria-label="Dev Syndicate on other platforms">
+                  <ul className="flex flex-col gap-1">
+                    {socials.map((social) => (
+                      <li key={social.href}>
+                        <a
+                          href={social.href}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          {social.label}
+                        </a>
                       </li>
-                    );
-                  })}
+                    ))}
                   </ul>
                 </nav>
 
-                {/* ── The ask ─────────────────────────────────────────────
-                    Inside the last column's cell, not as its own grid item.
-                    Placed as a grid child it landed in the second row, whose
-                    top is set by the TALLEST column — so it floated a hundred
-                    pixels below the links it belongs to. Sitting in the cell it
-                    hangs off the bottom of "Connect with us" at a fixed gap,
-                    which is where it was asked to be: those links are ways to
-                    reach the studio and this is the fourth. */}
-                {i === columns.length - 1 ? (
-                  <Link
-                    href="/contact"
-                    className="group inline-flex items-center gap-2 border-b border-primary/40 pb-1 text-sm font-medium text-foreground transition-colors hover:border-primary"
-                  >
-                    Start a project
-                    <ArrowUpRight
-                      aria-hidden
-                      className="size-4 text-primary transition-transform duration-[var(--duration-base)] ease-out-soft group-hover:translate-x-0.5 group-hover:-translate-y-0.5 motion-reduce:group-hover:translate-x-0 motion-reduce:group-hover:translate-y-0"
-                    />
-                  </Link>
-                ) : null}
+                <Link href="/contact" className="footer-action">
+                  Start a project
+                </Link>
               </div>
-            ))}
-          </div>
+            </div>
+          </Reveal>
         </div>
-
       </div>
 
+      {/* ── The name ───────────────────────────────────────────────────────
+          Set solid, at container width, with no word space — at this scale the
+          gap between "Dev" and "Syndicate" opens into a hole wide enough to
+          read as two words rather than one mark. Derived from `site.name` so a
+          rename flows through, and "DevSyndicate" is already a declared brand
+          variant (see `seo.alternateNames`) rather than something invented here.
+
+          It rises letter by letter as the footer is scrolled to — the last beat
+          of the footer's single entrance, after the statement, the pills and
+          the links. See `WordmarkReveal` for why it is a per-letter mask rather
+          than the shared fade-and-slide everything above it uses.
+
+          `aria-hidden`: the accessible brand name is in the rail below, so this
+          never reaches assistive tech twice — and it is what keeps the split
+          letters from being announced one at a time. */}
+      <div className="container-page mt-16 sm:mt-24">
+        <div aria-hidden className="wordmark wordmark-solid">
+          <WordmarkReveal text={site.name.replace(/\s+/g, "")} />
+        </div>
+      </div>
+
+      {/* ── The rail ───────────────────────────────────────────────────────
+          One row, and no divider above it. A rule here would be the third
+          horizontal band in six inches of page — the wordmark's own baseline
+          already draws a harder line than any hairline could, and a second one
+          under it just reads as a box edge. Space separates them instead.
+
+          Two facts, nothing else. The routes used to sit here as well; they are
+          set properly in the column above now, and leaving a duplicate set down
+          here would make the same five links appear twice in one footer. */}
+      <div className="container-page">
+        <div className="flex flex-col gap-3 pt-10 pb-8 text-[0.75rem] text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
+          <p className="tabular-nums">
+            © {year} {site.name}
+          </p>
+
+          <a
+            href={`mailto:${site.email}`}
+            className="transition-colors hover:text-foreground"
+          >
+            {site.email}
+          </a>
+        </div>
+      </div>
     </footer>
   );
 }
