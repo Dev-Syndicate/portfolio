@@ -162,7 +162,7 @@ export function servicesSchema(
   return {
     "@context": "https://schema.org",
     "@type": "ItemList",
-    name: "Services — Dev Syndicate",
+    name: "Services — DevSyndicate",
     itemListElement: services.map((s, i) => ({
       "@type": "ListItem",
       position: i + 1,

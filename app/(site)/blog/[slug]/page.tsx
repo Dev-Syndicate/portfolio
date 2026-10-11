@@ -50,7 +50,7 @@ export async function generateMetadata({
   return {
     ...meta,
     // Use the post headline verbatim as the <title>, WITHOUT the
-    // "%s — Dev Syndicate" suffix the root template appends. Article headlines
+    // "%s — DevSyndicate" suffix the root template appends. Article headlines
     // are already long, and the suffix pushed them past Bing's 70-char title
     // limit; `absolute` opts this page out of the template. The brand is still
     // present via OG siteName and the Article schema's publisher.

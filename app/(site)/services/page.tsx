@@ -47,7 +47,7 @@ export default function ServicesPage() {
         data={[
           webPageSchema({
             path: "/services",
-            name: "Services — Dev Syndicate",
+            name: "Services — DevSyndicate",
             description,
           }),
           breadcrumbSchema([

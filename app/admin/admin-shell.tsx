@@ -33,7 +33,7 @@ export function AdminShell({
               className="size-7"
             />
             <span className="text-sm font-semibold">
-              Dev Syndicate{" "}
+              DevSyndicate{" "}
               <span className="text-muted-foreground">/ Blog admin</span>
             </span>
           </Link>

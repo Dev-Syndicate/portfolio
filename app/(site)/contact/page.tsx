@@ -33,13 +33,13 @@ const instagramUrl =
 const instagramHandle = "@dev.syndicate";
 
 const description =
-  "Tell us what you're building and what it needs to achieve, and we'll come back with an honest view of scope and approach. Start your project with Dev Syndicate.";
+  "Tell us what you're building and what it needs to achieve, and we'll come back with an honest view of scope and approach. Start your project with DevSyndicate.";
 
 export const metadata = pageMetadata({
   title: "Contact",
   description,
   path: "/contact",
-  keywords: ["contact Dev Syndicate", "hire web developers", "start a project"],
+  keywords: ["contact DevSyndicate", "hire web developers", "start a project"],
 });
 
 const details = [
@@ -74,7 +74,7 @@ export default function ContactPage() {
         data={[
           webPageSchema({
             path: "/contact",
-            name: "Contact — Dev Syndicate",
+            name: "Contact — DevSyndicate",
             description,
           }),
           breadcrumbSchema([

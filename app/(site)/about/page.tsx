@@ -9,14 +9,14 @@ import { ContactCta } from "@/components/sections/contact-cta";
 
 // Kept ≤160 chars for the search snippet; the full positioning is in the page body.
 const description =
-  "Dev Syndicate (DS) is a software company that builds systems to solve operational problems — cutting manual work and connecting the tools a business runs on.";
+  "DevSyndicate (DS) is a software company that builds systems to solve operational problems — cutting manual work and connecting the tools a business runs on.";
 
 export const metadata = pageMetadata({
   title: "About",
   description,
   path: "/about",
   keywords: [
-    "about Dev Syndicate",
+    "about DevSyndicate",
     "software development company",
     "Developer Syndicate",
   ],
@@ -29,7 +29,7 @@ export default function AboutPage() {
         data={[
           webPageSchema({
             path: "/about",
-            name: "About — Dev Syndicate",
+            name: "About — DevSyndicate",
             description,
           }),
           breadcrumbSchema([

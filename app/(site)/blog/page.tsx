@@ -15,14 +15,14 @@ import { cn } from "@/lib/utils";
 export const revalidate = 60;
 
 const description =
-  "The Dev Syndicate blog — practical writing on software, AI, and automation: choosing a stack, performance, and the decisions behind building for the web.";
+  "The DevSyndicate blog — practical writing on software, AI, and automation: choosing a stack, performance, and the decisions behind building for the web.";
 
 export const metadata = pageMetadata({
   title: "Blog",
   description,
   path: "/blog",
   keywords: [
-    "Dev Syndicate blog",
+    "DevSyndicate blog",
     "software development blog",
     "web development articles",
     "AI and automation",
@@ -89,7 +89,7 @@ export default async function BlogPage() {
   const blogSchema = {
     "@context": "https://schema.org",
     "@type": "Blog",
-    name: "Blog — Dev Syndicate",
+    name: "Blog — DevSyndicate",
     url: abs("/blog"),
     blogPost: posts.map((p) => ({
       "@type": "BlogPosting",
@@ -107,7 +107,7 @@ export default async function BlogPage() {
         data={[
           webPageSchema({
             path: "/blog",
-            name: "Blog — Dev Syndicate",
+            name: "Blog — DevSyndicate",
             description,
           }),
           breadcrumbSchema([

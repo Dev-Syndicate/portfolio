@@ -21,7 +21,7 @@ const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
  *   RESEND_API_KEY     — Resend secret key (server-only credential).
  *   CONTACT_TO_EMAIL   — inbox that receives enquiries (defaults to site.email).
  *   CONTACT_FROM_EMAIL — verified sender on our domain, e.g.
- *                        "Dev Syndicate <contact@devsyndicate.in>".
+ *                        "DevSyndicate <contact@devsyndicate.in>".
  *
  * The recipient is fixed by config, never by form input — the form can't be
  * used to relay mail to an arbitrary address.
@@ -29,7 +29,7 @@ const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 const RESEND_API_KEY = process.env.RESEND_API_KEY;
 const TO_EMAIL = process.env.CONTACT_TO_EMAIL ?? site.email;
 const FROM_EMAIL =
-  process.env.CONTACT_FROM_EMAIL ?? `Dev Syndicate <${site.email}>`;
+  process.env.CONTACT_FROM_EMAIL ?? `DevSyndicate <${site.email}>`;
 
 /** Neutralise a value before it goes into an email header (subject / reply-to).
  *  Strips CR/LF so a crafted field can't inject extra headers, and caps length. */

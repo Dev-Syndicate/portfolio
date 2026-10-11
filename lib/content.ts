@@ -17,12 +17,12 @@
  */
 
 export const site = {
-  name: "Dev Syndicate",
+  name: "DevSyndicate",
   /* Brand promise / default meta description — general, no filler. Feeds the
      search snippet, OG/Twitter, schema, and footer. Leads with the operational
      positioning so the snippet matches the hero. */
   promise:
-    "Dev Syndicate is a software development company that builds software systems to solve operational problems for organisations — using software, AI, and automation to remove manual work, connect disconnected tools, and streamline how a business runs.",
+    "DevSyndicate is a software development company that builds software systems to solve operational problems for organisations — using software, AI, and automation to remove manual work, connect disconnected tools, and streamline how a business runs.",
   email: "contact@devsyndicate.in",
   /* Canonical domain. Everything SEO (canonicals, sitemap, robots, OG)
      resolves from this one value. It must match where the live host actually
@@ -45,7 +45,7 @@ export const seo = {
      is the fuller brand statement used for schema, OG-nothing, and the footer,
      and is deliberately longer than a snippet should be. */
   metaDescription:
-    "Dev Syndicate builds software, AI, and automation that solve real operational problems — removing manual work and connecting the tools a business runs on.",
+    "DevSyndicate builds software, AI, and automation that solve real operational problems — removing manual work and connecting the tools a business runs on.",
 
   /* Every way people spell or shorten the brand. Google uses Organization
      `alternateName` to understand these all refer to one entity, which is what
