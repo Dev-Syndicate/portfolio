@@ -234,6 +234,18 @@ export function SiteFooter() {
                 {site.url.replace("https://", "")}
               </a>
             </div>
+
+            {/* Legal on its own line: appended to the readout it wrapped and
+                started a line with a stray separator. */}
+            <div className="-mt-3 flex items-center gap-x-3 font-mono text-[0.6875rem] tracking-[0.08em] text-muted-foreground uppercase">
+              <Link href="/privacy" className="transition-colors hover:text-foreground">
+                Privacy
+              </Link>
+              <span aria-hidden className="text-muted-foreground/45">/</span>
+              <Link href="/terms" className="transition-colors hover:text-foreground">
+                Terms
+              </Link>
+            </div>
           </div>
 
           {/* ── The matrix ─────────────────────────────────────────────────
