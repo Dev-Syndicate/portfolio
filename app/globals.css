@@ -1799,46 +1799,21 @@
 /* --------------------------------------------------------------------------
    VALUE DIAGRAM MOTION
 
-   Each of the four value drawings performs its own claim rather than merely
-   decorating it — see the per-card notes in components/artwork/value-diagrams.
-   The rules that keep four looping animations from becoming a light show:
+   Shield, gauge, and the folder/key family are static drawings — the third
+   rewrite of this set went literal specifically to make each picture legible
+   on its own, and a static shape is easier to read at a glance than one
+   that is still arriving. OutcomeDiagram is the one card whose claim IS a
+   process ("disorder becomes direction"), so it is also the one card that
+   earns motion beyond the shared breathing-accent pulse: each scattered dot
+   actually travels to the outcome point. See the per-card notes in
+   components/artwork/value-diagrams.tsx.
 
-   0. MOTION THAT ADDS OR REMOVES BELONGS ONLY ON CARDS ABOUT CHANGE. Two of
-      these values — Built to last, Yours to keep — are claims about PERMANENCE,
-      and the first version of this file looped a slab blinking into a slot and
-      a code line erasing and rewriting itself. Both animations argued against
-      their own captions: a flickering box reads as instability, a self-erasing
-      line reads as churn. They now get motion that neither adds nor removes
-      anything — load travelling down a standing frame, a caret stepping down a
-      file that stays whole. Only the two cards that ARE about change (a
-      direction of reasoning, a measurement re-run) loop something in and out.
-   1. AT MOST TWO MOVING PARTS PER CARD, and in three of the four, one.
-   2. NO TWO CARDS SHARE A PERIOD. 1.15s / 7s / 8.4s / 6.2s never come back into
-      phase, so the grid never pulses in unison — which is the thing that makes
-      a set of looping cards read as a screensaver.
-   3. THE RESTING STATE IS THE FINISHED DRAWING. Every animation is written so
-      that with `animation-duration` collapsed to nothing — which is exactly
-      what the reduced-motion block at the foot of this file does — the element
-      lands on the completed artwork, not on an empty first frame. The one
-      exception is the ghost slab, whose honest static state IS absent: an empty
-      slot is what the drawing means when nothing is arriving.
-
-   These are CSS animations on server-rendered SVG, so the whole set costs zero
-   JavaScript and no hydration. The trade is that they cannot be gated on
-   visibility the way the hero's canvas is; four small stroke animations are
-   cheap enough that a rAF loop and an observer would cost more than they save.
+   THE RESTING STATE IS THE FINISHED DRAWING. Every animation here is written
+   so that with `animation-duration` collapsed to nothing — which is exactly
+   what the reduced-motion block at the foot of this file does — the element
+   lands on the completed artwork rather than mid-transit or on an empty
+   first frame.
    -------------------------------------------------------------------------- */
-
-/* Marching dashes — flow along a path, direction included. */
-@keyframes vd-flow {
-  to {
-    stroke-dashoffset: -9;
-  }
-}
-
-.vd-flow {
-  animation: vd-flow 1.15s linear infinite;
-}
 
 /* A slow breath on the one lit element, so the eye is told where to look
    without anything actually moving. */
@@ -1860,87 +1835,36 @@
   animation: vd-pulse 4.6s var(--ease-out-soft) infinite;
 }
 
-/* Load travelling down a frame and into its base. One short segment slides the
-   length of the upright and is gone; the structure it slides along never moves.
-   The base rule is `opacity: 0`, so with the duration collapsed under reduced
-   motion this leaves no stray mark on the drawing — it simply is not there. */
-@keyframes vd-load {
-  0% {
-    stroke-dashoffset: 0;
-    opacity: var(--o, 0.7);
-  }
-  100% {
-    stroke-dashoffset: -136;
-    opacity: var(--o, 0.7);
-  }
-}
-
-.vd-load {
-  opacity: 0;
-  stroke-dasharray: 16 120;
-  animation: vd-load 3.2s linear infinite;
-}
-
-/* A caret stepping down a gutter. Each tick runs the same keyframes on its own
-   phase, which is what an `animation-delay` on an infinite loop actually buys
-   you — a sequence that repeats forever with nothing to resynchronise. */
-@keyframes vd-caret {
+/* Each scatter dot on OutcomeDiagram travels from its own position (the
+   `--dx`/`--dy` displacement to the outcome point, set per-dot in the
+   component) and fades out just before it would overlap the lit outcome
+   circle — the dot does not visibly collide with it, it is absorbed by it.
+   Holding at the start for the first 55% of the cycle is what keeps the
+   "scattered" half of the drawing legible as a resting state rather than a
+   permanent blur of motion; the travel itself is the back third. `--at`
+   staggers each dot's delay so the eight arrive one after another, not in
+   unison — resolving, not scattering-and-snapping. */
+@keyframes vd-converge {
   0%,
+  55% {
+    transform: translate(0, 0);
+    opacity: var(--o, 0.28);
+  }
+  90% {
+    opacity: 0;
+  }
+  92%,
   100% {
-    opacity: 0.28;
-  }
-  4% {
-    opacity: 1;
-  }
-  16% {
-    opacity: 0.28;
+    transform: translate(var(--dx), var(--dy));
+    opacity: 0;
   }
 }
 
-.vd-caret {
-  animation: vd-caret 3.6s linear infinite;
+.vd-converge {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: vd-converge 5.2s var(--ease-out-soft) infinite;
   animation-delay: var(--at, 0s);
-}
-
-/* A line drawing itself. `--len` is the path length. Deliberately split from
-   the fade below rather than doing both in one keyframe set: an element can
-   only carry one `animation`, and the drawn line and the marks that belong with
-   it have to clear together. So the GROUP owns the fade and the PATH owns the
-   draw, on the same `--dur`. The dashoffset snaps back at 100%, which is
-   invisible because the group is at zero opacity across that boundary. */
-@keyframes vd-trace {
-  0% {
-    stroke-dashoffset: var(--len);
-  }
-  46%,
-  100% {
-    stroke-dashoffset: 0;
-  }
-}
-
-.vd-trace {
-  stroke-dasharray: var(--len);
-  animation: vd-trace var(--dur, 8s) var(--ease-out-soft) infinite;
-}
-
-/* The run: appear, hold long enough to be read, clear, repeat. On the group,
-   so everything the run consists of leaves together. */
-@keyframes vd-cycle {
-  0% {
-    opacity: 0;
-  }
-  8%,
-  88% {
-    opacity: 1;
-  }
-  97%,
-  100% {
-    opacity: 0;
-  }
-}
-
-.vd-cycle {
-  animation: vd-cycle var(--dur, 8s) var(--ease-out-soft) infinite;
 }
 
 /* --------------------------------------------------------------------------
@@ -2563,18 +2487,189 @@
 
    TWO LAYOUTS, NOT ONE RESPONSIVE COMPROMISE.
 
-     < lg   a plain horizontal row of cards you swipe, every detail already
-            open, no trace and no hover. The curve needs width to exist — at
-            375px the amplitude collapses, the alternation stops being legible,
-            and expanding cards have nowhere to expand into. Forcing it on is
-            worse than not having it, so the small layout is its own finished
-            thing rather than a squeezed copy of the large one.
+     < lg   a straight vertical rail in plain document flow — see "THE
+            VERTICAL PIPELINE" below. The curve needs width to exist — at
+            375px the amplitude collapses, the alternation stops being
+            legible, and expanding cards have nowhere to expand into. Forcing
+            it on is worse than not having it, so the small layout is its own
+            finished thing rather than a squeezed copy of the large one. It
+            used to be a pinned horizontal carousel (vertical scroll hijacked
+            into a sideways card slide); that traded "stages look unordered"
+            for scroll-jacking on a touch device, which is the worse problem.
 
      >= lg  the trace, the nodes sitting on it, and cards alternating above and
             below, each opening on hover.
 
    Everything here is token-driven; there is no literal colour in the block.
+
+   The rules below from here through "Small screens: the row" size and pin
+   the >= lg curve only — `.pipe-runway` is rendered `hidden lg:block` now, so
+   none of the `width < 64rem` rules in between have a target to match. Left
+   in place rather than pruned: the short-viewport fallback further down this
+   file shares several of these class names, and disentangling which rules a
+   sub-64rem-but-also-short-viewport case still depended on was a bigger risk
+   than a few inert rules.
    ========================================================================== */
+
+/* ==========================================================================
+   THE VERTICAL PIPELINE  —  the straight mobile rail (< lg)
+   --------------------------------------------------------------------------
+   A single line down the left edge, a node per stage, the card beside it.
+   No pin, no transform, no horizontal scroll — this is ordinary document
+   flow, so scrolling the page IS moving through the process, on whatever
+   terms the reader's thumb already knows. The line fills continuously as
+   you scroll (one motion value, not five independent per-card triggers)
+   and a node lights once the fill has reached it; see PipeVerticalRail and
+   PipeVerticalStage in process-strip.tsx.
+   ========================================================================== */
+
+.pipe-vertical {
+  margin-top: 4rem;
+}
+
+@media (width >= 40rem) {
+  .pipe-vertical {
+    margin-top: 5rem;
+  }
+}
+
+.pipe-vertical ol {
+  list-style: none;
+}
+
+/* The rail sits at the node's centre (half the 2rem node), not at a fixed
+   offset guessed to look right — so it is correct if the node size ever
+   changes. */
+.pipe-v-rail,
+.pipe-v-rail-lit {
+  position: absolute;
+  top: 1rem;
+  bottom: 1rem;
+  left: 1rem;
+  width: 1px;
+}
+
+.pipe-v-rail {
+  background: var(--hairline-strong);
+}
+
+/* The lit overlay — same box as `.pipe-v-rail`, scaled from a motion value
+   driven by scroll progress through the whole list. ONE element, scaled
+   from the top, rather than per-card segments: a single `scaleY` growing
+   continuously is what reads as a line arriving, where five independent
+   segments popping on one at a time reads as five small loading bars.
+
+   Plain and hairline-width, matching the desktop curve's own lit path
+   (`.pipe-line-lit`, also 1–1.5px with no blur) — a glow here read as
+   over-lit against this much quieter, text-dense layout. Colour alone is
+   enough contrast against the dim base. */
+.pipe-v-rail-lit {
+  background: var(--primary);
+  opacity: 0.9;
+  transform-origin: top;
+}
+
+.pipe-v-stage {
+  position: relative;
+  display: flex;
+  gap: 1.25rem;
+  padding-block: 2.25rem;
+}
+
+.pipe-v-stage:first-child {
+  padding-top: 0;
+}
+
+.pipe-v-stage:last-child {
+  padding-bottom: 0;
+}
+
+.pipe-v-node {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  flex-shrink: 0;
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 999px;
+  background: var(--background);
+  box-shadow: 0 0 0 1px var(--hairline-strong);
+  transition: box-shadow var(--duration-base) var(--ease-out-soft);
+}
+
+.pipe-v-stage[data-lit] .pipe-v-node {
+  box-shadow: 0 0 0 1px var(--primary);
+}
+
+/* The ring is a second disc, not a border on the node itself, so it can
+   spring in with its own scale/opacity without the node's 1px box-shadow
+   outline fighting the same transition. */
+.pipe-v-node-ring {
+  position: absolute;
+  inset: 0;
+  border-radius: 999px;
+  background: var(--primary);
+}
+
+.pipe-v-node-index {
+  position: relative;
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.02em;
+  color: var(--muted-foreground);
+  transition: color var(--duration-base) var(--ease-out-soft);
+}
+
+.pipe-v-stage[data-lit] .pipe-v-node-index {
+  color: var(--primary-foreground);
+}
+
+.pipe-v-card {
+  min-width: 0;
+  flex: 1;
+  padding-top: 0.125rem;
+}
+
+/* The question is read FIRST, as a short eyebrow that sets up what the
+   stage answers — not a caption tucked under the title. Mono + letterspaced
+   + uppercase gives it a clearly different register from both the title
+   below it and the body that follows, so the three lines of a stage don't
+   default to "three paragraphs of decreasing size" — which was the actual
+   complaint: a title, a sub-line and a body in the same sans at adjacent
+   sizes reads as one undifferentiated block of text, however the colour and
+   weight were tuned. */
+.pipe-v-question {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted-foreground);
+}
+
+.pipe-v-title {
+  margin-top: 0.5rem;
+  font-size: 1.625rem;
+  font-weight: 500;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  color: color-mix(in oklab, var(--foreground) 65%, var(--ref-blue));
+  transition: color var(--duration-slow) var(--ease-out-soft);
+}
+
+.pipe-v-stage[data-lit] .pipe-v-title {
+  color: var(--foreground);
+}
+
+.pipe-v-body {
+  margin-top: 0.625rem;
+  font-size: 0.9375rem;
+  line-height: 1.65;
+  text-wrap: pretty;
+  color: color-mix(in oklab, var(--muted-foreground) 92%, var(--foreground));
+}
 
 /* ── The pin ─────────────────────────────────────────────────────────────
    The runway is pure scroll budget: one viewport tall (what the pinned rail
@@ -2943,6 +3038,15 @@
    so the dash offset the component sets is a plain 0–1 fraction and no
    getTotalLength() call is needed.
 
+   `stroke-dasharray: 1 1`, NOT `1`. A single value means "dash 1, gap 1,
+   repeat" — with `pathLength={1}` that is a full-path dash followed by a
+   full-path gap, over and over. As `strokeDashoffset` shifts past a point,
+   the START of the *next* repetition's dash rotates into view further along
+   the same path, which read as a second independent bright segment growing
+   in from the middle. `1 9999` makes the gap far longer than the path can
+   ever be, so the pattern never completes a second cycle and only one dash
+   is ever drawn.
+
    NO TRANSITION ON `stroke-dashoffset`. There was one, back when the fill was
    driven by which card you were hovering and had to ease between two resting
    values. It is now written every frame from scroll position, and a 500ms ease
@@ -2954,7 +3058,7 @@
   stroke: var(--primary);
   stroke-width: 1.5;
   stroke-linecap: round;
-  stroke-dasharray: 1;
+  stroke-dasharray: 1 9999;
   opacity: 0.9;
 }
 
@@ -3390,4 +3494,28 @@ li + li .principle-row::after {
   .principle-title {
     transition-duration: 1ms;
   }
+}
+
+/* ==========================================================================
+   SERVICES OVERVIEW — the horizontal tab strip (< lg)
+   --------------------------------------------------------------------------
+   Companion to components/sections/services-overview.tsx. Below `lg` the six
+   layers are a swipeable row of pill tabs rather than the vertical list with
+   the travelling-light rule — see that file's comment for why the two
+   widths get different markup instead of one squeezed down. This block is
+   just the native-scroller housekeeping: no visible scrollbar, and a snap
+   point per chip so a swipe settles on a tab rather than stopping mid-chip.
+   ========================================================================== */
+
+.svc-strip {
+  scrollbar-width: none;
+  scroll-snap-type: x proximity;
+}
+
+.svc-strip::-webkit-scrollbar {
+  display: none;
+}
+
+.svc-strip > button {
+  scroll-snap-align: start;
 }

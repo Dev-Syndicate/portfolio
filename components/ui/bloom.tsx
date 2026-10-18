@@ -32,6 +32,7 @@ export function Bloom({
   children,
   id,
   as: Tag = "div",
+  ref,
 }: {
   /** Which edge or corner the light comes from. */
   from?: BloomFrom;
@@ -47,15 +48,30 @@ export function Bloom({
   /** Anchor target — /services#<slug> deep links land on these panels. */
   id?: string;
   as?: "div" | "article" | "li" | "section";
+  /* React 19 passes `ref` through as a normal prop — no forwardRef needed.
+     Typed as HTMLElement, not HTMLDivElement: `as` makes the rendered tag
+     polymorphic, and a ref callback has to accept whichever element every
+     variant (div/article/li/section) can produce. */
+  ref?: React.Ref<HTMLElement>;
 }) {
+  /* TS infers `Tag`'s ref type as the intersection of every tag in the union
+     (div & article & li & section), which only accepts a ref narrower than
+     any single one of them. The DOM doesn't actually have that constraint —
+     every element in the union is an HTMLElement — so this cast reflects
+     what's really there instead of fighting JSX's polymorphic inference. */
+  const Component = Tag as React.ElementType<
+    React.HTMLAttributes<HTMLElement> & { ref?: React.Ref<HTMLElement> }
+  >;
+
   return (
-    <Tag
+    <Component
+      ref={ref}
       id={id}
       className={cn("bloom", froms[from], soft && "bloom-soft", className)}
     >
       {/* Content sits above the ::before wash. Without the stacking context
           the light would paint over the text. */}
       <div className="relative z-10 flex h-full flex-col">{children}</div>
-    </Tag>
+    </Component>
   );
 }

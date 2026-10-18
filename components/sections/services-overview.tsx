@@ -56,8 +56,9 @@ export function ServicesOverview() {
   const [hovering, setHovering] = useState(false);
   const [focused, setFocused] = useState(false);
 
-  const listRef = useRef<HTMLDivElement>(null);
   const sectionRef = useRef<HTMLElement>(null);
+  const panelRef = useRef<HTMLElement>(null);
+  const stripRef = useRef<HTMLDivElement>(null);
   const inView = useInView(sectionRef, { amount: 0.3 });
   const reduceMotion = useReducedMotion();
 
@@ -72,11 +73,57 @@ export function ServicesOverview() {
     return () => window.clearInterval(id);
   }, [playing, items.length]);
 
+  /* Keeps the active chip inside the visible part of the horizontal strip —
+     load-bearing for the auto-advance timer specifically, which changes
+     `active` with no click or keypress to have scrolled the strip already.
+     Without this, the timer can light a chip sitting off the right edge of
+     a narrow viewport while the strip itself never moves. `"nearest"` is a
+     no-op once the chip is already visible, so this never fights a reader
+     who is mid-swipe through the strip on their own. */
+  useEffect(() => {
+    stripRef.current
+      ?.querySelector<HTMLButtonElement>(`[role="tab"][aria-selected="true"]`)
+      ?.scrollIntoView({
+        behavior: reduceMotion ? "auto" : "smooth",
+        block: "nearest",
+        inline: "nearest",
+      });
+  }, [active, reduceMotion]);
+
+  /* Below `lg` the index and panel stack vertically instead of sitting
+     side by side, so picking a layer can leave its detail entirely off
+     screen below the fold — a reader has to already know to scroll down,
+     and nothing on screen tells them the panel even changed. Below `lg`,
+     an explicit pick (click or keyboard — never the automatic timer, which
+     must never yank the page out from under someone reading something
+     else) scrolls the panel into view. `"nearest"` is doing real work
+     here: it is a no-op if the panel is already visible, so re-picking a
+     layer that's already on screen doesn't jerk the page downward. */
+  const revealPanel = useCallback(() => {
+    if (window.matchMedia("(min-width: 64rem)").matches) return;
+    panelRef.current?.scrollIntoView({
+      behavior: reduceMotion ? "auto" : "smooth",
+      block: "nearest",
+    });
+  }, [reduceMotion]);
+
+  const select = useCallback(
+    (index: number) => {
+      setActive(index);
+      revealPanel();
+    },
+    [revealPanel],
+  );
+
   /* Arrow keys move between layers and take the selection with them, which is
      what a tablist is expected to do. Home/End jump to the outermost and
-     innermost layer — meaningful here, since the list is ordered by depth. */
+     innermost layer — meaningful here, since the list is ordered by depth.
+     Shared by both tablists (the horizontal strip below `lg`, the vertical
+     list at `lg`+) — only one is ever visible/focusable at a given width, so
+     `event.currentTarget` is always the tablist actually in play, rather
+     than hard-coding the ref to whichever one existed first. */
   const onKeyDown = useCallback(
-    (event: React.KeyboardEvent) => {
+    (event: React.KeyboardEvent<HTMLDivElement>) => {
       const last = items.length - 1;
       let next: number | null = null;
 
@@ -92,12 +139,12 @@ export function ServicesOverview() {
 
       if (next === null) return;
       event.preventDefault();
-      setActive(next);
-      listRef.current
-        ?.querySelectorAll<HTMLButtonElement>("[role='tab']")
+      select(next);
+      event.currentTarget
+        .querySelectorAll<HTMLButtonElement>("[role='tab']")
         [next]?.focus();
     },
-    [active, items.length],
+    [active, items.length, select],
   );
 
   const current = items[active];
@@ -132,13 +179,62 @@ export function ServicesOverview() {
             onBlurCapture={() => setFocused(false)}
           >
             {/* ── The index ──────────────────────────────────────────────── */}
+            {/* Two renderings of the same six tabs, not one responsive
+                compromise. Below `lg` the panel sits BELOW the index (the
+                grid is one column until `lg`), so a six-row vertical list
+                costs most of a screen of height before the panel — the
+                content the index exists to get a reader to — even enters
+                view. Below `lg` this is a horizontal strip instead: compact
+                pill tabs you swipe or scroll through, same six tabs, same
+                `select`/`onKeyDown`, a fraction of the height. `lg` and up
+                keeps the vertical index with the travelling-light rule,
+                which is the point of the section at that width (see the file
+                header) and has the side-by-side room for a tall list to cost
+                nothing. */}
             <div
-              ref={listRef}
+              ref={stripRef}
+              role="tablist"
+              aria-orientation="horizontal"
+              aria-label="What we build"
+              onKeyDown={onKeyDown}
+              className="svc-strip relative -mx-5 flex gap-2 overflow-x-auto px-5 pb-1 sm:-mx-8 sm:px-8 lg:hidden"
+            >
+              {items.map((service, i) => {
+                const isActive = i === active;
+
+                return (
+                  <button
+                    key={service.slug}
+                    type="button"
+                    role="tab"
+                    id={`svc-tab-strip-${service.slug}`}
+                    aria-selected={isActive}
+                    aria-controls={`svc-panel-${service.slug}`}
+                    tabIndex={isActive ? 0 : -1}
+                    onClick={() => select(i)}
+                    className={cn(
+                      "group/chip relative flex shrink-0 cursor-pointer scroll-mx-5 items-center gap-2 rounded-full border px-4 py-2.5 text-sm font-medium whitespace-nowrap transition-colors duration-[var(--duration-base)]",
+                      "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring",
+                      isActive
+                        ? "border-primary/40 bg-wash text-foreground"
+                        : "border-hairline text-muted-foreground hover:text-foreground",
+                    )}
+                  >
+                    <span className="font-mono text-[0.6875rem] tabular-nums tracking-[0.1em] opacity-70">
+                      {service.n}
+                    </span>
+                    {service.name}
+                  </button>
+                );
+              })}
+            </div>
+
+            <div
               role="tablist"
               aria-orientation="vertical"
               aria-label="What we build"
               onKeyDown={onKeyDown}
-              className="relative flex flex-col"
+              className="relative hidden flex-col lg:flex"
             >
               {/* The rule the light travels down. */}
               <span
@@ -172,7 +268,7 @@ export function ServicesOverview() {
                        rattles the panel through four layers. Hovering pauses,
                        which is the useful half of the idea, and leaves the panel
                        on whatever the reader was actually reading. */
-                    onClick={() => setActive(i)}
+                    onClick={() => select(i)}
                     className={cn(
                       "group/tab relative flex w-full cursor-pointer items-baseline gap-4 py-4 pr-3 pl-6 text-left transition-colors duration-[var(--duration-base)] sm:gap-5 sm:py-5",
                       "focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-ring",
@@ -199,7 +295,7 @@ export function ServicesOverview() {
                     </span>
 
                     <span className="min-w-0 flex-1">
-                      <span className="block text-lg font-medium tracking-tight sm:text-xl">
+                      <span className="block text-base font-medium tracking-tight sm:text-xl">
                         {service.name}
                       </span>
 
@@ -223,7 +319,12 @@ export function ServicesOverview() {
             </div>
 
             {/* ── The open layer ─────────────────────────────────────────── */}
-            <Bloom from="tr" soft={false} className="min-h-[24rem]">
+            <Bloom
+              ref={panelRef}
+              from="tr"
+              soft={false}
+              className="min-h-[24rem] scroll-mt-24"
+            >
               {/* The tabpanel element is PERSISTENT and only its contents
                   cross-fade. With `role="tabpanel"` on the animated child,
                   `mode="wait"` unmounts the old panel before mounting the new
@@ -235,7 +336,7 @@ export function ServicesOverview() {
                 id={`svc-panel-${current.slug}`}
                 aria-labelledby={`svc-tab-${current.slug}`}
                 tabIndex={0}
-                className="flex h-full flex-col p-8 focus-visible:outline-2 focus-visible:outline-offset-[-4px] focus-visible:outline-ring sm:p-10"
+                className="flex h-full flex-col p-6 focus-visible:outline-2 focus-visible:outline-offset-[-4px] focus-visible:outline-ring sm:p-10"
               >
                 <AnimatePresence mode="wait" initial={false}>
                   <motion.div
@@ -263,8 +364,38 @@ export function ServicesOverview() {
 
                     {/* The scope, whole. This is the section's real payload —
                         "Integrations" means nothing until you can see that it
-                        covers payment gateways and webhooks. */}
-                    <ul className="mt-6 flex flex-wrap gap-2">
+                        covers payment gateways and webhooks.
+
+                        Pills wrapping freely (`.chip` + `flex-wrap`) look fine
+                        once a row has room to actually fill, but a ~320px
+                        column forces one or two short words per line with a
+                        ragged return — the wrap points land wherever a word
+                        happened to end, not on any grid. Below `sm` this is a
+                        stacked list instead, the same divided-rows pattern the
+                        /services detail panels already use for this data — one
+                        aligned column instead of a scatter of pill sizes.
+                        `.chip` is unlayered CSS (see its comment above), so it
+                        always beats `@layer utilities` regardless of source
+                        order — a conditional `sm:chip` can't be overridden by
+                        plain Tailwind utilities on the stacked variant. Easier
+                        to keep the two presentations fully separate than fight
+                        that specificity. */}
+                    <ul className="mt-6 flex flex-col sm:hidden">
+                      {current.includes.map((item) => (
+                        <li
+                          key={item}
+                          className="flex items-baseline gap-3 border-b border-hairline py-2.5 text-[0.9375rem] leading-snug text-muted-foreground last:border-b-0"
+                        >
+                          <span
+                            aria-hidden
+                            className="size-1 shrink-0 translate-y-[-0.15em] rounded-full bg-primary/70"
+                          />
+                          {item}
+                        </li>
+                      ))}
+                    </ul>
+
+                    <ul className="mt-6 hidden flex-wrap gap-2 sm:flex">
                       {current.includes.map((item) => (
                         <li key={item} className="chip chip-plain">
                           {item}

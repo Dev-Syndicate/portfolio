@@ -434,7 +434,22 @@ export function ProcessStrip() {
         </Reveal>
       </div>
 
-      {/* ── The runway ────────────────────────────────────────────────────
+      {/* ── Below lg: the straight pipeline ─────────────────────────────────
+          The curve below is a large-screen device — it needs width to fan
+          cards above and below a trace, and the pin needs a tall viewport to
+          hold still in. Neither is true on a phone, and the carousel this
+          used to fall back to (pin the section, hijack vertical scroll to
+          slide cards sideways) traded a real problem — stages read as
+          unordered — for a worse one: scroll-jacking on a touch device,
+          where a reader's thumb stops doing what it has done on every other
+          site. This is the straight answer instead. One line, top to
+          bottom, in document order — scrolling the PAGE is scrolling the
+          PROCESS, with no pin and nothing hijacked. */}
+      <div className="container-page pipe-vertical lg:hidden">
+        <PipeVerticalRail steps={process.steps} />
+      </div>
+
+      {/* ── lg and up: the curve ─────────────────────────────────────────
           Vertical scroll budget for the pin, and nothing else. Its height is
           one viewport (what the pinned rail occupies) plus the horizontal
           distance the track has to cover — so the page grows by exactly the
@@ -444,7 +459,32 @@ export function ProcessStrip() {
           Height is only set once `travel` has been measured; before that, and
           on every layout that is not pinned, this is an ordinary block that
           adds nothing. */}
-      <div ref={runwayRef} className="pipe-runway">
+      <div
+        ref={runwayRef}
+        className="pipe-runway hidden lg:block"
+        /* This div only ever renders visibly at `lg`+ (`hidden lg:block`),
+           so the pace below is always the wide-curve one (1.3), matching
+           the CSS `height` rule for `width >= 64rem`.
+
+           That CSS formula — max(122rem, 150vw) - 100vw — is an ESTIMATE of
+           the real travel distance, derived before anything has rendered so
+           the runway is the right size on the very first paint. Once
+           `travel` is actually measured from the DOM (below), that
+           measurement is ground truth — the track's real scrollWidth can
+           differ from the formula's assumption (viewport zoom, a non-16px
+           root font-size, scrollbar gutters), and when it runs LONGER than
+           the formula assumed, the pin has less runway than the transform
+           needs: `scrollYProgress` reaches 1 — and the trace, reading
+           straight off it, freezes — before `x` has actually finished
+           translating the track the full `travel` distance. This override
+           closes that gap once JS knows the true number, rather than
+           trusting the pre-layout guess for the entire scroll. */
+        style={
+          wide && travel > 0
+            ? { height: `calc(100svh + ${travel * 1.3}px)` }
+            : undefined
+        }
+      >
         <div className="pipe-pin">
           {/* The opening statement. On the large-screen curve it occupies the
               track's lead-in — the first 30%, before Discover — so at rest it
@@ -597,5 +637,111 @@ export function ProcessStrip() {
         </Reveal>
       </div>
     </section>
+  );
+}
+
+type Step = { title: string; question: string; body: string };
+
+/**
+ * The straight mobile pipeline. One continuous line down the left edge that
+ * FILLS AS YOU SCROLL, the same device as the desktop curve's travelling
+ * light — translated from "distance along a path" to "distance down a
+ * list" so the two sections read as one idea even though their layouts
+ * don't share any geometry.
+ *
+ * The fill is driven by scroll progress through the WHOLE rail
+ * (`start center` → `end center`, so it starts filling once the first node
+ * has reached the middle of the screen and finishes once the last one has)
+ * rather than by each card's own `useInView`. A per-card trigger made every
+ * stage snap its own segment independently, which read as five small
+ * loading bars rather than one line arriving — exactly the "pipeline"
+ * framing this is meant to deliver. A single motion value filling
+ * continuously is what makes it read as one thing moving, not five.
+ */
+function PipeVerticalRail({ steps }: { steps: readonly Step[] }) {
+  const railRef = useRef<HTMLDivElement>(null);
+  const reduceMotion = useReducedMotion();
+
+  const { scrollYProgress } = useScroll({
+    target: railRef,
+    offset: ["start center", "end center"],
+  });
+  const fill = useSpring(scrollYProgress, {
+    stiffness: 90,
+    damping: 26,
+    mass: 0.35,
+  });
+
+  /* Each node's position as a fraction of the rail (0 = first, 1 = last),
+     matched against the SAME fill fraction that draws the line — reusing
+     the desktop curve's rule that a node can only light once the line has
+     actually reached it. Evenly spaced is a safe assumption here: unlike
+     the desktop curve's bespoke geometry, every card in this list takes
+     its natural height, so position-by-index already tracks position-by-
+     scroll-distance closely enough that the eye never catches a mismatch. */
+  const [reached, setReached] = useState(reduceMotion ? steps.length - 1 : -1);
+  useMotionValueEvent(scrollYProgress, "change", (p) => {
+    if (reduceMotion) return;
+    const step = 1 / (steps.length - 1);
+    let next = -1;
+    for (let i = 0; i < steps.length; i++) if (i * step <= p) next = i;
+    setReached((prev) => (prev === next ? prev : next));
+  });
+
+  return (
+    <div ref={railRef} className="relative">
+      <ol className="relative flex flex-col">
+        <span aria-hidden className="pipe-v-rail" />
+        <motion.span
+          aria-hidden
+          className="pipe-v-rail-lit"
+          style={{ scaleY: reduceMotion ? 1 : fill }}
+        />
+        {steps.map((step, i) => (
+          <PipeVerticalStage
+            key={step.title}
+            step={step}
+            index={i}
+            lit={reduceMotion || i <= reached}
+          />
+        ))}
+      </ol>
+    </div>
+  );
+}
+
+function PipeVerticalStage({
+  step,
+  index,
+  lit,
+}: {
+  step: Step;
+  index: number;
+  lit: boolean;
+}) {
+  const reduceMotion = useReducedMotion();
+
+  return (
+    <li className="pipe-v-stage" data-lit={lit || undefined}>
+      <span aria-hidden className="pipe-v-node">
+        <motion.span
+          className="pipe-v-node-ring"
+          initial={false}
+          animate={{ scale: lit ? 1 : 0, opacity: lit ? 1 : 0 }}
+          transition={
+            reduceMotion
+              ? { duration: 0 }
+              : { type: "spring", stiffness: 300, damping: 24 }
+          }
+        />
+        <span className="pipe-v-node-index">{String(index + 1).padStart(2, "0")}</span>
+      </span>
+
+      <div className="pipe-v-card">
+        <p className="pipe-v-question">{step.question}</p>
+        <h3 className="pipe-v-title">{step.title}</h3>
+        <p className="pipe-v-body">{step.body}</p>
+      </div>
+    </li>
   );
 }
